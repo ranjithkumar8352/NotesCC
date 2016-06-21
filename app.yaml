@@ -1,0 +1,33 @@
+runtime: python27
+threadsafe: true
+api_version: 1
+
+builtins:
+- remote_api: on
+
+inbound_services:
+- warmup
+
+handlers:
+# The endpoints handler must be mapped to /_ah/spi.
+# Apps send requests to /_ah/api, but the endpoints service handles mapping
+# those requests to /_ah/spi.
+- url: /_ah/spi/.*
+  script: api.apiLists
+- url: /img
+  script: main.app
+
+libraries:
+- name: pycrypto
+  version: 2.6
+- name: endpoints
+  version: 1.0
+- name: ssl
+  version: latest
+- name: webapp2
+  version: "2.5.2" 
+
+skip_files:
+- ^(.*/)?.*\.py[co]$
+- ^venv$
+- ^test$

@@ -1,0 +1,41 @@
+college1
+	profile1 CSE A
+		ADMIN
+			course2 ECE A
+			course6 CSE A
+		SUBSCRIBED
+			course1
+			course3
+	profile2 CSE A
+		ADMIN
+			course1 CSE A
+			course3 CSE A
+		SUBSCRIBED
+			course6
+	profile3 ECE A
+
+college2
+	profile4 CSE A
+		course4 CSE A
+	profile5 CSE A
+		course5 CSE A
+	profile 6 ECE A
+
+college3
+
+
+
+college4
+
+notes1, notes2
+	profile1 course1
+	bookmark by profile 2
+
+notes3
+	profile2, course6
+	rated by profile1
+
+assignment1
+	profile 2 course6
+assignment2 
+	profile 1 course1
