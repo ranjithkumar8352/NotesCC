@@ -6,15 +6,22 @@ import datetime
 
 class ImageUpload(webapp2.RequestHandler):
     def post(self):
+
         urlList = []
         file = self.request.POST.getall('file')
         profileId = self.request.get('profileId')
+
         courseId = self.request.get('courseId')
+
         title = self.request.get('title')
+
         desc = self.request.get('desc')
+        print len(file)
+        print "_____________________________________________________-"
         type = self.request.get('type')
         bucketName = "/uploadnotes-2016.appspot.com"
         for file in self.request.POST.getall('file'):
+
             timestamp = str(datetime.datetime.now())
             fileName = bucketName + '/' + courseId + '/' + profileId + '/' + timestamp + '.jpg'
             gcsFile = gcs.open(fileName, mode='w', content_type='image/jpeg', options={'x-goog-acl': 'public-read'})
@@ -32,6 +39,10 @@ class ImageUpload(webapp2.RequestHandler):
             header = {'Content-Type':  'application/json; charset=UTF-8'}
             req = urllib2.Request(url, json.dumps(data), header)
             response = urllib2.urlopen(req)
+            response = json.loads(response.read())
+            key = response.get('key')
+            redirectUrl = str('https://salty-forest-16158.herokuapp.com/notebook?id=')+str(key)
+            self.redirect(redirectUrl)
         if type == 'assignment':
             dueDate = self.request.get('dueDate')
             dueTime = self.request.get('dueTime')
@@ -40,6 +51,10 @@ class ImageUpload(webapp2.RequestHandler):
             header = {'Content-Type':  'application/json; charset=UTF-8'}
             req = urllib2.Request(url, json.dumps(data), header)
             response = urllib2.urlopen(req)
+            response = json.loads(response.read())
+            key = response.get('key')
+            redirectUrl = str('https://salty-forest-16158.herokuapp.com/assignment?id=')+str(key)
+            self.redirect(redirectUrl)
         if type == 'exam':
             dueDate = self.request.get('dueDate')
             dueTime = self.request.get('dueTime')
@@ -48,8 +63,11 @@ class ImageUpload(webapp2.RequestHandler):
             header = {'Content-Type':  'application/json; charset=UTF-8'}
             req = urllib2.Request(url, json.dumps(data), header)
             response = urllib2.urlopen(req)
-        
-        
+            response = json.loads(response.read())
+            key = response.get('key')
+            redirectUrl = str('https://salty-forest-16158.herokuapp.com/exam?id=')+str(key)
+            self.redirect(redirectUrl)
+    
     def get(self):
         self.response.write("""<html>
 <head>

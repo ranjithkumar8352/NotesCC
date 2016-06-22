@@ -1034,6 +1034,8 @@ def deleteNoteBook(request, id=None):
     uploader = noteBook.uploaderId.get()
     uploader.uploadedNoteBookIds.remove(noteBookId)
     bookmarkedProfiles = Profile.query(Profile.bookmarkedNoteBookIds==noteBookId).fetch()
+    course.put()
+    uploader.put()
     for profileR in bookmarkedProfiles:
         profile = profileR.key.get()
         profile.bookmarkedNoteBookIds.remove(noteBookId)
@@ -1048,6 +1050,7 @@ def deleteNotes(request):
     noteBook = noteBookId.get()
     noteBook.notesIds.remove(notesId)
     noteBook.frequency -= 1
+    noteBook.put()
     if noteBook.frequency == 0:
         deleteNoteBook(id=noteBookId)
 
@@ -1060,6 +1063,7 @@ def deleteAssignment(request, id=None):
     assignment = assignmentId.get()
     course = assignment.courseId.get()
     course.assignmentIds.remove(assignmentId)
+    course.put()
     assignmentId.delete()
 
 
@@ -1068,10 +1072,22 @@ def deleteExam(request, id=None):
         examId = id
     else:
         examId = ndb.Key(urlsafe=getattr(request, 'examId'))
-        
-"""def deleteProfile(request):
+    exam = examId.get()
+    course = exam.courseId.get()
+    course.examIds.remove(examId)
+    course.put()
+    examId.delete()
+
+
+def deleteProfile(request):
     profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     profile = profile.get()
     for noteBookId in profile.uploadedNoteBookIds:
         deleteNoteBook(id=noteBookId)
-    for"""
+    for courseId in profile.administeredCourseIds:
+        course = couseId.get()
+        if len(course.adminIds) == 1:
+            if len(course.studentIds) == 1:
+                return Response(resource=1, description="No admins")
+            course.adminId.append(course.studentIds[0])
+            newAdmin = course.admin
