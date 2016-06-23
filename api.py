@@ -1,18 +1,15 @@
-from datetime import datetime
-
 import endpoints
 from protorpc import messages, message_types, remote
-from google.appengine.ext import ndb
 
 from models import CollegeForm, CourseForm, ProfileForm
 from models import NotesForm, Response, AssignmentForm, SubscribeCourseRequest
 from models import CourseListRequest, CourseListResponse, FeedResponse
 from models import ProfileIdRequest, TimeTableResponse, StudentListResponse
 from models import ExamForm, GetAssignmentRequest, GetAssignmentResponse
-from models import GetExamRequest, GetExamResponse, NotesForm, NoteBookRequest
+from models import GetExamRequest, GetExamResponse, NoteBookRequest
 from models import NoteBookDetailResponse, NoteBookListRequest
 from models import NoteBookListResponse, RatingRequest, CoursePageRequest
-from models import CoursePageResponse, GetExamListResponse, GetAssListResponse
+from models import CoursePageResponse, GetExamListResponse, GetAssListResponse, DeleteRequest
 from models import BookmarkRequest, CollegeListResponse, AddBranchRequest
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
@@ -23,6 +20,7 @@ from apiMethods import createNotesMethod, getNoteBook, getNoteBookListMethod
 from apiMethods import rateThisMethod, coursePageMethod
 from apiMethods import getAssignmentListMethod, getExamListMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
+from apiMethods import deleteMethod
 #from test import testScript
 #from apiMethods import createExamMethod
 #, createNoteBookMethod
@@ -265,6 +263,15 @@ class NotesAPI(remote.Service):
         addBranchMethod(request)
         return message_types.VoidMessage()
 
+    @endpoints.method(
+        DeleteRequest,
+        Response,
+        path='delete',
+        http_method='POST',
+        name='delete')
+    def delete(self, request):
+        return deleteMethod(request)
+        
     """@endpoints.method(
         message_types.VoidMessage,
         message_types.VoidMessage,

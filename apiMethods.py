@@ -990,12 +990,12 @@ def addBranchMethod(request):
     college.put()
 
 
-def deleteNoteBook(request, id=None):
-    if id:
-        noteBookId = id
-    else:
-        noteBookId = ndb.Key(urlsafe=getattr(request, 'noteBookId'))
+def deleteNoteBook(id, delNotes=0):
+    noteBookId = ndb.Key(urlsafe=id)
     noteBook = noteBookId.get()
+    if delNotes == 0:
+        for notesId in noteBook.notesIds:
+            notesId.delete()
     course = noteBook.courseId.get()
     course.noteBookIds.remove(noteBookId)
     uploader = noteBook.uploaderId.get()
@@ -1008,10 +1008,11 @@ def deleteNoteBook(request, id=None):
         profile.bookmarkedNoteBookIds.remove(noteBookId)
         profile.put()
     noteBookId.delete()
+    return Response(response=0, description="OK")
 
 
-def deleteNotes(request):
-    notesId = ndb.Key(urlsafe=getattr(request, 'notesId'))
+def deleteNotes(id):
+    notesId = ndb.Key(urlsafe=id)
     notes = notesId.get()
     noteBookId = notes.noteBookId
     noteBook = noteBookId.get()
@@ -1019,42 +1020,96 @@ def deleteNotes(request):
     noteBook.frequency -= 1
     noteBook.put()
     if noteBook.frequency == 0:
-        deleteNoteBook(id=noteBookId)
+        deleteNoteBook(noteBookId.urlsafe(), delNotes=1)
+    return Response(response=0, description="OK")
 
 
-def deleteAssignment(request, id=None):
-    if id:
-        assignmentId = id
-    else:
-        assignmentId = ndb.Key(urlsafe=getattr(request, 'assignmentId'))
+def deleteAssignment(id):
+    assignmentId = ndb.Key(urlsafe=id)
     assignment = assignmentId.get()
     course = assignment.courseId.get()
     course.assignmentIds.remove(assignmentId)
     course.put()
     assignmentId.delete()
+    return Response(response=0, description="OK")
 
 
-def deleteExam(request, id=None):
-    if id:
-        examId = id
-    else:
-        examId = ndb.Key(urlsafe=getattr(request, 'examId'))
+def deleteExam(id):
+    examId = ndb.Key(urlsafe=id)
     exam = examId.get()
     course = exam.courseId.get()
     course.examIds.remove(examId)
     course.put()
     examId.delete()
+    return Response(response=0, description="OK")
 
 
-def deleteProfile(request):
-    profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
+def deleteProfile(id):
+    profileId = ndb.Key(urlsafe=id)
     profile = profileId.get()
+    college = profile.collegeId.get()
+    college.studentCount -= 0
     for noteBookId in profile.uploadedNoteBookIds:
-        deleteNoteBook(id=noteBookId)
+        deleteNoteBook(noteBookId.urlsafe())
+    assUploadedList = Assignment.query(Assignment.uploaderId == profileId).fetch()
+    for assignment in assUploadedList:
+        print "6"
+        assignmentId = assignment.key
+        deleteAssignment(assignmentId.urlsafe())
+    examUploadedList = Exam.query(Exam.uploaderId == profileId).fetch()
+    for exam in examUploadedList:
+        print "7"
+        examId = exam.key
+        deleteExam(examId.urlsafe())
     for courseId in profile.administeredCourseIds:
         course = courseId.get()
         if len(course.adminIds) == 1:
             if len(course.studentIds) == 1:
-                return Response(resource=1, description="No admins")
-            course.adminId.append(course.studentIds[0])
-            newAdmin = course.admin
+                return Response(response=1, description="No admins")
+            course.adminIds.append(course.studentIds[0])
+            newAdmin = course.adminIds[0]
+            newAdmin.administeredCourseIds.append(courseId)
+            newAdmin.put()
+        if profileId in course.studentIds:
+            course.studentIds.remove(profileId)
+            course.put()
+    profileId.delete()
+    return Response(response=0, description="OK")
+
+
+def deleteCourseId(id):
+    courseId = ndb.Key(urlsafe=id)
+    course = courseId.get()
+    for noteBookId in course.noteBookIds:
+        deleteNoteBook(noteBookId.urlsafe())
+    for assignmentId in course.assignmentIds:
+        deleteAssignment(assignmentId)
+    for examId in course.examIds:
+        deleteExam(examId)
+
+
+def deleteMethod(request):
+    profileId = getattr(request, 'profileId', None)
+    notesId = getattr(request, 'notesId', None)
+    noteBookId = getattr(request, 'noteBookId', None)
+    assignmentId = getattr(request, 'assignmentId', None)
+    examId = getattr(request, 'examId', None)
+    courseId = getattr(request, 'courseId', None)
+    if profileId:
+        print "1"
+        return deleteProfile(profileId)
+    if notesId:
+        print "2"
+        return deleteNotes(notesId)
+    if noteBookId:
+        print "3"
+        return deleteNoteBook(noteBookId)
+    if assignmentId:
+        print "4"
+        return deleteAssignment(assignmentId)
+    if examId:
+        print "5"
+        return deleteExam(examId)
+    if courseId:
+        print "6"
+        return deleteCourse(courseId)

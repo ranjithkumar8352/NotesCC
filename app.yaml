@@ -31,5 +31,5 @@ libraries:
 
 skip_files:
 - ^(.*/)?.*\.py[co]$
-- ^venv$
-- ^test$
+- ^venv/*
+- ^.git/*

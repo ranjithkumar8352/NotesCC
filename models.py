@@ -474,3 +474,11 @@ class CollegeListResponse(messages.Message):
 class AddBranchRequest(messages.Message):
     collegeId = messages.StringField(1)
     branchName = messages.StringField(2)
+
+
+class DeleteRequest(messages.Message):
+    profileId = messages.StringField(1)
+    notesId = messages.StringField(2)
+    noteBookId = messages.StringField(3)
+    assignmentId = messages.StringField(4)
+    examId = messages.StringField(5)
