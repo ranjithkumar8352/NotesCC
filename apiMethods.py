@@ -1,6 +1,6 @@
 import datetime
 
-from models import College, Course, Profile, ProfileForm
+from models import College, Course, Profile
 from models import Response, FeedCourseResponse, CourseListResponse, FeedResponse
 from models import TTCourseResponse, TimeTableResponse, StudentResponse
 from models import StudentListResponse, Assignment, Exam, CourseResponse
