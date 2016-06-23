@@ -16,6 +16,8 @@ handlers:
   script: api.apiLists
 - url: /img
   script: main.app
+- url: /imgandroid
+  script: main.app
 
 libraries:
 - name: pycrypto

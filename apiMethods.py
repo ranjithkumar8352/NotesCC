@@ -1,6 +1,6 @@
-import datetime, json, pickle
+import datetime
 
-from models import College, Course, Profile, ProfileForm, AssignmentForm
+from models import College, Course, Profile, ProfileForm
 from models import Response, FeedCourseResponse, CourseListResponse, FeedResponse
 from models import TTCourseResponse, TimeTableResponse, StudentResponse
 from models import StudentListResponse, Assignment, Exam, CourseResponse
@@ -20,7 +20,7 @@ def createCollegeMethod(request):
     abbreviation = getattr(request, 'abbreviation')
     location = getattr(request, 'location')
     collegeType = getattr(request, 'collegeType', None)
-    semStartDate = getattr(request, 'semStartDate', None)   
+    semStartDate = getattr(request, 'semStartDate', None)
     semEndDate = getattr(request, 'semEndDate', None)
     branchNameList = getattr(request, 'branchNameList', None)
     queryString = ndb.AND(College.collegeName == collegeName,
@@ -1012,15 +1012,6 @@ def addBranchMethod(request):
     college.put()
 
 
-"""def collegeListMethod(request):
-    allCollege = College.query().fetch()
-    collegeList = {}
-    for col in allCollege:
-        collegeId = col.key
-        college = collegeId.get()
-        collegeDetail = {'collegeName': college.collegeName, 'branchNames':college.branchNameList}
-        collegeList[collegeId.urlsafe()] = collegeDetail
-    return CollegeListResponse(list=pickle.dumps(collegeList))A"""
 
 
 def deleteNoteBook(request, id=None):
