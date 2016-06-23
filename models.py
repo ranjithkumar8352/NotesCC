@@ -144,7 +144,7 @@ class FeedCourseResponse(messages.Message):
 
 
 class FeedResponse(messages.Message):
-    collegeId = messages.Message(8)
+    collegeId = messages.StringField(8)
     response = messages.IntegerField(1)
     description = messages.StringField(2)
     profileName = messages.StringField(3)
