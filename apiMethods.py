@@ -257,10 +257,11 @@ def feedMethod(request):
     subscribedCourseIds = profile.subscribedCourseIds
     availableCourseList = feedCourseResponse(availableCourseIds)
     subscribedCourseList = feedCourseResponse(subscribedCourseIds)
+    collegeId = profile.collegeId
     return FeedResponse(response=0, description="OK", profileName=profileName,
                         points=points, photoUrl=photoUrl,
                         availableCourseList=availableCourseList,
-                        subscribedCourseList=subscribedCourseList)
+                        subscribedCourseList=subscribedCourseList, collegeId=collegeId.urlsafe())
 
 
 def feedCourseResponse(courseIds):
