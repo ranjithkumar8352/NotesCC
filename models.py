@@ -121,7 +121,6 @@ class CourseResponse(messages.Message):
     studentCount = messages.IntegerField(7)
     professorName = messages.StringField(8)
     notesCount = messages.IntegerField(9)
-    completed = messages.IntegerField(10)
     semester = messages.StringField(12)
 
 
@@ -482,3 +481,7 @@ class DeleteRequest(messages.Message):
     noteBookId = messages.StringField(3)
     assignmentId = messages.StringField(4)
     examId = messages.StringField(5)
+
+
+class SearchCourseRequest(messages.Message):
+    searchString = messages.StringField(1)

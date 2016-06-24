@@ -11,6 +11,8 @@ from models import NoteBookDetailResponse, NoteBookListRequest
 from models import NoteBookListResponse, RatingRequest, CoursePageRequest
 from models import CoursePageResponse, GetExamListResponse, GetAssListResponse, DeleteRequest
 from models import BookmarkRequest, CollegeListResponse, AddBranchRequest
+from models import SearchCourseRequest
+from searchAPI import searchCourseMethod
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
 from apiMethods import courseListMethod, feedMethod, addAdminMethod
@@ -21,6 +23,7 @@ from apiMethods import rateThisMethod, coursePageMethod
 from apiMethods import getAssignmentListMethod, getExamListMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
 from apiMethods import deleteMethod
+from searchAPI import createCourseDoc
 #from test import testScript
 #from apiMethods import createExamMethod
 #, createNoteBookMethod
@@ -53,7 +56,9 @@ class NotesAPI(remote.Service):
         http_method='POST',
         name='addCourse')
     def addCourse(self, request):
-        return addCourseMethod(request)
+        response = addCourseMethod(request)
+        createCourseDoc(request, response.key)
+        return response
 
     @endpoints.method(
         SubscribeCourseRequest,
@@ -271,7 +276,16 @@ class NotesAPI(remote.Service):
         name='delete')
     def delete(self, request):
         return deleteMethod(request)
-        
+
+    @endpoints.method(
+        SearchCourseRequest,
+        CourseListResponse,
+        path='searchCourse',
+        http_method='POST',
+        name='searchCourse')
+    def search(self, request):
+        return searchCourseMethod(request)
+
     """@endpoints.method(
         message_types.VoidMessage,
         message_types.VoidMessage,
