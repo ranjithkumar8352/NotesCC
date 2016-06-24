@@ -11,8 +11,7 @@ from models import NoteBookDetailResponse, NoteBookListRequest
 from models import NoteBookListResponse, RatingRequest, CoursePageRequest
 from models import CoursePageResponse, GetExamListResponse, GetAssListResponse, DeleteRequest
 from models import BookmarkRequest, CollegeListResponse, AddBranchRequest
-from models import SearchCourseRequest, BookmarkResponse
-from searchAPI import searchCourseMethod
+from models import SearchCourseRequest, BookmarkResponse, SearchNBRequest
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
 from apiMethods import courseListMethod, feedMethod, addAdminMethod
@@ -23,10 +22,7 @@ from apiMethods import rateThisMethod, coursePageMethod
 from apiMethods import getAssignmentListMethod, getExamListMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
 from apiMethods import deleteMethod
-from searchAPI import createCourseDoc
-#from test import testScript
-#from apiMethods import createExamMethod
-#, createNoteBookMethod
+from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 
 
 @endpoints.api(name='notesapi', version='v1')
@@ -57,7 +53,8 @@ class NotesAPI(remote.Service):
         name='addCourse')
     def addCourse(self, request):
         response = addCourseMethod(request)
-        createCourseDoc(request, response.key)
+        if response.response == 0:
+            createCourseDoc(request, response.key)
         return response
 
     @endpoints.method(
@@ -283,8 +280,26 @@ class NotesAPI(remote.Service):
         path='searchCourse',
         http_method='POST',
         name='searchCourse')
-    def search(self, request):
+    def searchCourse(self, request):
         return searchCourseMethod(request)
+
+    @endpoints.method(
+        SearchNBRequest,
+        NoteBookListResponse,
+        path='searchNotes',
+        http_method='POST',
+        name='searchNotes')
+    def searchNotes(self, request):
+        return searchNBMethod(request)
+
+    """@endpoints.method(
+        SearchNBRequest,
+        NoteBookListResponse,
+        path='searchNoteBook',
+        http_method='POST',
+        name='searchNoteBook')
+    def searchNB(self, request):
+        return searchNBMethod(request)"""
 
     """@endpoints.method(
         message_types.VoidMessage,

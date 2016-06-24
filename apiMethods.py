@@ -10,7 +10,7 @@ from models import NoteBookResponse, CoursePageResponse, AssExamResponse
 from models import AssignmentResponse, ExamResponse, GetAssListResponse
 from models import GetExamListResponse, CollegeListResponse, CollegeDetails
 from models import BookmarkResponse
-
+from searchAPI import createNBDoc
 from google.appengine.ext import ndb
 
 
@@ -25,7 +25,6 @@ def createCollegeMethod(request):
     queryString = ndb.AND(College.collegeName == collegeName,
                           College.location == location)
     collegeSameDetails = College.query(queryString).fetch()
-    print collegeSameDetails
     if collegeSameDetails:
         return Response(response=1, description="College Already Exists")
     else:
@@ -510,11 +509,13 @@ def createNotesMethod(request):
     if noteBookResult:
         for noteBook in noteBookResult:
             addToNoteBook(noteBook.key, newNotes)
+            createNBDoc(title, notesDesc, date, noteBook.key.urlsafe())
             return Response(response=0, description="OK",
                             key=noteBook.key.urlsafe())
     else:
         noteBookId = createNoteBook(profileId, courseId)
         addToNoteBook(noteBookId, newNotes)
+        createNBDoc(title, notesDesc, date, noteBookId.urlsafe())
         return Response(response=0, description="OK", key=noteBookId.urlsafe())
 
 
@@ -599,7 +600,6 @@ def getNoteBook(request):
 
 def getNoteBookListMethod(request):
     noteBookIds = getattr(request, 'noteBookIds', None)
-    print noteBookIds
     bpid = getattr(request, 'bpid', None)
     upid = getattr(request, 'upid', None)
     courseId = getattr(request, 'courseId', None)
@@ -650,7 +650,6 @@ def getNoteBookListMethod(request):
                                    lastUpdated=noteBook.lastUpdated)
             noteBookList.append(new)
     elif upid:
-        print upid
         try:
             profileId = ndb.Key(urlsafe=upid)
         except Exception:
@@ -890,7 +889,6 @@ def getExamListMethod(request):
         examList = []
         for courseId in profile.subscribedCourseIds:
             course = courseId.get()
-            print course.courseName
             for examId in course.examIds:
                 exam = examId.get()
                 if profileId == exam.uploaderId:
@@ -1065,12 +1063,10 @@ def deleteProfile(id):
         deleteNoteBook(noteBookId.urlsafe())
     assUploadedList = Assignment.query(Assignment.uploaderId == profileId).fetch()
     for assignment in assUploadedList:
-        print "6"
         assignmentId = assignment.key
         deleteAssignment(assignmentId.urlsafe())
     examUploadedList = Exam.query(Exam.uploaderId == profileId).fetch()
     for exam in examUploadedList:
-        print "7"
         examId = exam.key
         deleteExam(examId.urlsafe())
     for courseId in profile.administeredCourseIds:
@@ -1108,20 +1104,14 @@ def deleteMethod(request):
     examId = getattr(request, 'examId', None)
     courseId = getattr(request, 'courseId', None)
     if profileId:
-        print "1"
         return deleteProfile(profileId)
     if notesId:
-        print "2"
         return deleteNotes(notesId)
     if noteBookId:
-        print "3"
         return deleteNoteBook(noteBookId)
     if assignmentId:
-        print "4"
         return deleteAssignment(assignmentId)
     if examId:
-        print "5"
         return deleteExam(examId)
     if courseId:
-        print "6"
         return deleteCourse(courseId)

@@ -492,3 +492,7 @@ class BookmarkResponse(messages.Message):
     response = messages.IntegerField(1)
     description = messages.StringField(2)
     bookmarkStatus = messages.IntegerField(3)
+
+
+class SearchNBRequest(messages.Message):
+    searchString = messages.StringField(1)
