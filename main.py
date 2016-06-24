@@ -33,7 +33,7 @@ class ImageUploadWeb(webapp2.RequestHandler):
         except Exception:
             print "desc Missing in request"
             return self.response.write("desc Missing in request")
-        print "Number of files to be uploaded" + str(len(file))
+        print "Number of files to be uploaded" + str(len(fileList))
         try:
             type = self.request.get('type')
         except Exception:
