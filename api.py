@@ -11,7 +11,7 @@ from models import NoteBookDetailResponse, NoteBookListRequest
 from models import NoteBookListResponse, RatingRequest, CoursePageRequest
 from models import CoursePageResponse, GetExamListResponse, GetAssListResponse, DeleteRequest
 from models import BookmarkRequest, CollegeListResponse, AddBranchRequest
-from models import SearchCourseRequest
+from models import SearchCourseRequest, BookmarkResponse
 from searchAPI import searchCourseMethod
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
@@ -232,7 +232,7 @@ class NotesAPI(remote.Service):
 
     @endpoints.method(
         BookmarkRequest,
-        Response,
+        BookmarkResponse,
         path='bookmarkNoteBook',
         http_method='POST',
         name='bookmarkNoteBook')

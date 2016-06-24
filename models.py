@@ -371,6 +371,7 @@ class NoteBookDetailResponse(messages.Message):
     notes = messages.MessageField(NotesResponse, 9, repeated=True)
     response = messages.IntegerField(10)
     description = messages.StringField(11)
+    bookmarkStatus = messages.IntegerField(13)
 
 
 class NoteBookListRequest(messages.Message):
@@ -485,3 +486,9 @@ class DeleteRequest(messages.Message):
 
 class SearchCourseRequest(messages.Message):
     searchString = messages.StringField(1)
+
+
+class BookmarkResponse(messages.Message):
+    response = messages.IntegerField(1)
+    description = messages.StringField(2)
+    bookmarkStatus = messages.IntegerField(3)

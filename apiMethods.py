@@ -9,6 +9,7 @@ from models import NotesResponse, NoteBookDetailResponse, NoteBookListResponse
 from models import NoteBookResponse, CoursePageResponse, AssExamResponse
 from models import AssignmentResponse, ExamResponse, GetAssListResponse
 from models import GetExamListResponse, CollegeListResponse, CollegeDetails
+from models import BookmarkResponse
 
 from google.appengine.ext import ndb
 
@@ -558,6 +559,11 @@ def getNoteBook(request):
         isAuthor = 1
     else:
         isAuthor = 0
+    profile = profileId.get()
+    if noteBookId in profile.bookmarkedNoteBookIds:
+        bookmarkStatus = 1
+    else:
+        bookmarkStatus = 0
     noteBookUploader = noteBook.uploaderId.get()
     course = noteBook.courseId.get()
     uploaderName = noteBookUploader.profileName
@@ -586,7 +592,8 @@ def getNoteBook(request):
                                   lastUpdated=lastUpdated, views=views,
                                   rated=rated, frequency=frequency,
                                   pages=pages, totalRating=totalRating,
-                                  notes=notesList, response=0,
+                                  notes=notesList, bookmarkStatus=bookmarkStatus,
+                                  response=0,
                                   description="OK")
 
 
@@ -933,15 +940,20 @@ def bookmarkMethod(request):
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
-        return Response(response=1, description="Invalid profileId")
+        return BookmarkResponse(response=1, description="Invalid profileId")
     try:
         noteBookId = ndb.Key(urlsafe=getattr(request, 'noteBookId'))
     except Exception:
-        return Response(response=1, description="Invalid noteBookId")
+        return BookmarkResponse(response=1, description="Invalid noteBookId")
     profile = profileId.get()
-    profile.bookmarkedNoteBookIds.append(noteBookId)
+    if noteBookId in profile.bookmarkedNoteBookIds:
+        profile.bookmarkedNoteBookIds.remove(noteBookId)
+        status = 0
+    else:
+        profile.bookmarkedNoteBookIds.append(noteBookId)
+        status = 1
     profile.put()
-    return Response(response=0, description="OK")
+    return BookmarkResponse(response=0, description="OK", bookmarkStatus=status)
 
 
 def clearAll():
