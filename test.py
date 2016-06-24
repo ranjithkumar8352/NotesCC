@@ -4,11 +4,12 @@ from apiclient.discovery import build
 
 
 def main():
-    apiRoot = 'https://uploadnotes-2016.appspot.com/_ah/api'
+    apiRoot = 'https://uploadingtest-1344.appspot.com/_ah/api'
     api = 'notesapi'
     version = 'v1'
     discovery_url = '%s/discovery/v1/apis/%s/%s/rest' % (apiRoot, api, version)
     service = build(api, version, discoveryServiceUrl=discovery_url)
+    service.clearAll().execute()
     # _______________________________________COLLEGE CREATION________________________________________
     collegeIdList = []
     collegeList = []
@@ -249,4 +250,15 @@ def main():
     print "examId"
     print examIdList
     print " "
+
+    for assignmentId in assignmentIdList:
+        service.delete(body={'assignmentId': assignmentId}).execute()
+    for examId in examIdList:
+        service.delete(body={'examId': examId}).execute()
+    for noteBookId in noteBookIdList:
+        service.delete(body={'noteBookId': noteBookId}).execute()
+    for courseId in courseIdList:
+        service.delete(body={'courseId': courseId}).execute()
+    for profileId in profileIdList:
+        service.delete(body={'profileId': profileId}).execute()
 main()

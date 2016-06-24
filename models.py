@@ -482,6 +482,7 @@ class DeleteRequest(messages.Message):
     noteBookId = messages.StringField(3)
     assignmentId = messages.StringField(4)
     examId = messages.StringField(5)
+    courseId = messages.StringField(6)
 
 
 class SearchCourseRequest(messages.Message):
