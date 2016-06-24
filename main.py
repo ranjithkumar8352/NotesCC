@@ -41,7 +41,7 @@ class ImageUploadWeb(webapp2.RequestHandler):
             return self.response.write("type Missing in request")
         bucketName = "/uploadnotes-2016.appspot.com"
         try:
-            for file in fileList('file'):
+            for file in fileList:
                 timestamp = str(datetime.datetime.now())
                 fileName = bucketName + '/' + courseId + '/' + profileId + '/' + timestamp + '.jpg'
                 gcsFile = gcs.open(fileName, mode='w', content_type='image/jpeg', options={'x-goog-acl': 'public-read'})
@@ -190,7 +190,7 @@ class ImageUploadAndroid(webapp2.RequestHandler):
         print len(file)
         type = self.request.get('type')
         bucketName = "/uploadnotes-2016.appspot.com"
-        for file in self.request.POST.getall('file'):
+        for file in fileList:
 
             timestamp = str(datetime.datetime.now())
             fileName = bucketName + '/' + courseId + '/' + profileId + '/' + timestamp + '.jpg'
