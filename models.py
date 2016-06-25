@@ -140,6 +140,7 @@ class FeedCourseResponse(messages.Message):
     date = messages.StringField(5, repeated=True)
     startTime = messages.StringField(6, repeated=True)
     endTime = messages.StringField(7, repeated=True) 
+    professorName = messages.StringField(9)
 
 
 class FeedResponse(messages.Message):
@@ -435,6 +436,7 @@ class CoursePageResponse(messages.Message):
     examList = messages.MessageField(AssExamResponse, 11, repeated=True)
     assignmentList = messages.MessageField(AssExamResponse, 12, repeated=True)
     studentCount = messages.IntegerField(13)
+    professorName = messages.StringField(15)
 
 
 class BookmarkRequest(messages.Message):
@@ -474,6 +476,11 @@ class CollegeListResponse(messages.Message):
 class AddBranchRequest(messages.Message):
     collegeId = messages.StringField(1)
     branchName = messages.StringField(2)
+
+
+class UnsubscribeCourseRequest(messages.Message):
+    profileId = messages.StringField(1)
+    courseId = messages.StringField(2)
 
 
 class DeleteRequest(messages.Message):

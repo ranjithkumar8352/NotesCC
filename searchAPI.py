@@ -41,8 +41,11 @@ def searchCourseMethod(request):
     courseList = []
     for doc in results:
         key = doc.doc_id
+        print key
         courseId = ndb.Key(urlsafe=key)
+        print courseId
         course = courseId.get()
+        print course
         courseResponse = CourseResponse(courseId=key, courseName=course.courseName,
                                         batchNames=course.batchNames, branchNames=course.branchNames,
                                         sectionNames=course.sectionNames, studentCount=len(course.studentIds),

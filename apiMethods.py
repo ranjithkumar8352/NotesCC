@@ -13,6 +13,7 @@ from models import BookmarkResponse
 from searchAPI import createNBDoc
 
 from google.appengine.ext import ndb
+from google.appengine.api import search
 
 
 def createCollegeMethod(request):
@@ -276,11 +277,11 @@ def feedMethod(request):
     try:
         availableCourseList = feedCourseResponse(availableCourseIds)
     except Exception, E:
-        return FeedResponse(response=1, description=E + ' in availableCourses')
+        return FeedResponse(response=1, description=' in availableCourses')
     try:
         subscribedCourseList = feedCourseResponse(subscribedCourseIds)
     except Exception, E:
-        return FeedResponse(response=1, description=E + ' in subscribedCourses')
+        return FeedResponse(response=1, description=' in subscribedCourses')
     collegeId = profile.collegeId
     return FeedResponse(response=0, description="OK", profileName=profileName,
                         points=points, photoUrl=photoUrl,
@@ -346,7 +347,8 @@ def feedCourseResponse(courseIds):
                                                dueExams=dueExams, date=course.date,
                                                startTime=course.startTime,
                                                endTime=course.endTime,
-                                               recentNotes=recentNotes))
+                                               recentNotes=recentNotes,
+                                               professorName=course.professorName))
     return responseList
 
 
@@ -601,7 +603,7 @@ def createNotesMethod(request):
             try:
                 addToNoteBook(noteBook.key, newNotes)
             except Exception, E:
-                return Response(response=1, description=E)
+                return Response(response=1, description=str(E))
             createNBDoc(title, notesDesc, date, noteBook.key.urlsafe())
             return Response(response=0, description="OK",
                             key=noteBook.key.urlsafe())
@@ -610,7 +612,7 @@ def createNotesMethod(request):
             noteBookId = createNoteBook(profileId, courseId)
             addToNoteBook(noteBookId, newNotes)
         except Exception, E:
-            return Response(response=1, description=E)
+            return Response(response=1, description=str(E))
         createNBDoc(title, notesDesc, date, noteBookId.urlsafe())
         return Response(response=0, description="OK", key=noteBookId.urlsafe())
 
@@ -638,7 +640,6 @@ def createNoteBook(profileId, courseId):
     course.noteBookIds.append(noteBookId)
     course.put()
     return noteBookId
-
 
 def addToNoteBook(noteBookId, newNotes):
     """addToNoteBook(noteBookId, newNotes)
@@ -1005,7 +1006,7 @@ def coursePageMethod(request):
                               courseName=course.courseName, date=course.date, startTime=course.startTime,
                               endTime=course.endTime, examCount=dueExams, assignmentCount=dueAssignments,
                               notesCount=recentNotes, examList=examList, assignmentList=assignmentList,
-                              studentCount=studentCount)
+                              studentCount=studentCount, professorName=course.professorName)
 
 
 def getAssignmentListMethod(request):
@@ -1175,6 +1176,18 @@ def clearAll():
     examList = Exam.query().fetch()
     for exam in examList:
         exam.key.delete()
+    idx = [search.Index('Course'), search.Index('NoteBook')]
+    for index in idx:
+        ids = []
+        results = index.search("NOT zoo")
+        print results
+        for doc in results:
+            key = doc.doc_id
+            ids.append(key)
+        index.delete(ids)
+    results = search.Index('Course').search("NOT zoo")
+    print "____"
+    print results
 
 
 def collegeListMethod(request):
@@ -1197,6 +1210,30 @@ def addBranchMethod(request):
     if branchName not in college.branchNameList:
         college.branchNameList.append(branchName)
     college.put()
+
+
+def unsubscribeCourseMethod(request):
+    try:
+        profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
+    except Exception, E:
+        return Response(response=1, description="Invaild profileId"+E)
+    try:
+        courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
+    except Exception, E:
+        return Response(response=1, description="Invaild courseId"+E)
+    profile = profileId.get()
+    course = courseId.get()
+    if profile is None:
+        return Response(response=1, description="Invaild profileId")
+    if course is None:
+        return Response(response=1, description="Invaild courseId")
+    if courseId in profile.subscribedCourseIds:
+        profile.subscribedCourseIds.remove(courseId)
+        profile.put()
+    if profileId in course.studentIds:
+        course.studentIds.remove(profileId)
+        course.put()
+    return Response(response=0, description="OK")
 
 
 def deleteNoteBook(id, delNotes=0):

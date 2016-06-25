@@ -71,7 +71,8 @@ class ImageUploadWeb(webapp2.RequestHandler):
             response = urllib2.urlopen(req)
             response = json.loads(response.read())
             key = response.get('key')
-            redirectUrl = str('https://salty-forest-16158.herokuapp.com/notebook?id=') + str(key)
+            redirectUrl = str('https://campusconnect-2016.herokuapp.com/notebook?id=') + str(key)
+            redirectUrl += str('&cId=') + str(courseId)
             self.redirect(redirectUrl)
         if type == 'assignment':
             try:
@@ -92,7 +93,8 @@ class ImageUploadWeb(webapp2.RequestHandler):
             response = urllib2.urlopen(req)
             response = json.loads(response.read())
             key = response.get('key')
-            redirectUrl = str('https://salty-forest-16158.herokuapp.com/assignment?id=') + str(key)
+            redirectUrl = str('https://campusconnect-2016.herokuapp.com/assignment?id=') + str(key)
+            redirectUrl += str('&cId=') + str(courseId)
             self.redirect(redirectUrl)
         if type == 'exam':
             try:
@@ -113,7 +115,8 @@ class ImageUploadWeb(webapp2.RequestHandler):
             response = urllib2.urlopen(req)
             response = json.loads(response.read())
             key = response.get('key')
-            redirectUrl = str('https://salty-forest-16158.herokuapp.com/exam?id=') + str(key)
+            redirectUrl = str('https://campusconnect-2016.herokuapp.com/exam?id=') + str(key)
+            redirectUrl += str('&cId=') + str(courseId)
             self.redirect(redirectUrl)
 
     def get(self):

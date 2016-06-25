@@ -12,6 +12,7 @@ from models import NoteBookListResponse, RatingRequest, CoursePageRequest
 from models import CoursePageResponse, GetExamListResponse, GetAssListResponse, DeleteRequest
 from models import BookmarkRequest, CollegeListResponse, AddBranchRequest
 from models import SearchCourseRequest, BookmarkResponse, SearchNBRequest
+from models import UnsubscribeCourseRequest
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
 from apiMethods import courseListMethod, feedMethod, addAdminMethod
@@ -21,7 +22,7 @@ from apiMethods import createNotesMethod, getNoteBook, getNoteBookListMethod
 from apiMethods import rateThisMethod, coursePageMethod
 from apiMethods import getAssignmentListMethod, getExamListMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
-from apiMethods import deleteMethod
+from apiMethods import deleteMethod, unsubscribeCourseMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 
 
@@ -66,6 +67,15 @@ class NotesAPI(remote.Service):
     def subscribeCourse(self, request):
         return subscribeCourseMethod(request)
 
+
+    @endpoints.method(
+        UnsubscribeCourseRequest,
+        Response,
+        path='unsubscribeCourse',
+        http_method='POST',
+        name='unsubscribeCourse')
+    def unsubCourse(self, request):
+        return unsubscribeCourseMethod(request)
     courseListResource = endpoints.ResourceContainer(CourseListRequest,
                                                      page=messages.IntegerField
                                                      (1, variant=messages.
@@ -291,15 +301,6 @@ class NotesAPI(remote.Service):
         name='searchNotes')
     def searchNotes(self, request):
         return searchNBMethod(request)
-
-    """@endpoints.method(
-        SearchNBRequest,
-        NoteBookListResponse,
-        path='searchNoteBook',
-        http_method='POST',
-        name='searchNoteBook')
-    def searchNB(self, request):
-        return searchNBMethod(request)"""
 
     """@endpoints.method(
         message_types.VoidMessage,
