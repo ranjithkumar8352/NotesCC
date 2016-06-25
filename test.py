@@ -9,7 +9,7 @@ def main():
     version = 'v1'
     discovery_url = '%s/discovery/v1/apis/%s/%s/rest' % (apiRoot, api, version)
     service = build(api, version, discoveryServiceUrl=discovery_url)
-    service.clearAll().execute()
+    # service.clearAll().execute()
     # _______________________________________COLLEGE CREATION________________________________________
     collegeIdList = []
     collegeList = []
@@ -55,11 +55,11 @@ def main():
     # _______________________________________COURSE CREATION__________________________________________
     courseList = []
     courseIdList = []
-    courseList.append({'courseName':'Test Course 1', 'courseCode':'TCourse1', 'professorName':'Test Professor 1', 'colour':'BLUE', 'batchNames':['2014'], 'branchNames':['CSE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1', '2', '5'], 'startTime':['12:00', '13:00', '14:00'], 'endTime':['13:00', '14:00', '15:00'], 'profileId':profileIdList[1], 'collegeId':collegeIdList[0]})
-    courseList.append({'courseName':'Test Course 2', 'courseCode':'TCourse2', 'professorName':'Test Professor 2', 'colour':'RED', 'batchNames':['2014'], 'branchNames':['ECE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1', '3', '5'], 'startTime':['12:00', '13:00', '14:00'], 'endTime':['13:00', '14:00', '15:00'], 'profileId':profileIdList[0], 'collegeId':collegeIdList[0]})
-    courseList.append({'courseName':'Test Course 3', 'courseCode':'TCourse3', 'professorName':'Test Professor 3', 'colour':'YELLOW', 'batchNames':['2014'], 'branchNames':['CSE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1','4'], 'startTime':['13:00', '14:00'], 'endTime':['14:00', '15:00'], 'profileId':profileIdList[1], 'collegeId':collegeIdList[0]})
-    courseList.append({'courseName':'Test Course 4', 'courseCode':'TCourse4', 'professorName':'Test Professor 4', 'colour':'VIOLET', 'batchNames':['2014'], 'branchNames':['CSE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1', '2', '5'], 'startTime':['12:00', '13:00', '14:00'], 'endTime':['13:00', '14:00', '15:00'], 'profileId':profileIdList[2], 'collegeId':collegeIdList[1]})
-    courseList.append({'courseName':'Test Course 5', 'courseCode':'TCourse5', 'professorName':'Test Professor 5', 'colour':'GREEN', 'batchNames':['2014'], 'branchNames':['CSE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1', '2', '5'], 'startTime':['12:00', '13:00', '14:00'], 'endTime':['13:00', '14:00', '15:00'], 'profileId':profileIdList[3], 'collegeId':collegeIdList[1]})
+    courseList.append({'courseName':'Test Course 1', 'courseCode':'TCourse1', 'professorName':'Test Professor 1', 'colour':'BLUE', 'batchNames':['2014'], 'branchNames':['CSE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1', '2', '5'], 'startTime':['12:00', '13:00', '14:00'], 'endTime':['13:00', '14:00', '15:00'], 'profileId':profileIdList[1], 'collegeId':collegeIdList[0], 'elective':'1'})
+    courseList.append({'courseName':'Test Course 2', 'courseCode':'TCourse2', 'professorName':'Test Professor 2', 'colour':'RED', 'batchNames':['2014'], 'branchNames':['ECE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1', '3', '5'], 'startTime':['12:00', '13:00', '14:00'], 'endTime':['13:00', '14:00', '15:00'], 'profileId':profileIdList[0], 'collegeId':collegeIdList[0], 'elective':'1'})
+    courseList.append({'courseName':'Test Course 3', 'courseCode':'TCourse3', 'professorName':'Test Professor 3', 'colour':'YELLOW', 'batchNames':['2014'], 'branchNames':['CSE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1','4'], 'startTime':['13:00', '14:00'], 'endTime':['14:00', '15:00'], 'profileId':profileIdList[1], 'collegeId':collegeIdList[0], 'elective':'0'})
+    courseList.append({'courseName':'Test Course 4', 'courseCode':'TCourse4', 'professorName':'Test Professor 4', 'colour':'VIOLET', 'batchNames':['2014'], 'branchNames':['CSE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1', '2', '5'], 'startTime':['12:00', '13:00', '14:00'], 'endTime':['13:00', '14:00', '15:00'], 'profileId':profileIdList[2], 'collegeId':collegeIdList[1], 'elective':'1'})
+    courseList.append({'courseName':'Test Course 5', 'courseCode':'TCourse5', 'professorName':'Test Professor 5', 'colour':'GREEN', 'batchNames':['2014'], 'branchNames':['CSE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1', '2', '5'], 'startTime':['12:00', '13:00', '14:00'], 'endTime':['13:00', '14:00', '15:00'], 'profileId':profileIdList[3], 'collegeId':collegeIdList[1], 'elective':'1'})
     print "CREATING COURSES..."
     for courseInfo in courseList:
         try:
@@ -86,7 +86,7 @@ def main():
             print traceback.print_exc()
     # ___________________ADDING NEW COURSES TO CHECK WORKING IF COURSES ARE CREATED LATER_____________
     print"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    courseList.append({'courseName':'Test Course 6', 'courseCode':'TCourse6', 'professorName':'Test Professor 6', 'colour':'BROWN', 'batchNames':['2014'], 'branchNames':['CSE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1', '3', '5'], 'startTime':['12:00', '13:00', '14:00'], 'endTime':['13:00', '14:00', '15:00'], 'profileId':profileIdList[0], 'collegeId':collegeIdList[0]})
+    courseList.append({'courseName':'Test Course 6', 'courseCode':'TCourse6', 'professorName':'Test Professor 6', 'colour':'BROWN', 'batchNames':['2014'], 'branchNames':['CSE'], 'sectionNames':['A'], 'semester':'Odd', 'date':['1', '3', '5'], 'startTime':['12:00', '13:00', '14:00'], 'endTime':['13:00', '14:00', '15:00'], 'profileId':profileIdList[0], 'collegeId':collegeIdList[0], 'elective':'0'})
     print "CREATING 1 MORE COURSE..."
     try:
         response = service.addCourse(body=courseList[5]).execute()
@@ -250,7 +250,7 @@ def main():
     print "examId"
     print examIdList
     print " "
-"""
+
     for assignmentId in assignmentIdList:
         service.delete(body={'assignmentId': assignmentId}).execute()
     for examId in examIdList:
@@ -260,5 +260,7 @@ def main():
     for courseId in courseIdList:
         service.delete(body={'courseId': courseId}).execute()
     for profileId in profileIdList:
-        service.delete(body={'profileId': profileId}).execute()"""
+        service.delete(body={'profileId': profileId}).execute()
+    for collegeId in collegeIdList:
+        service.delete(body={'collegeId': collegeId}).execute()
 main()

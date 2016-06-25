@@ -117,6 +117,7 @@ def addCourseMethod(request):
     professorName = getattr(request, 'professorName', None)
     colour = getattr(request, 'colour', None)
     courseCode = getattr(request, 'courseCode', None)
+    elective = getattr(request, 'elective', '1')
     college = collegeId.get()
     profile = profileId.get()
     if college is None:
@@ -141,7 +142,7 @@ def addCourseMethod(request):
                        startTime=startTime, endTime=endTime,
                        professorName=professorName, studentIds=studentIds,
                        colour=colour, courseCode=courseCode,
-                       noteBookIds=[], assignmentIds=[], examIds=[])
+                       noteBookIds=[], assignmentIds=[], examIds=[], elective=elective)
     courseId = newCourse.put()
     # Adding profileId of creator to adminId
     for profileId in adminIds:
@@ -233,7 +234,7 @@ def courseListMethod(request):
                                                     batchNames=course.batchNames, branchNames=course.branchNames,
                                                     sectionNames=course.sectionNames, semester=course.semester,
                                                     studentCount=studentCount, professorName=course.professorName,
-                                                    notesCount=notesCount)
+                                                    notesCount=notesCount, colour=course.colour, elective=course.elective)
                 courseListResponse.append(feedCourseResponse)
             return CourseListResponse(response=0, description="OK",
                                       courseList=courseListResponse,
@@ -251,7 +252,7 @@ def courseListMethod(request):
                                                     batchNames=course.batchNames, branchNames=course.branchNames,
                                                     sectionNames=course.sectionNames, studentCount=studentCount,
                                                     professorName=course.professorName, notesCount=notesCount,
-                                                    semester=course.semester)
+                                                    semester=course.semester, colour=course.colour, elective=course.elective)
                 courseListResponse.append(feedCourseResponse)
             return CourseListResponse(response=0, description="OK",
                                       courseList=courseListResponse,
@@ -346,9 +347,9 @@ def feedCourseResponse(courseIds):
                                                dueAssignments=dueAssignments,
                                                dueExams=dueExams, date=course.date,
                                                startTime=course.startTime,
-                                               endTime=course.endTime,
+                                               endTime=course.endTime, colour=course.colour,
                                                recentNotes=recentNotes,
-                                               professorName=course.professorName))
+                                               professorName=course.professorName,elective=course.elective))
     return responseList
 
 
@@ -714,7 +715,7 @@ def getNoteBook(request):
                                   rated=rated, frequency=frequency,
                                   pages=pages, totalRating=totalRating,
                                   notes=notesList, bookmarkStatus=bookmarkStatus,
-                                  response=0,
+                                  response=0, colour=course.colour,
                                   description="OK")
 
 
@@ -755,7 +756,7 @@ def getNoteBookListMethod(request):
                                    views=noteBook.views, pages=pages,
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
-                                   lastUpdated=noteBook.lastUpdated)
+                                   lastUpdated=noteBook.lastUpdated, colour=course.colour)
             noteBookList.append(new)
     elif bpid:
         try:
@@ -788,7 +789,7 @@ def getNoteBookListMethod(request):
                                    views=noteBook.views, pages=pages,
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
-                                   lastUpdated=noteBook.lastUpdated)
+                                   lastUpdated=noteBook.lastUpdated, colour=course.colour)
             noteBookList.append(new)
     elif upid:
         try:
@@ -821,7 +822,7 @@ def getNoteBookListMethod(request):
                                    views=noteBook.views, pages=pages,
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
-                                   lastUpdated=noteBook.lastUpdated)
+                                   lastUpdated=noteBook.lastUpdated, colour=course.colour)
             noteBookList.append(new)
     elif courseId:
         try:
@@ -849,7 +850,7 @@ def getNoteBookListMethod(request):
                                    views=noteBook.views, pages=pages,
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
-                                   lastUpdated=noteBook.lastUpdated)
+                                   lastUpdated=noteBook.lastUpdated, colour=course.colour)
             noteBookList.append(new)
     elif profileId:
         try:
@@ -883,7 +884,7 @@ def getNoteBookListMethod(request):
                                        views=noteBook.views, pages=pages,
                                        totalRating=noteBook.totalRating,
                                        frequency=noteBook.frequency,
-                                       lastUpdated=noteBook.lastUpdated)
+                                       lastUpdated=noteBook.lastUpdated, colour=course.colour)
                 noteBookList.append(new)
     else:
         return NoteBookListResponse(response=1, description="Bad request")
@@ -1006,7 +1007,8 @@ def coursePageMethod(request):
                               courseName=course.courseName, date=course.date, startTime=course.startTime,
                               endTime=course.endTime, examCount=dueExams, assignmentCount=dueAssignments,
                               notesCount=recentNotes, examList=examList, assignmentList=assignmentList,
-                              studentCount=studentCount, professorName=course.professorName)
+                              studentCount=studentCount, professorName=course.professorName, colour=course.colour,
+                              elective=course.elective)
 
 
 def getAssignmentListMethod(request):
@@ -1043,7 +1045,7 @@ def getAssignmentListMethod(request):
                                                   lastUpdated=assignment.dateUploaded,
                                                   uploaderName=uploaderName, dueDate=assignment.dueDate,
                                                   dueTime=assignment.dueTime, pages=len(assignment.urlList),
-                                                  courseName=course.courseName))
+                                                  courseName=course.courseName, colour=course.colour))
     else:
         try:
             courseId = ndb.Key(urlsafe=courseId)
@@ -1072,7 +1074,8 @@ def getAssignmentListMethod(request):
                                               dueDate=assignment.dueDate,
                                               dueTime=assignment.dueTime,
                                               pages=len(assignment.urlList),
-                                              courseName=course.courseName))
+                                              courseName=course.courseName,
+                                              colour=course.colour))
     return GetAssListResponse(response=0, description="OK",
                               assList=assList)
 
@@ -1105,7 +1108,8 @@ def getExamListMethod(request):
                                              dueDate=exam.dueDate,
                                              dueTime=exam.dueTime,
                                              pages=len(exam.urlList),
-                                             courseName=course.courseName))
+                                             courseName=course.courseName,
+                                             colour=course.colour))
     else:
         try:
             courseId = ndb.Key(urlsafe=courseId)
@@ -1129,7 +1133,8 @@ def getExamListMethod(request):
                                          dueDate=exam.dueDate,
                                          dueTime=exam.dueTime,
                                          pages=len(exam.urlList),
-                                         courseName=course.courseName))
+                                         courseName=course.courseName,
+                                         colour=course.colour))
     return GetExamListResponse(response=0, description="OK",
                                examList=examList)
 
@@ -1216,11 +1221,11 @@ def unsubscribeCourseMethod(request):
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception, E:
-        return Response(response=1, description="Invaild profileId"+E)
+        return Response(response=1, description="Invaild profileId"+str(E))
     try:
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
     except Exception, E:
-        return Response(response=1, description="Invaild courseId"+E)
+        return Response(response=1, description="Invaild courseId"+str(E))
     profile = profileId.get()
     course = courseId.get()
     if profile is None:
@@ -1230,8 +1235,12 @@ def unsubscribeCourseMethod(request):
     if courseId in profile.subscribedCourseIds:
         profile.subscribedCourseIds.remove(courseId)
         profile.put()
-    if profileId in course.studentIds:
         course.studentIds.remove(profileId)
+        course.put()
+    else:
+        profile.subscribedCourseIds.append(courseId)
+        profile.put()
+        course.studentIds.append(profileId)
         course.put()
     return Response(response=0, description="OK")
 
@@ -1262,6 +1271,7 @@ def deleteNoteBook(id, delNotes=0):
         profile.bookmarkedNoteBookIds.remove(noteBookId)
         profile.put()
     noteBookId.delete()
+    search.Index('NoteBook').delete([id])
     return Response(response=0, description="OK")
 
 
@@ -1348,6 +1358,8 @@ def deleteCourse(id):
     except Exception:
         return Response(response=1, description="No such courseId")
     course = courseId.get()
+    if course is None:
+        return Response(response=1, description="No such courseId")
     for noteBookId in course.noteBookIds:
         deleteNoteBook(noteBookId.urlsafe())
     for assignmentId in course.assignmentIds:
@@ -1370,8 +1382,20 @@ def deleteCourse(id):
     college.courseIds.remove(courseId)
     college.put()
     courseId.delete()
+    search.Index('Course').delete([id])
     return Response(response=0, description='OK')
 
+
+def deleteCollege(id):
+    try:
+        collegeId = ndb.Key(urlsafe=id)
+    except Exception:
+        return Response(response=1, description="No such collegeId")
+    college = collegeId.get()
+    if college is None:
+        return Response(response=1, description="No such collegeId")
+    collegeId.delete()
+    return Response(response=0, description='OK')
 
 def deleteMethod(request):
     print request
@@ -1382,6 +1406,7 @@ def deleteMethod(request):
     assignmentId = getattr(request, 'assignmentId', None)
     examId = getattr(request, 'examId', None)
     courseId = getattr(request, 'courseId', None)
+    collegeId = getattr(request, 'collegeId', None)
     if profileId:
         return deleteProfile(profileId)
     if notesId:
@@ -1394,3 +1419,5 @@ def deleteMethod(request):
         return deleteExam(examId)
     if courseId:
         return deleteCourse(courseId)
+    if collegeId:
+        return deleteCollege(collegeId)

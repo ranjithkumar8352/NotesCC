@@ -84,6 +84,7 @@ class Course(ndb.Model):
     colour = ndb.StringProperty()
     courseCode = ndb.StringProperty()
     studentIds = ndb.KeyProperty(repeated=True, kind='Profile')
+    elective = ndb.StringProperty()
 
 
 class CourseForm(messages.Message):
@@ -100,6 +101,7 @@ class CourseForm(messages.Message):
     colour = messages.StringField(11)
     courseCode = messages.StringField(12)
     date = messages.StringField(13, repeated=True)
+    elective = messages.StringField(14)
 
 
 class SubscribeCourseRequest(messages.Message):
@@ -122,6 +124,8 @@ class CourseResponse(messages.Message):
     professorName = messages.StringField(8)
     notesCount = messages.IntegerField(9)
     semester = messages.StringField(12)
+    colour = messages.StringField(13)
+    elective = messages.StringField(14)
 
 
 class CourseListResponse(messages.Message):
@@ -141,6 +145,8 @@ class FeedCourseResponse(messages.Message):
     startTime = messages.StringField(6, repeated=True)
     endTime = messages.StringField(7, repeated=True) 
     professorName = messages.StringField(9)
+    colour = messages.StringField(10)
+    elective = messages.StringField(11)
 
 
 class FeedResponse(messages.Message):
@@ -267,6 +273,7 @@ class AssignmentResponse(messages.Message):
     dueTime = messages.StringField(8)
     pages = messages.IntegerField(9)
     courseName = messages.StringField(11)
+    colour = messages.StringField(12)
 
 
 class ExamResponse(messages.Message):
@@ -281,6 +288,7 @@ class ExamResponse(messages.Message):
     dueTime = messages.StringField(8)
     pages = messages.IntegerField(9)
     courseName = messages.StringField(11)
+    colour = messages.StringField(12)
 
 
 class GetAssListResponse(messages.Message):
@@ -373,6 +381,7 @@ class NoteBookDetailResponse(messages.Message):
     response = messages.IntegerField(10)
     description = messages.StringField(11)
     bookmarkStatus = messages.IntegerField(13)
+    colour = messages.StringField(14)
 
 
 class NoteBookListRequest(messages.Message):
@@ -392,6 +401,7 @@ class NoteBookResponse(messages.Message):
     totalRating = messages.StringField(6)
     frequency = messages.IntegerField(7)
     lastUpdated = messages.StringField(8)
+    colour = messages.StringField(9)
 
 
 class NoteBookListResponse(messages.Message):
@@ -437,6 +447,8 @@ class CoursePageResponse(messages.Message):
     assignmentList = messages.MessageField(AssExamResponse, 12, repeated=True)
     studentCount = messages.IntegerField(13)
     professorName = messages.StringField(15)
+    colour = messages.StringField(16)
+    elective = messages.StringField(17)
 
 
 class BookmarkRequest(messages.Message):
@@ -490,6 +502,7 @@ class DeleteRequest(messages.Message):
     assignmentId = messages.StringField(4)
     examId = messages.StringField(5)
     courseId = messages.StringField(6)
+    collegeId = messages.StringField(7)
 
 
 class SearchCourseRequest(messages.Message):
