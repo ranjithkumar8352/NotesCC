@@ -1,5 +1,5 @@
 from google.appengine.ext import ndb
-from protorpc import messages, message_types
+from protorpc import messages
 
 
 class College(ndb.Model):

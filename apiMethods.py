@@ -11,22 +11,27 @@ from models import AssignmentResponse, ExamResponse, GetAssListResponse
 from models import GetExamListResponse, CollegeListResponse, CollegeDetails
 from models import BookmarkResponse
 from searchAPI import createNBDoc
+
 from google.appengine.ext import ndb
 
 
 def createCollegeMethod(request):
+    """createCollegeMethod(request)
+        request (collegeName, abbreviation, location, collegeType, semStartDate,
+        semEndDate, branchNameList)
+        To create New college"""
     collegeName = getattr(request, 'collegeName')
     abbreviation = getattr(request, 'abbreviation')
     location = getattr(request, 'location')
     collegeType = getattr(request, 'collegeType', None)
     semStartDate = getattr(request, 'semStartDate', None)
     semEndDate = getattr(request, 'semEndDate', None)
-    branchNameList = getattr(request, 'branchNameList', None)
-    queryString = ndb.AND(College.collegeName == collegeName,
-                          College.location == location)
+    branchNameList = getattr(request, 'branchNameList', [])
+    # To find college with same name and location
+    queryString = ndb.AND(College.collegeName == collegeName, College.location == location)
     collegeSameDetails = College.query(queryString).fetch()
     if collegeSameDetails:
-        return Response(response=1, description="College Already Exists")
+        return Response(response=2, description="College Already Exists")
     else:
         newCollege = College(collegeName=collegeName, abbreviation=abbreviation,
                              location=location, studentCount=0, noteBookCount=0,
@@ -38,15 +43,19 @@ def createCollegeMethod(request):
 
 
 def createProfileMethod(request):
-    profileName = getattr(request, 'profileName')
+    """createProfileMethod(request)
+        request (collegeId, profileName, batchName, branchName, sectionName, photoUrl,
+        gcmId, email)
+        Creates a new profile"""
     try:
         collegeId = ndb.Key(urlsafe=getattr(request, 'collegeId'))
     except Exception:
         return Response(response=1, description="No such collegeId")
+    profileName = getattr(request, 'profileName')
     batchName = getattr(request, 'batchName', None)
     branchName = getattr(request, 'branchName', None)
     sectionName = getattr(request, 'sectionName', None)
-    # Querier for compatible courses and stores in availableCourseIds
+    # Querie for compatible courses and stores in availableCourseIds
     availableCourseIds = []
     queryString = ndb.AND(Course.collegeId == collegeId,
                           Course.batchNames == batchName,
@@ -58,11 +67,12 @@ def createProfileMethod(request):
     gcmId = getattr(request, 'gcmId')
     email = getattr(request, 'email')
     college = collegeId.get()
+    # To get existing profiles (if any) with same email id
     profileCheck = Profile.query(Profile.email == email).fetch()
     if college is None:
         return Response(response=1, description="No such college ID")
     elif profileCheck:
-        return Response(response=1, description="Profile already registered")
+        return Response(response=2, description="Profile already registered")
     else:
         newProfile = Profile(profileName=profileName, collegeId=collegeId,
                              batchName=batchName, branchName=branchName,
@@ -71,6 +81,7 @@ def createProfileMethod(request):
                              administeredCourseIds=[], gcmId=gcmId,
                              photoUrl=photoUrl, email=email, points=0,
                              uploadedNoteBookIds=[], bookmarkedNoteBookIds=[])
+        # increasing the studentCount in college
         college.studentCount += 1
         college.put()
         key = newProfile.put()
@@ -79,14 +90,14 @@ def createProfileMethod(request):
 
 def addCourseMethod(request):
     """addCourseMethod(request)
-    request(POST) containing courseName, collegeId, batchName, sectionName,
-    semester, adminId, startTime, endTime, proffessorName
+    request(POST) (courseName, collegeId, batchName, sectionName,
+    semester, adminId, startTime, endTime, proffessorName)
     creates a new course and adds it to the college"""
-    courseName = getattr(request, 'courseName')
     try:
         collegeId = ndb.Key(urlsafe=(getattr(request, 'collegeId')))
     except Exception:
         return Response(response=1, description="No such collegeId")
+    courseName = getattr(request, 'courseName')
     batchNames = getattr(request, 'batchNames', None)
     branchNames = getattr(request, 'branchNames', None)
     sectionNames = getattr(request, 'sectionNames', None)
@@ -111,6 +122,7 @@ def addCourseMethod(request):
         return Response(response=1, description="No such college ID")
     if profile is None:
         return Response(response=1, description="No such profile ID")
+    # To check if same course already exists
     queryString = ndb.AND(Course.courseCode == courseCode,
                           Course.collegeId == collegeId,
                           Course.sectionNames.IN(sectionNames),
@@ -119,7 +131,7 @@ def addCourseMethod(request):
                           Course.professorName == professorName)
     coursesWithSameCode = Course.query(queryString).fetch()
     if coursesWithSameCode:
-        return Response(response=1, description="Course already exists")
+        return Response(response=2, description="Course already exists")
 
     newCourse = Course(courseName=courseName, collegeId=collegeId,
                        batchNames=batchNames, branchNames=branchNames,
@@ -130,14 +142,18 @@ def addCourseMethod(request):
                        colour=colour, courseCode=courseCode,
                        noteBookIds=[], assignmentIds=[], examIds=[])
     courseId = newCourse.put()
+    # Adding profileId of creator to adminId
     for profileId in adminIds:
         profile = profileId.get()
         profile.subscribedCourseIds.append(courseId)
         profile.put()
+    # Adding courseId to college.courseIds
     college.courseIds.append(courseId)
     college.put()
+    # Adding courseId to profile.administeredCourseIds
     profile.administeredCourseIds.append(courseId)
     profile.put()
+    # To update the availableCourseIds of users
     queryString = ndb.AND(Profile.collegeId == collegeId,
                           Profile.batchName.IN(batchNames),
                           Profile.branchName.IN(branchNames),
@@ -151,6 +167,9 @@ def addCourseMethod(request):
 
 
 def subscribeCourseMethod(request):
+    """subscribeCourseMethod(request)
+       request (profileId, courseIds)
+       Subscribes the profileId to a list of courseIds"""
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
@@ -158,6 +177,9 @@ def subscribeCourseMethod(request):
     courseIdList = getattr(request, 'courseIds')
     courseIds = []
     profile = profileId.get()
+    if profile is None:
+        return Response(response=1, description="No such profileId")
+    # Adding courseId to profile.subscribedCourseIds
     for course in courseIdList:
         try:
             courseId = ndb.Key(urlsafe=course)
@@ -165,6 +187,7 @@ def subscribeCourseMethod(request):
             return Response(response=1, description="No such courseId")
         profile.subscribedCourseIds.append(courseId)
         courseIds.append(courseId)
+    # Removing courses with same courseCode from profile.availableCourseIds
     courseCodes = []
     for courseId in courseIds:
         course = courseId.get()
@@ -182,6 +205,9 @@ def subscribeCourseMethod(request):
 
 
 def courseListMethod(request):
+    """courseList(request)
+       request (profileId) OR request(courseIds[])
+       to get the list of courses"""
     profileIdUrlSafe = getattr(request, 'profileId', None)
     courseIdsUrlSafe = getattr(request, 'courseIds', None)
     if not profileIdUrlSafe and not courseIdsUrlSafe:
@@ -192,10 +218,14 @@ def courseListMethod(request):
             try:
                 profileId = ndb.Key(urlsafe=profileIdUrlSafe)
             except Exception:
-                return CourseListResponse(response=1, description="No such ProfileId")
+                return CourseListResponse(response=1, description="No such profileId")
             profile = profileId.get()
+            if profile is None:
+                return CourseListResponse(response=1, description="No such profileId")
             for courseId in profile.availableCourseIds:
                 course = courseId.get()
+                if course is None:
+                    return CourseListResponse(response=1, description="No such courseId")
                 notesCount = len(course.noteBookIds)
                 studentCount = len(course.studentIds)
                 feedCourseResponse = CourseResponse(courseId=courseId.urlsafe(), courseName=course.courseName,
@@ -228,18 +258,29 @@ def courseListMethod(request):
 
 
 def feedMethod(request):
+    """feedMethod(request)
+       request (profileId)
+       To get the home page feed of the user"""
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
         return FeedResponse(response=1, description="Invalid profileId")
     profile = profileId.get()
+    if profile is None:
+        return FeedResponse(response=1, description="Invalid profileId")
     profileName = profile.profileName
     points = profile.points
     photoUrl = profile.photoUrl
     availableCourseIds = profile.availableCourseIds
     subscribedCourseIds = profile.subscribedCourseIds
-    availableCourseList = feedCourseResponse(availableCourseIds)
-    subscribedCourseList = feedCourseResponse(subscribedCourseIds)
+    try:
+        availableCourseList = feedCourseResponse(availableCourseIds)
+    except Exception, E:
+        return FeedResponse(response=1, description=E + ' in availableCourses')
+    try:
+        subscribedCourseList = feedCourseResponse(subscribedCourseIds)
+    except Exception, E:
+        return FeedResponse(response=1, description=E + ' in subscribedCourses')
     collegeId = profile.collegeId
     return FeedResponse(response=0, description="OK", profileName=profileName,
                         points=points, photoUrl=photoUrl,
@@ -248,6 +289,8 @@ def feedMethod(request):
 
 
 def feedCourseResponse(courseIds):
+    """feedCourseResponse(courseIds[])
+        To get the course details for home page feed"""
     responseList = []
     curDate = datetime.datetime.now().date()
     curTime = datetime.datetime.now().time()
@@ -257,6 +300,8 @@ def feedCourseResponse(courseIds):
         assignmentIds = course.assignmentIds
         for assignmentId in assignmentIds:
             assignment = assignmentId.get()
+            if assignment is None:
+                raise Exception("Invalid assignmentId")
             a = assignment.dueDate
             date, month, year = int(a[0:2]), int(a[3:5]), int(a[6:10])
             dueDate = datetime.date(year, month, date)
@@ -271,6 +316,8 @@ def feedCourseResponse(courseIds):
         examIds = course.examIds
         for examId in examIds:
             exam = examId.get()
+            if exam is None:
+                raise Exception("Invalid examId")
             a = exam.dueDate
             date, month, year = int(a[0:2]), int(a[3:5]), int(a[6:10])
             dueDate = datetime.date(year, month, date)
@@ -285,6 +332,8 @@ def feedCourseResponse(courseIds):
         noteBookIds = course.noteBookIds
         for noteBookId in noteBookIds:
             noteBook = noteBookId.get()
+            if noteBook is None:
+                raise Exception("Invalid noteBookId")
             a = str(noteBook.lastUpdated)
             date, month, year = int(a[8:10]), int(a[5:7]), int(a[0:4])
             lastUpdated = datetime.date(year, month, date)
@@ -302,6 +351,9 @@ def feedCourseResponse(courseIds):
 
 
 def addAdminMethod(request):
+    """addAdmin(request)
+       request (courseId, profileId)
+       to make a new Admin"""
     try:
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
     except Exception:
@@ -311,7 +363,11 @@ def addAdminMethod(request):
     except Exception:
         return Response(response=1, description="Invalid profileId")
     course = courseId.get()
+    if course is None:
+        return Response(response=1, description="Invalid courseId")
     profile = profileId.get()
+    if profile is None:
+        return Response(response=1, description="Invalid profileId")
     profile.administeredCourseIds.append(courseId)
     course.adminIds.append(profileId)
     if courseId in profile.availableCourseIds:
@@ -322,11 +378,16 @@ def addAdminMethod(request):
 
 
 def timeTableMethod(request):
+    """timeTableMethod(request)
+       request (profileId)
+       To get the timetable of all the subscribe courses of user"""
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
-        return Response(response=1, description="Invalid profile Id")
+        return TimeTableResponse(response=1, description="Invalid profile Id")
     profile = profileId.get()
+    if profile is None:
+        return TimeTableResponse(response=1, description="Invalid profileId")
     subscribedCourseIds = profile.subscribedCourseIds
     courseList = []
     for courseId in subscribedCourseIds:
@@ -342,6 +403,9 @@ def timeTableMethod(request):
 
 
 def studentListMethod(request):
+    """studentListMethod(request)
+       request (profileId, courseId)
+       To get the list of students subscribed to the course"""
     try:
         profileId = ndb.Key(urlsafe=request.profileId)
     except Exception:
@@ -351,7 +415,11 @@ def studentListMethod(request):
     except Exception:
         return StudentListResponse(response=1, description="Invalid courseId")
     profile = profileId.get()
+    if profile is None:
+        return StudentListResponse(response=1, description="Invalid profileId")
     course = courseId.get()
+    if course is None:
+        return StudentListResponse(response=1, description="Invalid courseId")
     if courseId in profile.administeredCourseIds:
         isAdmin = 1
     else:
@@ -375,6 +443,9 @@ def studentListMethod(request):
 
 
 def createAssignmentMethod(request):
+    """createAssignmentMethod(request)
+       request (assignmentTitle, assignmentDesc, dateUploaded, courseId, uploaderId,
+                dueDate, dueTime, urlList)"""
     assignmentTitle = getattr(request, 'assignmentTitle')
     assignmentDesc = getattr(request, 'assignmentDesc')
     dateUploaded = str(datetime.datetime.now())
@@ -398,12 +469,18 @@ def createAssignmentMethod(request):
                                remindProfileIds=[])
     assignmentId = newAssignment.put()
     course = courseId.get()
+    if course is None:
+        return Response(response=1, description="Invalid courseId")
     course.assignmentIds.append(assignmentId)
     course.put()
     return Response(response=0, description="OK", key=assignmentId.urlsafe())
 
 
 def createExamMethod(request):
+    """createExamMethod(request)
+       request (examTitle, examDesc, dateUploaded, courseId, profileId, dueDate,
+                dueTime, urlList)
+       To create a new exam"""
     examTitle = getattr(request, 'examTitle')
     examDesc = getattr(request, 'examDesc')
     dateUploaded = str(datetime.datetime.now())
@@ -424,12 +501,16 @@ def createExamMethod(request):
                    dueTime=dueTime, urlList=urlList, dateUploaded=dateUploaded)
     examId = newExam.put()
     course = courseId.get()
+    if course is None:
+        return Response(response=1, description="Invalid courseId")
     course.examIds.append(examId)
     course.put()
     return Response(response=0, description="OK", key=examId.urlsafe())
 
 
 def getAssignmentMethod(request):
+    """getAssignmentMethod(request)
+       request (profileId, assignmentId)"""
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
@@ -439,6 +520,8 @@ def getAssignmentMethod(request):
     except Exception:
         return GetAssignmentResponse(response=1, description="Invalid assignmentId")
     assignment = assignmentId.get()
+    if assignment is None:
+        return GetAssignmentResponse(response=1, description="Invalid assignmentId")
     if profileId == assignment.uploaderId:
         isAuthor = 1
     else:
@@ -460,6 +543,8 @@ def getAssignmentMethod(request):
 
 
 def getExamMethod(request):
+    """getExamMethod(request)
+       request (profileId, examId)"""
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
@@ -469,6 +554,8 @@ def getExamMethod(request):
     except Exception:
         return GetExamResponse(response=1, description="Invalid examId")
     exam = examId.get()
+    if exam is None:
+        return GetExamResponse(response=1, description="Invalid examId")
     if profileId == exam.uploaderId:
         isAuthor = 1
     else:
@@ -487,6 +574,9 @@ def getExamMethod(request):
 
 
 def createNotesMethod(request):
+    """createNotes(request)
+       request (profileId, date, urlList,notesDesc, classNumber, courseId, title)
+       To create new Notes"""
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
@@ -508,26 +598,40 @@ def createNotesMethod(request):
     noteBookResult = query.fetch()
     if noteBookResult:
         for noteBook in noteBookResult:
-            addToNoteBook(noteBook.key, newNotes)
+            try:
+                addToNoteBook(noteBook.key, newNotes)
+            except Exception, E:
+                return Response(response=1, description=E)
             createNBDoc(title, notesDesc, date, noteBook.key.urlsafe())
             return Response(response=0, description="OK",
                             key=noteBook.key.urlsafe())
     else:
-        noteBookId = createNoteBook(profileId, courseId)
-        addToNoteBook(noteBookId, newNotes)
+        try:
+            noteBookId = createNoteBook(profileId, courseId)
+            addToNoteBook(noteBookId, newNotes)
+        except Exception, E:
+            return Response(response=1, description=E)
         createNBDoc(title, notesDesc, date, noteBookId.urlsafe())
         return Response(response=0, description="OK", key=noteBookId.urlsafe())
 
 
 def createNoteBook(profileId, courseId):
+    """createNoteBook(profileId, courseId)
+       To create new noteBook"""
     newNoteBook = NoteBook(courseId=courseId, uploaderId=profileId,
                            notesIds=[], ratedUserIds=[], ratingList=[],
                            totalRating="0", frequency=0, views=0)
     course = courseId.get()
+    if course is None:
+        raise Exception("Invalid courseId")
     college = course.collegeId.get()
+    if college is None:
+        raise Exception("Invalid collegeId")
     college.noteBookCount += 1
     college.put()
     profile = profileId.get()
+    if profile is None:
+        raise Exception("Invalid profileId")
     noteBookId = newNoteBook.put()
     profile.uploadedNoteBookIds.append(noteBookId)
     profile.put()
@@ -537,9 +641,13 @@ def createNoteBook(profileId, courseId):
 
 
 def addToNoteBook(noteBookId, newNotes):
+    """addToNoteBook(noteBookId, newNotes)
+       To add new notes to existing noteBook"""
     newNotes.noteBookId = noteBookId
     notesId = newNotes.put()
     noteBook = noteBookId.get()
+    if noteBook is None:
+        raise Exception("Invalid profileId")
     noteBook.notesIds.append(notesId)
     noteBook.frequency += 1
     noteBook.lastUpdated = str(datetime.datetime.now())
@@ -547,6 +655,9 @@ def addToNoteBook(noteBookId, newNotes):
 
 
 def getNoteBook(request):
+    """getNoteBook(request)
+       request (profileId, noteBookId)
+       To get noteBook"""
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
@@ -556,17 +667,23 @@ def getNoteBook(request):
     except Exception:
         return NoteBookDetailResponse(response=1, description="Invalid noteBookId")
     noteBook = noteBookId.get()
+    if noteBook is None:
+        return NoteBookDetailResponse(response=1, description="Invalid noteBookId")
     if noteBook.uploaderId == profileId:
         isAuthor = 1
     else:
         isAuthor = 0
     profile = profileId.get()
+    if profile is None:
+        return NoteBookDetailResponse(response=1, description="Invalid profileId")
     if noteBookId in profile.bookmarkedNoteBookIds:
         bookmarkStatus = 1
     else:
         bookmarkStatus = 0
     noteBookUploader = noteBook.uploaderId.get()
     course = noteBook.courseId.get()
+    if course is None:
+        return NoteBookDetailResponse(response=1, description="Invalid courseId")
     uploaderName = noteBookUploader.profileName
     lastUpdated = noteBook.lastUpdated
     views = noteBook.views + 1
@@ -582,6 +699,8 @@ def getNoteBook(request):
     pages = 0
     for notesId in noteBook.notesIds:
         notes = notesId.get()
+        if notes is None:
+            return NoteBookDetailResponse(response=1, description="Invalid notesId")
         notesList.append(NotesResponse(title=notes.title,
                                        description=notes.notesDesc,
                                        date=notes.date,
@@ -599,6 +718,9 @@ def getNoteBook(request):
 
 
 def getNoteBookListMethod(request):
+    """getNoteBookListMethod(request)
+       request (noteBookIds[]) OR request(bpid) OR request(upid) OR request(courseId)
+       OR request(profileId)"""
     noteBookIds = getattr(request, 'noteBookIds', None)
     bpid = getattr(request, 'bpid', None)
     upid = getattr(request, 'upid', None)
@@ -612,11 +734,19 @@ def getNoteBookListMethod(request):
             except Exception:
                 return NoteBookListResponse(response=1, description="Invalid noteBookId")
             noteBook = noteBookId.get()
+            if noteBook is None:
+                return NoteBookListResponse(response=1, description="Invalid noteBookId")
             course = noteBook.courseId.get()
+            if course is None:
+                return NoteBookListResponse(response=1, description="Invalid courseId")
             uploader = noteBook.uploaderId.get()
+            if uploader is None:
+                return NoteBookListResponse(response=1, description="Invalid profileId")
             pages = 0
             for notesId in noteBook.notesIds:
                 notes = notesId.get()
+                if notes is None:
+                    return NoteBookListResponse(response=1, description="Invalid notesId")
                 pages += len(notes.urlList)
             new = NoteBookResponse(noteBookId=idurlsafe,
                                    courseName=course.courseName,
@@ -632,14 +762,24 @@ def getNoteBookListMethod(request):
         except Exception:
             return NoteBookListResponse(response=1, description="Invalid profileId")
         profile = profileId.get()
+        if profile is None:
+            return NoteBookListResponse(response=1, description="Invalid profileId")
         bookmarkedIds = profile.bookmarkedNoteBookIds
         for noteBookId in bookmarkedIds:
             noteBook = noteBookId.get()
+            if noteBook is None:
+                return NoteBookListResponse(response=1, description="Invalid noteBookId")
             course = noteBook.courseId.get()
+            if course is None:
+                return NoteBookListResponse(response=1, description="Invalid courseId")
             uploader = noteBook.uploaderId.get()
+            if uploader is None:
+                return NoteBookListResponse(response=1, description="Invalid profileId")
             pages = 0
             for notesId in noteBook.notesIds:
                 notes = notesId.get()
+                if notes is None:
+                    return NoteBookListResponse(response=1, description="Invalid notesId")
                 pages += len(notes.urlList)
             new = NoteBookResponse(noteBookId=noteBookId.urlsafe(),
                                    courseName=course.courseName,
@@ -655,14 +795,24 @@ def getNoteBookListMethod(request):
         except Exception:
             return NoteBookListResponse(response=1, description="Invalid profileId")
         profile = profileId.get()
+        if profile is None:
+            return NoteBookListResponse(response=1, description="Invalid profileId")
         uploadedIds = profile.uploadedNoteBookIds
         for noteBookId in uploadedIds:
             noteBook = noteBookId.get()
+            if noteBook is None:
+                return NoteBookListResponse(response=1, description="Invalid noteBookId")
             course = noteBook.courseId.get()
+            if course is None:
+                return NoteBookListResponse(response=1, description="Invalid courseId")
             uploader = noteBook.uploaderId.get()
+            if uploader is None:
+                return NoteBookListResponse(response=1, description="Invalid profileId")
             pages = 0
             for notesId in noteBook.notesIds:
                 notes = notesId.get()
+                if notes is None:
+                    return NoteBookListResponse(response=1, description="Invalid notesId")
                 pages += len(notes.urlList)
             new = NoteBookResponse(noteBookId=noteBookId.urlsafe(),
                                    courseName=course.courseName,
@@ -678,13 +828,19 @@ def getNoteBookListMethod(request):
         except Exception:
             return NoteBookListResponse(response=1, description="Invalid courseId")
         course = courseId.get()
+        if course is None:
+            return NoteBookListResponse(response=1, description="Invalid courseId")
         noteBookIds = course.noteBookIds
         for noteBookId in noteBookIds:
             noteBook = noteBookId.get()
+            if noteBook is None:
+                return NoteBookListResponse(response=1, description="Invalid noteBookId")
             uploader = noteBook.uploaderId.get()
             pages = 0
             for notesId in noteBook.notesIds:
                 notes = notesId.get()
+                if notes is None:
+                    return NoteBookListResponse(response=1, description="Invalid notesId")
                 pages += len(notes.urlList)
             new = NoteBookResponse(noteBookId=noteBookId.urlsafe(),
                                    courseName=course.courseName,
@@ -700,15 +856,25 @@ def getNoteBookListMethod(request):
         except Exception:
             return NoteBookListResponse(response=1, description="Invalid profileId")
         profile = profileId.get()
+        if profile is None:
+            return NoteBookListResponse(response=1, description="Invalid profileId")
         for courseId in profile.subscribedCourseIds:
             course = courseId.get()
+            if course is None:
+                return NoteBookListResponse(response=1, description="Invalid courseId")
             noteBookIds = course.noteBookIds
             for noteBookId in noteBookIds:
                 noteBook = noteBookId.get()
+                if noteBook is None:
+                    return NoteBookListResponse(response=1, description="Invalid noteBookId")
                 uploader = noteBook.uploaderId.get()
+                if uploader is None:
+                    return NoteBookListResponse(response=1, description="Invalid profileId")
                 pages = 0
                 for notesId in noteBook.notesIds:
                     notes = notesId.get()
+                    if notes is None:
+                        return NoteBookListResponse(response=1, description="Invalid notesId")
                     pages += len(notes.urlList)
                 new = NoteBookResponse(noteBookId=noteBookId.urlsafe(),
                                        courseName=course.courseName,
@@ -725,6 +891,9 @@ def getNoteBookListMethod(request):
 
 
 def rateThisMethod(request):
+    """rateThisMethod(request)
+       request (profileId, rating, noteBookId)
+       To rate a noteBook"""
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
@@ -732,8 +901,12 @@ def rateThisMethod(request):
     rating = getattr(request, 'rating')
     noteBookId = ndb.Key(urlsafe=getattr(request, 'noteBookId'))
     noteBook = noteBookId.get()
+    if noteBook is None:
+        return Response(response=1, description="Invalid noteBookId")
     if profileId in noteBook.ratedUserIds:
-        return Response(response=1, description="Already Rated")
+        idx = noteBook.ratedUserIds.index(profileId)
+        del(noteBook.ratingList[idx])
+        noteBook.ratedUserIds.remove(profileId)
     noteBook.ratedUserIds.append(profileId)
     noteBook.ratingList.append(rating)
     noteBook.put()
@@ -741,11 +914,15 @@ def rateThisMethod(request):
 
 
 def coursePageMethod(request):
+    """coursePage(request)
+       request(profileId, courseId)"""
     try:
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
     except Exception:
         return CoursePageResponse(response=1, description="Invalid courseId")
     course = courseId.get()
+    if course is None:
+        return CoursePageResponse(response=1, description="Invalid courseId")
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
@@ -762,6 +939,8 @@ def coursePageMethod(request):
     studentCount = len(course.studentIds)
     for assignmentId in assignmentIds:
         assignment = assignmentId.get()
+        if assignment is None:
+            return CoursePageResponse(response=1, description="Invalid assignmentId")
         a = assignment.dueDate
         date, month, year = int(a[0:2]), int(a[3:5]), int(a[6:10])
         dueDate = datetime.date(year, month, date)
@@ -774,6 +953,8 @@ def coursePageMethod(request):
             continue
         dueAssignments = dueAssignments + 1
         uploader = assignment.uploaderId.get()
+        if uploader is None:
+            return CoursePageResponse(response=1, description="Invalid profileId")
         assignmentList.append(AssExamResponse(Id=assignmentId.urlsafe(),
                                               name=assignment.assignmentTitle,
                                               dueDate=assignment.dueDate,
@@ -785,6 +966,8 @@ def coursePageMethod(request):
     examIds = course.examIds
     for examId in examIds:
         exam = examId.get()
+        if exam is None:
+            return CoursePageResponse(response=1, description="Invalid examId")
         a = exam.dueDate
         date, month, year = int(a[0:2]), int(a[3:5]), int(a[6:10])
         dueDate = datetime.date(year, month, date)
@@ -797,6 +980,8 @@ def coursePageMethod(request):
             continue
         dueExams = dueExams + 1
         uploader = exam.uploaderId.get()
+        if uploader is None:
+            return CoursePageResponse(response=1, description="Invalid profileId")
         examList.append(AssExamResponse(Id=examId.urlsafe(),
                                         name=exam.examTitle,
                                         dueDate=exam.dueDate,
@@ -808,6 +993,8 @@ def coursePageMethod(request):
         noteBookIds = course.noteBookIds
         for noteBookId in noteBookIds:
             noteBook = noteBookId.get()
+            if noteBook is None:
+                return CoursePageResponse(response=1, description="Invalid noteBookId")
             a = str(noteBook.lastUpdated)
             date, month, year = int(a[8:10]), int(a[5:7]), int(a[0:4])
             lastUpdated = datetime.date(year, month, date)
@@ -822,6 +1009,8 @@ def coursePageMethod(request):
 
 
 def getAssignmentListMethod(request):
+    """getAssignmentListmethod(rquest)
+       request (profileId) OR request (courseId)"""
     profileId = getattr(request, 'profileId', None)
     courseId = getattr(request, 'courseId', None)
     if profileId:
@@ -830,11 +1019,17 @@ def getAssignmentListMethod(request):
         except Exception:
             return GetAssListResponse(response=1, description="Invalid profileId")
         profile = profileId.get()
+        if profile is None:
+            return GetAssListResponse(response=1, description="Invalid profileId")
         assList = []
         for courseId in profile.subscribedCourseIds:
             course = courseId.get()
+            if course is None:
+                return GetAssListResponse(response=1, description="Invalid courseId")
             for assignmentId in course.assignmentIds:
                 assignment = assignmentId.get()
+                if assignment is None:
+                    return GetAssListResponse(response=1, description="Invalid assignmentId")
                 if profileId == assignment.uploaderId:
                     isAuthor = 1
                 else:
@@ -855,8 +1050,12 @@ def getAssignmentListMethod(request):
             return GetAssListResponse(response=1, description="Invalid courseId")
         assList = []
         course = courseId.get()
+        if course is None:
+            return GetAssListResponse(response=1, description="Invalid courseId")
         for assignmentId in course.assignmentIds:
             assignment = assignmentId.get()
+            if assignment is None:
+                return GetAssListResponse(response=1, description="Invalid assignmentId")
             if profileId == assignment.uploaderId:
                 isAuthor = 1
             else:

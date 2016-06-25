@@ -250,7 +250,7 @@ def main():
     print "examId"
     print examIdList
     print " "
-
+"""
     for assignmentId in assignmentIdList:
         service.delete(body={'assignmentId': assignmentId}).execute()
     for examId in examIdList:
@@ -260,5 +260,5 @@ def main():
     for courseId in courseIdList:
         service.delete(body={'courseId': courseId}).execute()
     for profileId in profileIdList:
-        service.delete(body={'profileId': profileId}).execute()
+        service.delete(body={'profileId': profileId}).execute()"""
 main()
