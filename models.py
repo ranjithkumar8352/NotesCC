@@ -194,7 +194,7 @@ class Assignment(ndb.Model):
     dueTime = ndb.StringProperty()
     courseId = ndb.KeyProperty(required=True, kind='Course')
     uploaderId = ndb.KeyProperty(kind='Profile')
-    assignmentViews = ndb.IntegerProperty()
+    assignmentViews = ndb.IntegerProperty(default=0)
     dateUploaded = ndb.StringProperty()
     urlList = ndb.StringProperty(repeated=True)
     remindProfileIds = ndb.KeyProperty(repeated=True, kind='Profile')
@@ -325,6 +325,7 @@ class NoteBook(ndb.Model):
     frequency = ndb.IntegerProperty()
     views = ndb.IntegerProperty()
     lastUpdated = ndb.StringProperty()
+    bmUserList = ndb.KeyProperty(repeated=True, kind='Profile')
 
 
 class Notes(ndb.Model):

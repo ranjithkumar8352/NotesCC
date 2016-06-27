@@ -17,6 +17,10 @@ from google.appengine.api import search
 from google.appengine.api import memcache
 
 
+noteBookOpened = set()
+assignmentOpened = set()
+examOpened = set()
+
 def createCollegeMethod(request):
     """createCollegeMethod(request)
         request (collegeName, abbreviation, location, collegeType, semStartDate,
@@ -525,19 +529,26 @@ def getAssignmentMethod(request):
         assignmentId = ndb.Key(urlsafe=getattr(request, 'assignmentId'))
     except Exception:
         return GetAssignmentResponse(response=1, description="Invalid assignmentId")
+    assignmentOpened.add(assignmentId.urlsafe())
+    print str(assignmentOpened)
     cacheVal = memcache.get(assignmentId.urlsafe())
+    memViews = memcache.get('views' + assignmentId.urlsafe())
     if cacheVal is not None:
-        if profileId == cacheVal[9]:
+        if profileId == cacheVal[8]:
             isAuthor = 1
         else:
             isAuthor = 0
+        if memViews is None:
+            assignment = assignmentId.get()
+            memViews = assignment.assignmentViews
+            memcache.add('views' + assignmentId.urlsafe(), memViews)
+        memcache.incr('views' + assignmentId.urlsafe())
         return GetAssignmentResponse(response=0, description="OK", isAuthor=isAuthor,
-                                     views=cacheVal[0], assignmentTitle=cacheVal[1],
-                                     assignmentDesc=cacheVal[2], lastUpdated=cacheVal[3],
-                                     uploaderName=cacheVal[4], dueDate=cacheVal[5],
-                                     dueTime=cacheVal[6], urlList=cacheVal[7],
-                                     courseName=cacheVal[8])
-
+                                     assignmentTitle=cacheVal[0], assignmentDesc=cacheVal[1],
+                                     lastUpdated=cacheVal[2], uploaderName=cacheVal[3],
+                                     dueDate=cacheVal[4], dueTime=cacheVal[5],
+                                     urlList=cacheVal[6], courseName=cacheVal[7],
+                                     views=memViews)
     assignment = assignmentId.get()
     if assignment is None:
         return GetAssignmentResponse(response=1, description="Invalid assignmentId")
@@ -549,10 +560,11 @@ def getAssignmentMethod(request):
     assignment.assignmentViews = assignment.assignmentViews + 1
     course = assignment.courseId.get()
     assignment.put()
-    fields = [assignment.assignmentViews, assignment.assignmentTitle, assignment.assignmentDesc,
-              assignment.dateUploaded, uploaderName, assignment.dueDate, assignment.dueTime, assignment.urlList,
+    fields = [assignment.assignmentTitle, assignment.assignmentDesc, assignment.dateUploaded,
+              uploaderName, assignment.dueDate, assignment.dueTime, assignment.urlList,
               course.courseName, assignment.uploaderId]
     memcache.add(assignmentId.urlsafe(), fields, 3600)
+    memcache.add('views' + assignmentId.urlsafe(), assignment.assignmentViews, 3600)
     return GetAssignmentResponse(response=0, description="OK",
                                  isAuthor=isAuthor, views=assignment.assignmentViews,
                                  assignmentTitle=assignment.assignmentTitle,
@@ -576,17 +588,23 @@ def getExamMethod(request):
         examId = ndb.Key(urlsafe=getattr(request, 'examId'))
     except Exception:
         return GetExamResponse(response=1, description="Invalid examId")
-    cacheVal = memcache.get(assignmentId.urlsafe())
-    if cacheVal is None:
-        if profileId == cacheVal[9]:
+    examOpened.add(examId.urlsafe())
+    cacheVal = memcache.get(examId.urlsafe())
+    memViews = memcache.get('views' + examId.urlsafe())
+    if cacheVal is not None:
+        if profileId == cacheVal[8]:
             isAuthor = 1
         else:
-            isAuthor = 0    
-        return GetExamResponse(response=0, description="OK", isAuthor=isAuthor, views=cacheVal[0],
-                               examTitle=cacheVal[1], examDesc=cacheVal[2], lastUpdated=cacheVal[3],
-                           uploaderName=cacheVal[4], dueDate=cacheVal[5],
-                           dueTime=cacheVal[6], urlList=cacheVal[7],
-                           courseName=cacheVal[8])
+            isAuthor = 0
+        if memViews is None:
+            exam = examId.get()
+            memViews = exam.examViews
+            memcache.add('views' + examId.urlsafe(), memViews)
+        memcache.incr('views' + examId.urlsafe())
+        return GetExamResponse(response=0, description="OK", isAuthor=isAuthor,
+                               examTitle=cacheVal[0], examDesc=cacheVal[1], lastUpdated=cacheVal[2],
+                               uploaderName=cacheVal[3], dueDate=cacheVal[4], dueTime=cacheVal[5],
+                               urlList=cacheVal[6], courseName=cacheVal[7], views=memViews)
 
     exam = examId.get()
     if exam is None:
@@ -599,9 +617,11 @@ def getExamMethod(request):
     exam.examViews = exam.examViews + 1
     exam.put()
     course = exam.courseId.get()
-    fields = [exam.views, exam.examTitle, exam.examDesc, exam.dateUploaded, uploaderName, exam.dueDate, exam.dueTime,
+    fields = [exam.examTitle, exam.examDesc, exam.dateUploaded, uploaderName, exam.dueDate, exam.dueTime,
               exam.urlList, course.courseName, exam.uploaderId]
     memcache.add(examId.urlsafe(), fields, 3600)
+    memcache.add('views' + examId.urlsafe(), exam.examViews, 3600)
+
     return GetExamResponse(response=0, description="OK",
                            isAuthor=isAuthor, views=exam.examViews,
                            examTitle=exam.examTitle, examDesc=exam.examDesc,
@@ -658,7 +678,7 @@ def createNoteBook(profileId, courseId):
        To create new noteBook"""
     newNoteBook = NoteBook(courseId=courseId, uploaderId=profileId,
                            notesIds=[], ratedUserIds=[], ratingList=[],
-                           totalRating="0", frequency=0, views=0)
+                           totalRating="0", frequency=0, views=0, bmUserList=[])
     course = courseId.get()
     if course is None:
         raise Exception("Invalid courseId")
@@ -676,6 +696,7 @@ def createNoteBook(profileId, courseId):
     course.noteBookIds.append(noteBookId)
     course.put()
     return noteBookId
+
 
 def addToNoteBook(noteBookId, newNotes):
     """addToNoteBook(noteBookId, newNotes)
@@ -703,12 +724,41 @@ def getNoteBook(request):
         noteBookId = ndb.Key(urlsafe=getattr(request, 'noteBookId'))
     except Exception:
         return NoteBookDetailResponse(response=1, description="Invalid noteBookId")
-    """cacheVal = memcache.get(noteBookId.urlsafe())
-    id cacheVal is None:
-        if noteBook.uploaderId == profileId:
+    noteBookOpened.add(noteBookId.urlsafe())
+    cacheVal = memcache.get(noteBookId.urlsafe())
+    if cacheVal is not None:
+        memViews = memcache.get('views' + noteBookId.urlsafe())
+        if memViews is None:
+            noteBook = noteBookId.get()
+            memViews = noteBook.views
+            memcache.add('views' + noteBookId.urlsafe(), memViews, 3600)
+        memcache.incr('views' + noteBookId.urlsafe())
+        noteBookOpened.add(noteBookId.urlsafe())
+        bmUserList = cacheVal[8]
+        if profileId in bmUserList:
+            bookmarkStatus = 1
+        else:
+            bookmarkStatus = 0
+        ratedUserList = cacheVal[9]
+        if profileId in ratedUserList:
+            for i in range(len(ratedUserList)):
+                if ratedUserList[i] == profileId:
+                    rated = cacheVal[10][i]
+        else:
+            rated = -1
+        if profileId == cacheVal[11]:
             isAuthor = 1
         else:
-            isAuthor = 0"""
+            isAuthor = 0
+        return NoteBookDetailResponse(courseName=cacheVal[0],
+                                      isAuthor=isAuthor, uploaderName=cacheVal[1],
+                                      lastUpdated=cacheVal[2], views=memViews,
+                                      rated=rated, frequency=cacheVal[3],
+                                      pages=cacheVal[4], totalRating=cacheVal[5],
+                                      notes=cacheVal[6], bookmarkStatus=bookmarkStatus,
+                                      response=0, colour=cacheVal[7],
+                                      description="OK")
+
 
 
     noteBook = noteBookId.get()
@@ -752,6 +802,11 @@ def getNoteBook(request):
                                        classNumber=notes.classNumber,
                                        urlList=notes.urlList))
         pages += len(notes.urlList)
+    fields = [course.courseName, uploaderName, lastUpdated, frequency, pages, totalRating,
+              notesList, course.colour, noteBook.bmUserList, noteBook.ratedUserIds,
+              noteBook.ratingList, noteBook.uploaderId]
+    memcache.add(noteBookId.urlsafe(), fields, 3600)
+    memcache.add('views' + noteBookId.urlsafe(), views, 3600)
     return NoteBookDetailResponse(courseName=course.courseName,
                                   isAuthor=isAuthor, uploaderName=uploaderName,
                                   lastUpdated=lastUpdated, views=views,
@@ -1209,13 +1264,17 @@ def bookmarkMethod(request):
     except Exception:
         return BookmarkResponse(response=1, description="Invalid noteBookId")
     profile = profileId.get()
+    noteBook = noteBookId.get()
     if noteBookId in profile.bookmarkedNoteBookIds:
         profile.bookmarkedNoteBookIds.remove(noteBookId)
+        noteBook.bmUserList.remove(profileId)
         status = 0
     else:
         profile.bookmarkedNoteBookIds.append(noteBookId)
+        noteBook.bmUserList.append(profileId)
         status = 1
     profile.put()
+    noteBook.put()
     return BookmarkResponse(response=0, description="OK", bookmarkStatus=status)
 
 

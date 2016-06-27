@@ -1,5 +1,5 @@
 runtime: python27
-threadsafe: true
+threadsafe: false
 api_version: 1
 
 builtins:
@@ -18,6 +18,8 @@ handlers:
   script: main.app
 - url: /imgandroid
   script: main.app
+- url: /task/updateViews
+  script: cronTasks/updateViews.py
 
 libraries:
 - name: pycrypto

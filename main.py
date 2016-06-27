@@ -42,7 +42,7 @@ class ImageUploadWeb(webapp2.RequestHandler):
         bucketName = "/uploadnotes-2016.appspot.com"
         try:
             for file in fileList:
-                timestamp = str(datetime.datetime.now())
+                timestamp = "".join(str(datetime.datetime.now()).split())
                 fileName = bucketName + '/' + courseId + '/' + profileId + '/' + timestamp + '.jpg'
                 gcsFile = gcs.open(fileName, mode='w', content_type='image/jpeg', options={'x-goog-acl': 'public-read'})
                 gcsFile.write(file.value)

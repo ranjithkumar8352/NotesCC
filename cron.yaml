@@ -1,0 +1,5 @@
+cron:
+- description: "updating views on assignment"
+  url: /task/updateViews
+  schedule: every 1 minutes
+  target: crontask
