@@ -14,9 +14,9 @@ from searchAPI import createNBDoc
 
 from google.appengine.ext import ndb
 from google.appengine.api import search
+from google.appengine.api import memcache
 
-
-def createCollegeMethod(request):
+def createCollegeMethod(request)    :
     """createCollegeMethod(request)
         request (collegeName, abbreviation, location, collegeType, semStartDate,
         semEndDate, branchNameList)
@@ -522,6 +522,23 @@ def getAssignmentMethod(request):
         assignmentId = ndb.Key(urlsafe=getattr(request, 'assignmentId'))
     except Exception:
         return GetAssignmentResponse(response=1, description="Invalid assignmentId")
+    cacheVal = memcache.get(assignmentId.urlsafe())
+    if cacheVal is not None:
+        if profileId == cacheVal[9]:
+            isAuthor = 1
+        else:
+            isAuthor = 0
+        return GetAssignmentResponse(response=0, description="OK",
+                                 isAuthor=isAuthor, views=cacheVal[0],
+                                 assignmentTitle=cacheVal[1],
+                                 assignmentDesc=cacheVal[2],
+                                 lastUpdated=cacheVal[3],
+                                 uploaderName=cacheVal[4],
+                                 dueDate=cacheVal[5],
+                                 dueTime=cacheVal[6],
+                                 urlList=cacheVal[7],
+                                 courseName=cacheVal[8])
+    
     assignment = assignmentId.get()
     if assignment is None:
         return GetAssignmentResponse(response=1, description="Invalid assignmentId")
@@ -533,6 +550,10 @@ def getAssignmentMethod(request):
     assignment.assignmentViews = assignment.assignmentViews + 1
     course = assignment.courseId.get()
     assignment.put()
+    fields = [assignment.assignmentViews, assignment.assignmentTitle, assignment.assignmentDesc,    
+              assignment.dateUploaded, uploaderName, assignment.dueDate, assignment.dueTime, assignment.urlList,
+              course.courseName, assignment.uploaderId]
+    memcache.add(assignmentId.urlsafe(), fields, 3600)
     return GetAssignmentResponse(response=0, description="OK",
                                  isAuthor=isAuthor, views=assignment.assignmentViews,
                                  assignmentTitle=assignment.assignmentTitle,
@@ -556,6 +577,20 @@ def getExamMethod(request):
         examId = ndb.Key(urlsafe=getattr(request, 'examId'))
     except Exception:
         return GetExamResponse(response=1, description="Invalid examId")
+    cacheVal = memcache.get(assignmentId.urlsafe())
+    if cacheVal is None:
+        if profileId == cacheVal[9]:
+            isAuthor = 1
+        else:
+            isAuthor = 0    
+        return GetExamResponse(response=0, description="OK",
+                           isAuthor=isAuthor, views=cacheVal[0],
+                           examTitle=cacheVal[1], examDesc=cacheVal[2],
+                           lastUpdated=cacheVal[3],
+                           uploaderName=cacheVal[4], dueDate=cacheVal[5],
+                           dueTime=cacheVal[6], urlList=cacheVal[7],
+                           courseName=cacheVal[8])
+
     exam = examId.get()
     if exam is None:
         return GetExamResponse(response=1, description="Invalid examId")
@@ -567,6 +602,9 @@ def getExamMethod(request):
     exam.examViews = exam.examViews + 1
     exam.put()
     course = exam.courseId.get()
+    fields = [exam.views, exam.examTitle, exam.examDesc, exam.dateUploaded, uploaderName, exam.dueDate, exam.dueTime,
+              exam.urlList, course.courseName, exam.uploaderId]
+    memcache.add(examId.urlsafe(), fields, 3600)
     return GetExamResponse(response=0, description="OK",
                            isAuthor=isAuthor, views=exam.examViews,
                            examTitle=exam.examTitle, examDesc=exam.examDesc,
@@ -668,6 +706,14 @@ def getNoteBook(request):
         noteBookId = ndb.Key(urlsafe=getattr(request, 'noteBookId'))
     except Exception:
         return NoteBookDetailResponse(response=1, description="Invalid noteBookId")
+    """cacheVal = memcache.get(noteBookId.urlsafe())
+    id cacheVal is None:
+        if noteBook.uploaderId == profileId:
+            isAuthor = 1
+        else:
+            isAuthor = 0"""
+
+
     noteBook = noteBookId.get()
     if noteBook is None:
         return NoteBookDetailResponse(response=1, description="Invalid noteBookId")
@@ -922,13 +968,25 @@ def coursePageMethod(request):
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
     except Exception:
         return CoursePageResponse(response=1, description="Invalid courseId")
-    course = courseId.get()
-    if course is None:
-        return CoursePageResponse(response=1, description="Invalid courseId")
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
         return CoursePageResponse(response=1, description="Invalid profileId")
+    cacheVal = memcache.get(courseId.urlsafe())
+    if cacheVal is not None:
+        if profileId in cacheVal[13]:
+            isSubscribed = 1
+        else:
+            isSubscribed = 0
+        return CoursePageResponse(response=0, description="OK", isSubscribed=isSubscribed,
+                              courseName=cacheVal[0], date=cacheVal[1], startTime=cacheVal[2],
+                              endTime=cacheVal[3], examCount=cacheVal[4], assignmentCount=cacheVal[5],
+                              notesCount=cacheVal[6], examList=cacheVal[7], assignmentList=cacheVal[8],
+                              studentCount=cacheVal[9], professorName=cacheVal[10], colour=cacheVal[11],
+                              elective=cacheVal[12])
+    course = courseId.get()
+    if course is None:
+        return CoursePageResponse(response=1, description="Invalid courseId")
     if profileId in course.studentIds:
         isSubscribed = 1
     else:
@@ -1003,6 +1061,10 @@ def coursePageMethod(request):
             if(curDate - lastUpdated).days > 7:
                 continue
             recentNotes = recentNotes + 1
+    fields = [course.courseName, course.date, course.startTime, course.endTime, dueExams, dueAssignments, reczentNotes, examList,
+              assignmentList, studentCount, course.professorName, course.colour, course.elective, course.studentIds]
+    memcache.add(courseId.urlsafe(), fields, 3600)
+    print "1"
     return CoursePageResponse(response=0, description="OK", isSubscribed=isSubscribed,
                               courseName=course.courseName, date=course.date, startTime=course.startTime,
                               endTime=course.endTime, examCount=dueExams, assignmentCount=dueAssignments,
@@ -1185,14 +1247,11 @@ def clearAll():
     for index in idx:
         ids = []
         results = index.search("NOT zoo")
-        print results
         for doc in results:
             key = doc.doc_id
             ids.append(key)
         index.delete(ids)
     results = search.Index('Course').search("NOT zoo")
-    print "____"
-    print results
 
 
 def collegeListMethod(request):
@@ -1398,11 +1457,9 @@ def deleteCollege(id):
     return Response(response=0, description='OK')
 
 def deleteMethod(request):
-    print request
     profileId = getattr(request, 'profileId', None)
     notesId = getattr(request, 'notesId', None)
     noteBookId = getattr(request, 'noteBookId', None)
-    print noteBookId
     assignmentId = getattr(request, 'assignmentId', None)
     examId = getattr(request, 'examId', None)
     courseId = getattr(request, 'courseId', None)
