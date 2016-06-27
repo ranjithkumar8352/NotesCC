@@ -67,7 +67,6 @@ class NotesAPI(remote.Service):
     def subscribeCourse(self, request):
         return subscribeCourseMethod(request)
 
-
     @endpoints.method(
         UnsubscribeCourseRequest,
         Response,
@@ -92,7 +91,7 @@ class NotesAPI(remote.Service):
 
     feedResource = endpoints.ResourceContainer(message_types.VoidMessage,
                                                profileId=messages.StringField(1))
-    
+
     @endpoints.method(
         feedResource,
         FeedResponse,

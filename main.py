@@ -49,9 +49,13 @@ class ImageUploadWeb(webapp2.RequestHandler):
                 url = 'https://storage.googleapis.com' + fileName
                 urlList.append(url)
                 gcsFile.close()
-        except:
-            print "Upload Failed!!!"
-            return self.response.write("UPLOAD FAILED")
+        except Exception, E:
+            if str(E) == "'unicode' object has no attribute 'value'":
+                print "0 image"
+                urlList.append("http://guiaquebueno.com/Images/Restaurantes/Restaurante_no_image.jpg")
+            else:
+                print "Upload Failed!!!"
+                return self.response.write("UPLOAD FAILED" + str(E))
         if type == 'notes':
             try:
                 date = self.request.get('date')
@@ -194,7 +198,6 @@ class ImageUploadAndroid(webapp2.RequestHandler):
         type = self.request.get('type')
         bucketName = "/uploadnotes-2016.appspot.com"
         for file in fileList:
-
             timestamp = str(datetime.datetime.now())
             fileName = bucketName + '/' + courseId + '/' + profileId + '/' + timestamp + '.jpg'
             gcsFile = gcs.open(fileName, mode='w', content_type='image/jpeg', options={'x-goog-acl': 'public-read'})

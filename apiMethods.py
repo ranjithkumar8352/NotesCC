@@ -16,7 +16,8 @@ from google.appengine.ext import ndb
 from google.appengine.api import search
 from google.appengine.api import memcache
 
-def createCollegeMethod(request)    :
+
+def createCollegeMethod(request):
     """createCollegeMethod(request)
         request (collegeName, abbreviation, location, collegeType, semStartDate,
         semEndDate, branchNameList)
@@ -234,7 +235,8 @@ def courseListMethod(request):
                                                     batchNames=course.batchNames, branchNames=course.branchNames,
                                                     sectionNames=course.sectionNames, semester=course.semester,
                                                     studentCount=studentCount, professorName=course.professorName,
-                                                    notesCount=notesCount, colour=course.colour, elective=course.elective)
+                                                    notesCount=notesCount, colour=course.colour,
+                                                    elective=course.elective)
                 courseListResponse.append(feedCourseResponse)
             return CourseListResponse(response=0, description="OK",
                                       courseList=courseListResponse,
@@ -252,7 +254,8 @@ def courseListMethod(request):
                                                     batchNames=course.batchNames, branchNames=course.branchNames,
                                                     sectionNames=course.sectionNames, studentCount=studentCount,
                                                     professorName=course.professorName, notesCount=notesCount,
-                                                    semester=course.semester, colour=course.colour, elective=course.elective)
+                                                    semester=course.semester, colour=course.colour,
+                                                    elective=course.elective)
                 courseListResponse.append(feedCourseResponse)
             return CourseListResponse(response=0, description="OK",
                                       courseList=courseListResponse,
@@ -277,11 +280,11 @@ def feedMethod(request):
     subscribedCourseIds = profile.subscribedCourseIds
     try:
         availableCourseList = feedCourseResponse(availableCourseIds)
-    except Exception, E:
+    except Exception:
         return FeedResponse(response=1, description=' in availableCourses')
     try:
         subscribedCourseList = feedCourseResponse(subscribedCourseIds)
-    except Exception, E:
+    except Exception:
         return FeedResponse(response=1, description=' in subscribedCourses')
     collegeId = profile.collegeId
     return FeedResponse(response=0, description="OK", profileName=profileName,
@@ -528,17 +531,13 @@ def getAssignmentMethod(request):
             isAuthor = 1
         else:
             isAuthor = 0
-        return GetAssignmentResponse(response=0, description="OK",
-                                 isAuthor=isAuthor, views=cacheVal[0],
-                                 assignmentTitle=cacheVal[1],
-                                 assignmentDesc=cacheVal[2],
-                                 lastUpdated=cacheVal[3],
-                                 uploaderName=cacheVal[4],
-                                 dueDate=cacheVal[5],
-                                 dueTime=cacheVal[6],
-                                 urlList=cacheVal[7],
-                                 courseName=cacheVal[8])
-    
+        return GetAssignmentResponse(response=0, description="OK", isAuthor=isAuthor,
+                                     views=cacheVal[0], assignmentTitle=cacheVal[1],
+                                     assignmentDesc=cacheVal[2], lastUpdated=cacheVal[3],
+                                     uploaderName=cacheVal[4], dueDate=cacheVal[5],
+                                     dueTime=cacheVal[6], urlList=cacheVal[7],
+                                     courseName=cacheVal[8])
+
     assignment = assignmentId.get()
     if assignment is None:
         return GetAssignmentResponse(response=1, description="Invalid assignmentId")
@@ -550,7 +549,7 @@ def getAssignmentMethod(request):
     assignment.assignmentViews = assignment.assignmentViews + 1
     course = assignment.courseId.get()
     assignment.put()
-    fields = [assignment.assignmentViews, assignment.assignmentTitle, assignment.assignmentDesc,    
+    fields = [assignment.assignmentViews, assignment.assignmentTitle, assignment.assignmentDesc,
               assignment.dateUploaded, uploaderName, assignment.dueDate, assignment.dueTime, assignment.urlList,
               course.courseName, assignment.uploaderId]
     memcache.add(assignmentId.urlsafe(), fields, 3600)
@@ -583,10 +582,8 @@ def getExamMethod(request):
             isAuthor = 1
         else:
             isAuthor = 0    
-        return GetExamResponse(response=0, description="OK",
-                           isAuthor=isAuthor, views=cacheVal[0],
-                           examTitle=cacheVal[1], examDesc=cacheVal[2],
-                           lastUpdated=cacheVal[3],
+        return GetExamResponse(response=0, description="OK", isAuthor=isAuthor, views=cacheVal[0],
+                               examTitle=cacheVal[1], examDesc=cacheVal[2], lastUpdated=cacheVal[3],
                            uploaderName=cacheVal[4], dueDate=cacheVal[5],
                            dueTime=cacheVal[6], urlList=cacheVal[7],
                            courseName=cacheVal[8])
@@ -1061,7 +1058,8 @@ def coursePageMethod(request):
             if(curDate - lastUpdated).days > 7:
                 continue
             recentNotes = recentNotes + 1
-    fields = [course.courseName, course.date, course.startTime, course.endTime, dueExams, dueAssignments, reczentNotes, examList,
+    fields = [course.courseName, course.date, course.startTime, course.endTime,
+              dueExams, dueAssignments, recentNotes, examList,
               assignmentList, studentCount, course.professorName, course.colour, course.elective, course.studentIds]
     memcache.add(courseId.urlsafe(), fields, 3600)
     print "1"
