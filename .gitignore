@@ -91,3 +91,6 @@ ENV/
 
 test/
 requests/
+
+campusconnect.sublime-project
+campusconnect.sublime-workspace
