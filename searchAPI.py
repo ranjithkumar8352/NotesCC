@@ -97,7 +97,9 @@ def searchNBMethod(request):
         if '' in queryString:
             queryString.remove('')
         queryString = ' AND '.join(queryString)
-    results = index.search(queryString)
+        results = index.search(queryString)
+    else:
+        results = index.search("")
     noteBookList = []
     for doc in results:
         key = doc.doc_id
