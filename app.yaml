@@ -34,3 +34,5 @@ skip_files:
 - ^venv/*
 - ^.git/*
 - ^test/*
+- ^campusconnect.sublime-project$
+- ^campusconnect.sublime-workspace$
