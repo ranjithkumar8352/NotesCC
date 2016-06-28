@@ -1001,6 +1001,17 @@ def rateThisMethod(request):
         return Response(response=1, description="Invaild profileId")
     rating = getattr(request, 'rating')
     noteBookId = ndb.Key(urlsafe=getattr(request, 'noteBookId'))
+    noteBookOpened.add(noteBookId.urlsafe())
+    cacheVal = memcache.get(noteBookId.urlsafe())
+    if cacheVal is not None:
+        if profileId in cacheVal[9]:
+            idx = cacheVal[9].index(profileId)
+            del(cacheVal[10][idx])
+            cacheVal[9].remove(profileId)
+        cacheVal[9].append(profileId)
+        cacheVal[10].append(rating)
+        memcache.set(noteBookId.urlsafe(), cacheVal)
+        return Response(response=0, description="OK")
     noteBook = noteBookId.get()
     if noteBook is None:
         return Response(response=1, description="Invalid noteBookId")

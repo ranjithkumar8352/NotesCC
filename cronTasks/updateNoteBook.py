@@ -15,7 +15,13 @@ for urlsafeId in noteBookOpened:
     cacheVal = memcache.get(urlsafeId)
     print cacheVal[8]
     if cacheVal is not None:
-        print noteBook.bmUserList
+        LOG.info(cacheVal[9])
+        LOG.info(cacheVal[10])
+        if noteBook.ratedUserIds != cacheVal[9] or noteBook.ratingList != cacheVal[10]:
+            noteBook.ratedUserIds = cacheVal[9]
+            noteBook.ratingList = cacheVal[10]
+            flag = 1
+        LOG.info(noteBook.bmUserList)
         if noteBook.bmUserList == cacheVal[8]:
             flag = 0
         else:

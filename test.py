@@ -4,7 +4,7 @@ from apiclient.discovery import build
 
 
 def main():
-    apiRoot = 'https://uploadingtest-1344.appspot.com/_ah/api'
+    apiRoot = 'https://uploadnotes-2016.appspot.com/_ah/api'
     api = 'notesapi'
     version = 'v1'
     discovery_url = '%s/discovery/v1/apis/%s/%s/rest' % (apiRoot, api, version)
@@ -158,13 +158,13 @@ def main():
     notesList.append({'classNumber':'1', 'courseId':courseIdList[0], 'date': '22:06:2016', 'notesDesc': 'NotesDescription1', 'profileId': profileIdList[0], 'title': 'Notes Title1', 'urlList':['http://tartarus.org/gareth/maths/Complex_Methods/rjs/cm1_q02vi.jpg', 'http://ds.nahoo.net/Academic/images/Pure3-Integration-Notes.gif', 'http://vle.woodhouse.ac.uk/topicdocs/maths/student%20work/S2%20summary%20notes%20for%20revision%20by%20Damini.jpg', 'http://img10.deviantart.net/cf6b/i/2010/277/8/d/math_notes_by_cptmcmuffinz-d303z7k.jpg']})
     notesList.append({'classNumber':'2', 'courseId':courseIdList[0], 'date': '24:06:2016', 'notesDesc': 'NotesDescription2', 'profileId': profileIdList[0], 'title': 'Notes Title2', 'urlList':['http://www.mathplane.com/yahoo_site_admin/assets/images/additional_derivatives_natural_logs.186145208_large.png', 'http://science.hyde.wikispaces.net/file/view/PolyVision_01_13_12_11_08_03.jpg/292006929/PolyVision_01_13_12_11_08_03.jpg', 'http://leah4sci.com/wp-content/uploads/2014/04/Carboxylic-Acid-Derivative-Study-Guide-Cheat-Sheet-by-Leah4sci.jpg']})
     notesList.append({'classNumber':'3', 'courseId':courseIdList[5], 'date': '21:06:2016', 'notesDesc': 'NotesDescription3', 'profileId': profileIdList[1], 'title': 'Notes Title3', 'urlList':['http://image.slidesharecdn.com/form4addmathsnote-140118081550-phpapp02/95/form-4-add-maths-note-6-638.jpg?cb=1390032984', 'http://image.slidesharecdn.com/basicbusinessmath-studynotes-131221043822-phpapp01/95/basic-business-math-study-notes-2-638.jpg?cb=1388105510', 'http://enlighteninglearnersweblog.com/blogs/media/blogs/b/1.gif']})
-    notesList.append({"urlList": ["https://storage.googleapis.com/uploadingtest-1344/1.png",
-                      "https://storage.googleapis.com/uploadingtest-1344/2.png",
-                      "https://storage.googleapis.com/uploadingtest-1344/3.png",
-                      "https://storage.googleapis.com/uploadingtest-1344/4.png",
-                      "https://storage.googleapis.com/uploadingtest-1344/5.png",
-                      "https://storage.googleapis.com/uploadingtest-1344/6.png",
-                      "https://storage.googleapis.com/uploadingtest-1344/7.png"],
+    notesList.append({"urlList": ["https://storage.googleapis.com/uploadnotes-2016/1.png",
+                      "https://storage.googleapis.com/uploadnotes-2016/2.png",
+                      "https://storage.googleapis.com/uploadnotes-2016/3.png",
+                      "https://storage.googleapis.com/uploadnotes-2016/4.png",
+                      "https://storage.googleapis.com/uploadnotes-2016/5.png",
+                      "https://storage.googleapis.com/uploadnotes-2016/6.png",
+                      "https://storage.googleapis.com/uploadnotes-2016/7.png"],
                       "classNumber": "3",
                       "courseId": courseIdList[0],
                       "date": "22-06-2016", "notesDesc": "TEST NOTES 4",
