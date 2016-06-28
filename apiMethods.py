@@ -286,12 +286,12 @@ def feedMethod(request):
     subscribedCourseIds = profile.subscribedCourseIds
     try:
         availableCourseList = feedCourseResponse(availableCourseIds)
-    except Exception:
-        return FeedResponse(response=1, description=' in availableCourses')
+    except Exception, E:
+        return FeedResponse(response=1, description=' in availableCourses ' + str(E))
     try:
         subscribedCourseList = feedCourseResponse(subscribedCourseIds)
-    except Exception:
-        return FeedResponse(response=1, description=' in subscribedCourses')
+    except Exception, E:
+        return FeedResponse(response=1, description=' in subscribedCourses' + str(E))
     collegeId = profile.collegeId
     return FeedResponse(response=0, description="OK", profileName=profileName,
                         points=points, photoUrl=photoUrl,
@@ -304,7 +304,7 @@ def feedCourseResponse(courseIds):
         To get the course details for home page feed"""
     responseList = []
     curDate = datetime.datetime.now().date()
-    curTime = datetime.datetime.now().time()
+    curTime = (datetime.datetime.now() + datetime.timedelta(hours=5, minutes=30)).time()
     for courseId in courseIds:
         dueAssignments, dueExams, recentNotes = 0, 0, 0
         course = courseId.get()
@@ -460,7 +460,7 @@ def createAssignmentMethod(request):
                 dueDate, dueTime, urlList)"""
     assignmentTitle = getattr(request, 'assignmentTitle')
     assignmentDesc = getattr(request, 'assignmentDesc')
-    dateUploaded = str(datetime.datetime.now())
+    dateUploaded = str(datetime.datetime.now() + datetime.timedelta(hours=5, minutes=30))
     try:
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
     except Exception:
@@ -495,7 +495,7 @@ def createExamMethod(request):
        To create a new exam"""
     examTitle = getattr(request, 'examTitle')
     examDesc = getattr(request, 'examDesc')
-    dateUploaded = str(datetime.datetime.now())
+    dateUploaded = str(datetime.datetime.now()+datetime.timedelta(hours=5, minutes=30))
     try:
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
     except Exception:
@@ -532,7 +532,6 @@ def getAssignmentMethod(request):
     except Exception:
         return GetAssignmentResponse(response=1, description="Invalid assignmentId")
     assignmentOpened.add(assignmentId.urlsafe())
-    print str(assignmentOpened)
     cacheVal = memcache.get(assignmentId.urlsafe())
     memViews = memcache.get('views' + assignmentId.urlsafe())
     if cacheVal is not None:
@@ -654,11 +653,10 @@ def createNotesMethod(request):
     query = NoteBook.query(ndb.AND(NoteBook.courseId == courseId,
                                    NoteBook.uploaderId == profileId))
     noteBookResult = query.fetch()
-    print noteBookResult
     if noteBookResult:
         for noteBook in noteBookResult:
             newNotes = Notes(date=date, urlList=urlList, notesDesc=notesDesc,
-                             classNumber=str(len(noteBook.notesIds)+1), title=title)
+                             classNumber=str(len(noteBook.notesIds) + 1), title=title)
             try:
                 addToNoteBook(noteBook.key, newNotes)
             except Exception, E:
@@ -668,6 +666,8 @@ def createNotesMethod(request):
                             key=noteBook.key.urlsafe())
     else:
         try:
+            newNotes = Notes(date=date, urlList=urlList, notesDesc=notesDesc,
+                             classNumber='1', title=title)
             noteBookId = createNoteBook(profileId, courseId)
             addToNoteBook(noteBookId, newNotes)
         except Exception, E:
@@ -681,7 +681,8 @@ def createNoteBook(profileId, courseId):
        To create new noteBook"""
     newNoteBook = NoteBook(courseId=courseId, uploaderId=profileId,
                            notesIds=[], ratedUserIds=[], ratingList=[],
-                           totalRating="0", frequency=0, views=0, bmUserList=[])
+                           totalRating="0", frequency=0, views=0, bmUserList=[],
+                           lastUpdated=str(datetime.datetime.now() + datetime.timedelta(hours=5, minutes=30)))
     course = courseId.get()
     if course is None:
         raise Exception("Invalid courseId")
@@ -711,7 +712,26 @@ def addToNoteBook(noteBookId, newNotes):
         raise Exception("Invalid profileId")
     noteBook.notesIds.append(notesId)
     noteBook.frequency += 1
-    noteBook.lastUpdated = str(datetime.datetime.now())
+    notesList = []
+    pages = 0
+    for notesId in noteBook.notesIds:
+        notes = notesId.get()
+        if notes is None:
+            return NoteBookDetailResponse(response=1, description="Invalid notesId")
+        notesList.append(NotesResponse(title=notes.title,
+                                       description=notes.notesDesc,
+                                       date=notes.date,
+                                       classNumber=notes.classNumber,
+                                       urlList=notes.urlList))
+        pages += len(notes.urlList)
+    noteBook.lastUpdated = str(datetime.datetime.now() + datetime.timedelta(hours=5, minutes=30))
+    noteBookUploader = noteBook.uploaderId.get()
+    uploaderName = noteBookUploader.profileName
+    course = noteBook.courseId.get()
+    fields = [course.courseName, uploaderName, noteBook.lastUpdated, noteBook.frequency, pages, noteBook.totalRating,
+              notesList, course.colour, noteBook.bmUserList, noteBook.ratedUserIds,
+              noteBook.ratingList, noteBook.uploaderId]
+    memcache.set(noteBookId.urlsafe(), fields)
     noteBook.put()
 
 
@@ -1060,7 +1080,7 @@ def coursePageMethod(request):
     collegeName = college.collegeName
     assignmentList, examList = [], []
     curDate = datetime.datetime.now().date()
-    curTime = datetime.datetime.now().time()
+    curTime = (datetime.datetime.now() + datetime.timedelta(hours=5, minutes=30)).time()
     dueAssignments, dueExams, recentNotes = 0, 0, 0
     assignmentIds = course.assignmentIds
     studentCount = len(course.studentIds)
@@ -1134,7 +1154,6 @@ def coursePageMethod(request):
               course.elective, course.studentIds, collegeName, course.branchNames,
               course.sectionNames, course.batchNames, course.semester]
     memcache.add(courseId.urlsafe(), fields, 3600)
-    print "1"
     return CoursePageResponse(response=0, description="OK", isSubscribed=isSubscribed,
                               courseName=course.courseName, date=course.date, startTime=course.startTime,
                               endTime=course.endTime, examCount=dueExams, assignmentCount=dueAssignments,

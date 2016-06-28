@@ -41,7 +41,7 @@ class ImageUploadWeb(webapp2.RequestHandler):
             except Exception:
                 print "type Missing in request"
                 return self.response.write("type Missing in request")
-            bucketName = "/uploadingtest-1344.appspot.com"
+            bucketName = "/uploadnotes-2016.appspot.com"
             try:
                 for file in fileList:
                     timestamp = "".join(str(datetime.datetime.now()).split())
@@ -69,7 +69,7 @@ class ImageUploadWeb(webapp2.RequestHandler):
                 #except:
                 #    print "classNumber Missing from request"
                 #    self.response.write("classNumber Missing in request")
-                url = "https://uploadingtest-1344.appspot.com/_ah/api/notesapi/v1/createNotes"
+                url = "https://uploadnotes-2016.appspot.com/_ah/api/notesapi/v1/createNotes"
                 data = {'profileId': profileId, 'courseId': courseId, 'title': title, 'notesDesc': desc,
                         'urlList': urlList, 'date': date}
                 header = {'Content-Type': 'application/json; charset=UTF-8'}
@@ -93,7 +93,7 @@ class ImageUploadWeb(webapp2.RequestHandler):
                 except:
                     print "dueTime Missing from request"
                     self.response.write("dueTime Missing from request")
-                url = "https://uploadingtest-1344.appspot.com/_ah/api/notesapi/v1/createAssignment"
+                url = "https://uploadnotes-2016.appspot.com/_ah/api/notesapi/v1/createAssignment"
                 data = {'uploaderId': profileId, 'courseId': courseId, 'assignmentTitle': title, 'assignmentDesc': desc,
                         'urlList': urlList, 'dueDate': dueDate, 'dueTime': dueTime}
                 header = {'Content-Type': 'application/json; charset=UTF-8'}
@@ -115,7 +115,7 @@ class ImageUploadWeb(webapp2.RequestHandler):
                 except:
                     print "dueTime Missing from request"
                     self.response.write("dueTime Missing from request")
-                url = "https://uploadingtest-1344.appspot.com/_ah/api/notesapi/v1/createExam"
+                url = "https://uploadnotes-2016.appspot.com/_ah/api/notesapi/v1/createExam"
                 data = {'uploaderId': profileId, 'courseId': courseId, 'examTitle': title, 'examDesc': desc,
                         'urlList': urlList, 'dueDate': dueDate, 'dueTime': dueTime}
                 header = {'Content-Type': 'application/json; charset=UTF-8'}
@@ -126,7 +126,8 @@ class ImageUploadWeb(webapp2.RequestHandler):
                 redirectUrl = str('https://campusconnect-2016.herokuapp.com/exam?id=') + str(key)
                 redirectUrl += str('&cId=') + str(courseId)
                 self.redirect(redirectUrl)
-        except HTTPException, E:
+        except Exception, E:
+            print E
             if flag == 1 or flag == 2:
                 self.redirect('https://campusconnect-2016.herokuapp.com/home')
     def get(self):

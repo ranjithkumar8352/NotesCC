@@ -173,6 +173,7 @@ def main():
     print "CREATING NOTES..."
     for notes in notesList:
         response = service.createNotes(body=notes).execute()
+        print response
         noteBookIdList.append(response.get('key'))
     print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     print "NOTEBOOK LIST BY upid..."
@@ -186,6 +187,7 @@ def main():
     print "NOTEBOOK LIST BY bpid..."
     print service.getNoteBookList(body={'upid':profileIdList[0]}).execute()"""
     print "RATING NOTEBOOK"
+    print noteBookIdList
     service.rateThis(body={'noteBookId': noteBookIdList[1], 'profileId':profileIdList[0], 'rating':4}).execute()
     print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     # ____________________________________CREATING ASSIGNMENT_________________________________________

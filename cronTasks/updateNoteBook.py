@@ -13,7 +13,6 @@ for urlsafeId in noteBookOpened:
     noteBookId = ndb.Key(urlsafe=urlsafeId)
     noteBook = noteBookId.get()
     cacheVal = memcache.get(urlsafeId)
-    print cacheVal[8]
     if cacheVal is not None:
         LOG.info(cacheVal[9])
         LOG.info(cacheVal[10])
