@@ -24,6 +24,8 @@ handlers:
   script: cronTasks/updateExam.py
 - url: /task/updateNoteBook
   script: cronTasks/updateNoteBook.py  
+- url: /task/updateCourse
+  script: cronTasks/updateCourse.py
 
 libraries:
 - name: pycrypto

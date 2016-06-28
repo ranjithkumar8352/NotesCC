@@ -11,3 +11,7 @@ cron:
   url: /task/updateNoteBook
   schedule: every 1 minutes
   target: crontask
+- description: "updating subscriptions on course"
+  url: /task/updateCourse
+  schedule: every 1 minutes
+  target: crontask

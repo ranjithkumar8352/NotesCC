@@ -20,6 +20,8 @@ from google.appengine.api import memcache
 noteBookOpened = set()
 assignmentOpened = set()
 examOpened = set()
+courseUpdate = set()
+
 
 def createCollegeMethod(request):
     """createCollegeMethod(request)
@@ -122,7 +124,7 @@ def addCourseMethod(request):
     professorName = getattr(request, 'professorName', None)
     colour = getattr(request, 'colour', None)
     courseCode = getattr(request, 'courseCode', None)
-    elective = getattr(request, 'elective', '1')
+    elective = getattr(request, 'elective', '0')
     college = collegeId.get()
     profile = profileId.get()
     if college is None:
@@ -760,8 +762,6 @@ def getNoteBook(request):
                                       response=0, colour=cacheVal[7],
                                       description="OK")
 
-
-
     noteBook = noteBookId.get()
     if noteBook is None:
         return NoteBookDetailResponse(response=1, description="Invalid noteBookId")
@@ -1370,12 +1370,25 @@ def unsubscribeCourseMethod(request):
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception, E:
-        return Response(response=1, description="Invaild profileId"+str(E))
+        return Response(response=1, description="Invaild profileId " + str(E))
     try:
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
     except Exception, E:
-        return Response(response=1, description="Invaild courseId"+str(E))
+        return Response(response=1, description="Invaild courseId " + str(E))
     profile = profileId.get()
+    cacheVal = memcache.get(courseId.urlsafe())
+    courseUpdate.add(courseId.urlsafe())
+    if cacheVal is not None:
+        if profileId in cacheVal[13]:
+            profile.subscribedCourseIds.remove(courseId)
+            profile.put()
+            cacheVal[13].remove(profileId)
+        else:
+            profile.subscribedCourseIds.append(courseId)
+            profile.put()
+            cacheVal[13].append(profileId)
+        memcache.set(courseId.urlsafe(), cacheVal)
+        return Response(response=0, description="OK")
     course = courseId.get()
     if profile is None:
         return Response(response=1, description="Invaild profileId")
@@ -1545,6 +1558,7 @@ def deleteCollege(id):
         return Response(response=1, description="No such collegeId")
     collegeId.delete()
     return Response(response=0, description='OK')
+
 
 def deleteMethod(request):
     profileId = getattr(request, 'profileId', None)
