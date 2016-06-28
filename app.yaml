@@ -18,8 +18,12 @@ handlers:
   script: main.app
 - url: /imgandroid
   script: main.app
-- url: /task/updateViews
-  script: cronTasks/updateViews.py
+- url: /task/updateAssignment
+  script: cronTasks/updateAssignment.py
+- url: /task/updateExam
+  script: cronTasks/updateExam.py
+- url: /task/updateNoteBook
+  script: cronTasks/updateNoteBook.py  
 
 libraries:
 - name: pycrypto

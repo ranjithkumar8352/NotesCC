@@ -356,7 +356,7 @@ def feedCourseResponse(courseIds):
                                                startTime=course.startTime,
                                                endTime=course.endTime, colour=course.colour,
                                                recentNotes=recentNotes,
-                                               professorName=course.professorName,elective=course.elective))
+                                               professorName=course.professorName, elective=course.elective))
     return responseList
 
 
@@ -642,20 +642,21 @@ def createNotesMethod(request):
     date = getattr(request, 'date')
     urlList = getattr(request, 'urlList')
     notesDesc = getattr(request, 'notesDesc')
-    classNumber = getattr(request, 'classNumber')
+    # classNumber = getattr(request, 'classNumber')
     try:
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
     except Exception:
         return Response(response=1, description="Invalid courseId")
     title = getattr(request, 'title')
     # CHECKS IF NOTEBOOK WITH SAME profileID AND courseId already exists
-    newNotes = Notes(date=date, urlList=urlList, notesDesc=notesDesc,
-                     classNumber=classNumber, title=title)
     query = NoteBook.query(ndb.AND(NoteBook.courseId == courseId,
                                    NoteBook.uploaderId == profileId))
     noteBookResult = query.fetch()
+    print noteBookResult
     if noteBookResult:
         for noteBook in noteBookResult:
+            newNotes = Notes(date=date, urlList=urlList, notesDesc=notesDesc,
+                             classNumber=str(len(noteBook.notesIds)+1), title=title)
             try:
                 addToNoteBook(noteBook.key, newNotes)
             except Exception, E:
@@ -1269,6 +1270,21 @@ def bookmarkMethod(request):
         noteBookId = ndb.Key(urlsafe=getattr(request, 'noteBookId'))
     except Exception:
         return BookmarkResponse(response=1, description="Invalid noteBookId")
+    noteBookOpened.add(noteBookId.urlsafe())
+    cacheVal = memcache.get(noteBookId.urlsafe())
+    if cacheVal is not None:
+        profile = profileId.get()
+        if profileId in cacheVal[8]:
+            cacheVal[8].remove(profileId)
+            profile.bookmarkedNoteBookIds.remove(noteBookId)
+            bookmarkStatus = 0
+        else:
+            cacheVal[8].append(profileId)
+            bookmarkStatus = 1
+            profile.bookmarkedNoteBookIds.append(noteBookId)
+        profile.put()
+        memcache.set(noteBookId.urlsafe(), cacheVal)
+        return BookmarkResponse(response=0, description="OK", bookmarkStatus=bookmarkStatus)
     profile = profileId.get()
     noteBook = noteBookId.get()
     if noteBookId in profile.bookmarkedNoteBookIds:

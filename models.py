@@ -342,7 +342,7 @@ class NotesForm(messages.Message):
     date = messages.StringField(2)
     urlList = messages.StringField(3, repeated=True)
     notesDesc = messages.StringField(4)
-    classNumber = messages.StringField(5)
+    #classNumber = messages.StringField(5)
     courseId = messages.StringField(6)
     title = messages.StringField(7)
 
