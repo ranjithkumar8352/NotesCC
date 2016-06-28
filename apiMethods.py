@@ -1031,11 +1031,12 @@ def coursePageMethod(request):
         else:
             isSubscribed = 0
         return CoursePageResponse(response=0, description="OK", isSubscribed=isSubscribed,
-                              courseName=cacheVal[0], date=cacheVal[1], startTime=cacheVal[2],
-                              endTime=cacheVal[3], examCount=cacheVal[4], assignmentCount=cacheVal[5],
-                              notesCount=cacheVal[6], examList=cacheVal[7], assignmentList=cacheVal[8],
-                              studentCount=cacheVal[9], professorName=cacheVal[10], colour=cacheVal[11],
-                              elective=cacheVal[12])
+                                  courseName=cacheVal[0], date=cacheVal[1], startTime=cacheVal[2],
+                                  endTime=cacheVal[3], examCount=cacheVal[4], assignmentCount=cacheVal[5],
+                                  notesCount=cacheVal[6], examList=cacheVal[7], assignmentList=cacheVal[8],
+                                  studentCount=cacheVal[9], professorName=cacheVal[10], colour=cacheVal[11],
+                                  elective=cacheVal[12], collegeName=cacheVal[14], branchNames=cacheVal[15],
+                                  sectionNames=cacheVal[16], batchNames=cacheVal[17], semester=cacheVal[18])
     course = courseId.get()
     if course is None:
         return CoursePageResponse(response=1, description="Invalid courseId")
@@ -1043,6 +1044,8 @@ def coursePageMethod(request):
         isSubscribed = 1
     else:
         isSubscribed = 0
+    college = course.collegeId.get()
+    collegeName = college.collegeName
     assignmentList, examList = [], []
     curDate = datetime.datetime.now().date()
     curTime = datetime.datetime.now().time()
@@ -1115,7 +1118,9 @@ def coursePageMethod(request):
             recentNotes = recentNotes + 1
     fields = [course.courseName, course.date, course.startTime, course.endTime,
               dueExams, dueAssignments, recentNotes, examList,
-              assignmentList, studentCount, course.professorName, course.colour, course.elective, course.studentIds]
+              assignmentList, studentCount, course.professorName, course.colour,
+              course.elective, course.studentIds, collegeName, course.branchNames,
+              course.sectionNames, course.batchNames, course.semester]
     memcache.add(courseId.urlsafe(), fields, 3600)
     print "1"
     return CoursePageResponse(response=0, description="OK", isSubscribed=isSubscribed,
@@ -1123,7 +1128,8 @@ def coursePageMethod(request):
                               endTime=course.endTime, examCount=dueExams, assignmentCount=dueAssignments,
                               notesCount=recentNotes, examList=examList, assignmentList=assignmentList,
                               studentCount=studentCount, professorName=course.professorName, colour=course.colour,
-                              elective=course.elective)
+                              elective=course.elective, collegeName=collegeName, branchNames=course.branchNames,
+                              sectionNames=course.sectionNames, batchNames=course.batchNames, semester=course.semester)
 
 
 def getAssignmentListMethod(request):

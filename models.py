@@ -442,6 +442,11 @@ class CoursePageResponse(messages.Message):
     professorName = messages.StringField(15)
     colour = messages.StringField(16)
     elective = messages.StringField(17)
+    branchNames = messages.StringField(18, repeated=True)
+    batchNames = messages.StringField(19, repeated=True)
+    sectionNames = messages.StringField(20, repeated=True)
+    semester = messages.StringField(21)
+    collegeName = messages.StringField(22)
 
 
 class BookmarkRequest(messages.Message):
