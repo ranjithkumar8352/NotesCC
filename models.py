@@ -23,9 +23,9 @@ class College(ndb.Model):
 
 
 class CollegeForm(messages.Message):
-    collegeName = messages.StringField(1, required=True)
-    abbreviation = messages.StringField(2, required=True)
-    location = messages.StringField(3, required=True)
+    collegeName = messages.StringField(1)
+    abbreviation = messages.StringField(2)
+    location = messages.StringField(3)
     collegeType = messages.StringField(4)
     semStartDate = messages.StringField(5)
     semEndDate = messages.StringField(6)
@@ -50,13 +50,13 @@ class Profile(ndb.Model):
 
 
 class ProfileForm(messages.Message):
-    profileName = messages.StringField(1, required=True)
-    collegeId = messages.StringField(2, required=True)
+    profileName = messages.StringField(1)
+    collegeId = messages.StringField(2)
     batchName = messages.StringField(3)
     branchName = messages.StringField(4)
     sectionName = messages.StringField(5)
-    photoUrl = messages.StringField(10, required=True)
-    email = messages.StringField(14, required=True)
+    photoUrl = messages.StringField(10)
+    email = messages.StringField(14)
     gcmId = messages.StringField(15)
 
 
@@ -82,16 +82,16 @@ class Course(ndb.Model):
 
 
 class CourseForm(messages.Message):
-    courseName = messages.StringField(1, required=True)
-    collegeId = messages.StringField(2, required=True)
+    courseName = messages.StringField(1)
+    collegeId = messages.StringField(2)
     batchNames = messages.StringField(3, repeated=True)
     branchNames = messages.StringField(10, repeated=True)
     sectionNames = messages.StringField(4, repeated=True)
-    semester = messages.StringField(5, required=True)
+    semester = messages.StringField(5)
     startTime = messages.StringField(6, repeated=True)
     endTime = messages.StringField(7, repeated=True)
     professorName = messages.StringField(8)
-    profileId = messages.StringField(9, required=True)
+    profileId = messages.StringField(9)
     colour = messages.StringField(11)
     courseCode = messages.StringField(12)
     date = messages.StringField(13, repeated=True)
