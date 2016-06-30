@@ -311,15 +311,5 @@ class NotesAPI(remote.Service):
     def runTestScript(self, request):
         runScript()
         return message_types.VoidMessage()
-        
-    """@endpoints.method(
-        message_types.VoidMessage,
-        message_types.VoidMessage,
-        path='runExamScript',
-        http_method='GET',
-        name='runExamScript')
-    def runExamScript(self, request):
-        examScript()
-        return message_types.VoidMessage()"""
 
 apiLists = endpoints.api_server([NotesAPI])

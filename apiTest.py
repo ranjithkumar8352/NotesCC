@@ -1,8 +1,6 @@
-import urllib2
 import json
-
-
-projectId = 'uploadnotes-2016.appspot.com'
+import urllib2
+from config import PROJECT_URL
 collegeList = []
 collegeIdList = []
 profileList = []
@@ -135,7 +133,7 @@ def createExamList():
 
 def createCollege():
     createCollegeList()
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/createCollege"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/createCollege"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     for i in range(4):
         req = urllib2.Request(url, json.dumps(collegeList[i]), header)
@@ -146,7 +144,7 @@ def createCollege():
         key = response.get('key')
         collegeIdList.append(key)
         print key
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/collegeList"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/collegeList"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     req = urllib2.Request(url)
     response = urllib2.urlopen(req)
@@ -169,7 +167,7 @@ def createCollege():
 
 def createProfile():
     createProfileList()
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/createProfile"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/createProfile"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     for i in range(6):
         req = urllib2.Request(url, json.dumps(profileList[i]), header)
@@ -184,7 +182,7 @@ def createProfile():
 
 def createCourse():
     createCourseList()
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/addCourse"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/addCourse"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     for i in range(6):
         req = urllib2.Request(url, json.dumps(courseList[i]), header)
@@ -198,12 +196,12 @@ def createCourse():
 
 
 def addBranch():
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/addBranch"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/addBranch"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     data = {'branchName': 'CIVIL', 'collegeId': collegeIdList[1]}
     req = urllib2.Request(url, json.dumps(data), header)
     response = urllib2.urlopen(req)
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/collegeList"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/collegeList"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     req = urllib2.Request(url)
     response = urllib2.urlopen(req)
@@ -225,7 +223,7 @@ def addBranch():
 
 
 def addAdmin():
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/addAdmin/" + courseIdList[0]
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/addAdmin/" + courseIdList[0]
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     data = {'profileId': profileIdList[5]}
     req = urllib2.Request(url, json.dumps(data), header)
@@ -236,7 +234,7 @@ def addAdmin():
 
 
 def courseListMethod():
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/courseList/1"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/courseList/1"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     for id in profileIdList:
         data = {'profileId': id}
@@ -248,7 +246,7 @@ def courseListMethod():
 
 
 def coursePage():
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/coursePage/"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/coursePage/"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     for pid in profileIdList:
         for cid in courseIdList:
@@ -262,7 +260,7 @@ def coursePage():
 
 def subscribeCourseList():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/subscribeCourse/"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/subscribeCourse/"
     data = {'profileId': profileIdList[0], 'courseIds': [courseIdList[0], courseIdList[2]]}
     req = urllib2.Request(url, json.dumps(data), header)
     response = urllib2.urlopen(req)
@@ -285,7 +283,7 @@ def subscribeCourseList():
 
 def feed():
     for pid in profileIdList:
-        url = "https://" + projectId + "/_ah/api/notesapi/v1/feed/" + pid
+        url = PROJECT_URL + "/_ah/api/notesapi/v1/feed/" + pid
         req = urllib2.Request(url)
         response = urllib2.urlopen(req)
         response = json.loads(response.read())
@@ -295,7 +293,7 @@ def feed():
 
 def createNotes():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/createNotes"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/createNotes"
     for data in notesList:
         req = urllib2.Request(url, json.dumps(data), header)
         response = urllib2.urlopen(req)
@@ -309,7 +307,7 @@ def createNotes():
 
 def createAssignment():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/createAssignment"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/createAssignment"
     for data in assignmentList:
         req = urllib2.Request(url, json.dumps(data), header)
         response = urllib2.urlopen(req)
@@ -323,7 +321,7 @@ def createAssignment():
 
 def createExam():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/createExam"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/createExam"
     for data in examList:
         req = urllib2.Request(url, json.dumps(data), header)
         response = urllib2.urlopen(req)
@@ -337,7 +335,7 @@ def createExam():
 
 def assignmentListAPI():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/assignmentList"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/assignmentList"
     for courseId in courseIdList:
         req = urllib2.Request(url, json.dumps({'courseId': courseId}), header)
         response = urllib2.urlopen(req)
@@ -348,7 +346,7 @@ def assignmentListAPI():
 
 def examListAPI():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/examList"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/examList"
     for courseId in courseIdList:
         req = urllib2.Request(url, json.dumps({'courseId': courseId}), header)
         response = urllib2.urlopen(req)
@@ -359,7 +357,7 @@ def examListAPI():
 
 def noteBookListAPI():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/notebookList"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/notebookList"
     for courseId in courseIdList:
         req = urllib2.Request(url, json.dumps({'courseId': courseId}), header)
         response = urllib2.urlopen(req)
@@ -377,7 +375,7 @@ def noteBookListAPI():
 
 def bookmarkNoteBook():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/bookmarkNoteBook"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/bookmarkNoteBook"
     req = urllib2.Request(url, json.dumps({'noteBookId': noteBookIdList[0],
                                            'profileId': profileIdList[1]}), header)
     response = urllib2.urlopen(req)
@@ -388,7 +386,7 @@ def bookmarkNoteBook():
 
 def rateThis(rating):
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = "https://" + projectId + "/_ah/api/notesapi/v1/rateThis"
+    url = PROJECT_URL + "/_ah/api/notesapi/v1/rateThis"
     req = urllib2.Request(url, json.dumps({'noteBookId': noteBookIdList[0],
                                            'profileId': profileIdList[1],
                                            'rating': rating}), header)
@@ -402,7 +400,7 @@ def studentList():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     for courseId in courseIdList:
         for profileId in profileIdList:
-            url = "https://" + projectId + "/_ah/api/notesapi/v1/studentList/" + courseId
+            url = PROJECT_URL + "/_ah/api/notesapi/v1/studentList/" + courseId
             req = urllib2.Request(url, json.dumps({'profileId': profileIdList[1]}), header)
             response = urllib2.urlopen(req)
             response = json.loads(response.read())
@@ -414,7 +412,7 @@ def getNoteBookAPI():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     for noteBookId in noteBookIdList:
         for profileId in profileIdList:
-            url = "https://" + projectId + "/_ah/api/notesapi/v1/getNoteBook"
+            url = PROJECT_URL + "/_ah/api/notesapi/v1/getNoteBook"
             req = urllib2.Request(url, json.dumps({'profileId': profileIdList[1],
                                                    'noteBookId': noteBookId}), header)
             response = urllib2.urlopen(req)
@@ -427,7 +425,7 @@ def getExamAPI():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     for examId in examIdList:
         for profileId in profileIdList:
-            url = "https://" + projectId + "/_ah/api/notesapi/v1/getExam"
+            url = PROJECT_URL + "/_ah/api/notesapi/v1/getExam"
             req = urllib2.Request(url, json.dumps({'profileId': profileIdList[1],
                                                    'examId': examId}), header)
             response = urllib2.urlopen(req)
@@ -440,7 +438,7 @@ def getAssignmentAPI():
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     for assignmentId in assignmentIdList:
         for profileId in profileIdList:
-            url = "https://" + projectId + "/_ah/api/notesapi/v1/getAssignment"
+            url = PROJECT_URL + "/_ah/api/notesapi/v1/getAssignment"
             req = urllib2.Request(url, json.dumps({'profileId': profileIdList[1],
                                                    'assignmentId': assignmentId}), header)
             response = urllib2.urlopen(req)
