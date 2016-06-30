@@ -26,7 +26,7 @@ from apiMethods import deleteMethod, unsubscribeCourseMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 from apiTest import runScript
 from editMethods import editCollegeMethod, editProfileMethod, editCourseMethod
-
+from editMethods import editAssignmentMethod, editExamMethod
 
 
 @endpoints.api(name='notesapi', version='v1')
@@ -185,6 +185,18 @@ class NotesAPI(remote.Service):
     def createAssignment(self, request):
         return createAssignmentMethod(request)
 
+    editAssignmentResource = endpoints.ResourceContainer(AssignmentForm,
+                                                         assignmentId=messages.StringField(1))
+
+    @endpoints.method(
+        editAssignmentResource,
+        Response,
+        path='editAssignment/{assignmentId}',
+        http_method='POST',
+        name='editAssignment')
+    def editAssignment(self, request):
+        return editAssignmentMethod(request)
+
     @endpoints.method(
         ExamForm,
         Response,
@@ -193,6 +205,18 @@ class NotesAPI(remote.Service):
         name='createExam')
     def createExam(self, request):
         return createExamMethod(request)
+
+    editExamResource = endpoints.ResourceContainer(AssignmentForm,
+                                                   examId=messages.StringField(1))
+
+    @endpoints.method(
+        editExamResource,
+        Response,
+        path='editExam/{examId}',
+        http_method='POST',
+        name='editExam')
+    def editExam(self, request):
+        return editExamMethod(request)
 
     @endpoints.method(
         GetAssignmentRequest,
