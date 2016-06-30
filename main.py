@@ -6,8 +6,16 @@ import datetime
 
 
 class ImageUploadWeb(webapp2.RequestHandler):
+    def options(self):      
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
+        self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
+
     def post(self):
+        self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+        self.response.headers['Content-Type'] = 'application/json'
         flag = 0
+        print self.request.POST
         try:
             urlList = []
             try:
@@ -46,7 +54,8 @@ class ImageUploadWeb(webapp2.RequestHandler):
                 for file in fileList:
                     timestamp = "".join(str(datetime.datetime.now()).split())
                     fileName = bucketName + '/' + courseId + '/' + profileId + '/' + timestamp + '.jpg'
-                    gcsFile = gcs.open(fileName, mode='w', content_type='image/jpeg', options={'x-goog-acl': 'public-read'})
+                    gcsFile = gcs.open(fileName, mode='w', content_type='image/jpeg',
+                                       options={'x-goog-acl': 'public-read'})
                     gcsFile.write(file.value)
                     url = 'https://storage.googleapis.com' + fileName
                     urlList.append(url)
@@ -64,9 +73,9 @@ class ImageUploadWeb(webapp2.RequestHandler):
                 except:
                     print "date Missing from request"
                     return self.response.write("date Missing from request")
-                #try:
+                # try:
                 #    classNumber = self.request.get('classNumber')
-                #except:
+                # except:
                 #    print "classNumber Missing from request"
                 #    self.response.write("classNumber Missing in request")
                 url = "https://uploadnotes-2016.appspot.com/_ah/api/notesapi/v1/createNotes"
@@ -81,7 +90,13 @@ class ImageUploadWeb(webapp2.RequestHandler):
                 key = response.get('key')
                 redirectUrl = str('https://campusconnect-2016.herokuapp.com/notebook?id=') + str(key)
                 redirectUrl += str('&cId=') + str(courseId)
-                self.redirect(redirectUrl)
+                # self.redirect(redirectUrl)
+                self.response.headers['Content-Type'] = 'application/json'   
+                obj = {
+                    'response': 0,
+                    'noteBookId': str(key)
+                  } 
+                self.response.out.write(json.dumps(obj))
             if type == 'assignment':
                 try:
                     dueDate = self.request.get('dueDate')
@@ -103,7 +118,13 @@ class ImageUploadWeb(webapp2.RequestHandler):
                 key = response.get('key')
                 redirectUrl = str('https://campusconnect-2016.herokuapp.com/assignment?id=') + str(key)
                 redirectUrl += str('&cId=') + str(courseId)
-                self.redirect(redirectUrl)
+                # self.redirect(redirectUrl)
+                self.response.headers['Content-Type'] = 'application/json'   
+                obj = {
+                    'response': 0,
+                    'assignmentId': str(key)
+                  } 
+                self.response.out.write(json.dumps(obj))
             if type == 'exam':
                 try:
                     dueDate = self.request.get('dueDate')
@@ -125,12 +146,21 @@ class ImageUploadWeb(webapp2.RequestHandler):
                 key = response.get('key')
                 redirectUrl = str('https://campusconnect-2016.herokuapp.com/exam?id=') + str(key)
                 redirectUrl += str('&cId=') + str(courseId)
-                self.redirect(redirectUrl)
+                # self.redirect(redirectUrl)
+                self.response.headers['Content-Type'] = 'application/json'   
+                obj = {
+                    'response': 0,
+                    'examId': str(key)
+                  } 
+                self.response.out.write(json.dumps(obj))
         except Exception, E:
             print E
             if flag == 1 or flag == 2:
                 self.redirect('https://campusconnect-2016.herokuapp.com/home')
+
     def get(self):
+        self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+        self.response.headers['Content-Type'] = 'application/json'
         self.response.write("""<html>
                     <head>
                     <style type="text/css">.thumb-image{float:left;width:100px;position:relative;padding:5px;}</style>
