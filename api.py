@@ -40,8 +40,9 @@ class NotesAPI(remote.Service):
         return createCollegeMethod(request)
 
     editCollegeResource = endpoints.ResourceContainer(CollegeForm,
-                                                 collegeId=messages.StringField(1))
-    @endpoints(
+                                                      collegeId=messages.StringField(1))
+
+    @endpoints.method(
         editCollegeResource,
         Response,
         path='editCollege/{collegeId}',
