@@ -25,7 +25,7 @@ from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMet
 from apiMethods import deleteMethod, unsubscribeCourseMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 from apiTest import runScript
-from editMethods import editCollegeMethod
+from editMethods import editCollegeMethod, editProfileMethod
 
 
 @endpoints.api(name='notesapi', version='v1')
@@ -59,6 +59,18 @@ class NotesAPI(remote.Service):
         name='createProfile')
     def createProfile(self, request):
         return createProfileMethod(request)
+
+    editProfileResource = endpoints.ResourceContainer(ProfileForm,
+                                                      profileId=messages.StringField(1))
+
+    @endpoints.method(
+        editProfileResource,
+        Response,
+        path='editProfile/{profileId}',
+        http_method='POST',
+        name='editProfile')
+    def editProfile(self, request):
+        editProfileMethod(request)
 
     @endpoints.method(
         CourseForm,
