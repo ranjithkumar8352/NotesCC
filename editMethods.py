@@ -1,6 +1,7 @@
 from models import CollegeForm, ProfileForm, CourseForm, Response
 from models import AssignmentForm, ExamForm
 from google.appengine.ext import ndb
+from google.appengine.api import memcache
 
 
 def editCollegeMethod(request):
@@ -45,6 +46,7 @@ def editCourseMethod(request):
             if value is None or value == "" or value == []:
                 continue
             setattr(course, field.name, value)
+        memcache.delete(courseId.urlsafe())
         course.put()
         return Response(response=1, description="OK")
     except Exception, E:
@@ -62,6 +64,7 @@ def editAssignmentMethod(self, request):
                 continue
             setattr(assignment, field.name, value)
         assignment.put()
+        memcache.delete(assignmentId.urlsafe())
         return Response(response=1, description="OK")
     except Exception, E:
         return Response(response=1, description=str(E))
@@ -77,6 +80,7 @@ def editExamMethod(self, request):
             if value is None or value == "" or value == []:
                 continue
             setattr(exam, field.name, value)
+            memcache.delete(examId.urlsafe())
         exam.put()
         return Response(response=1, description="OK")
     except Exception, E:
