@@ -201,9 +201,9 @@ class Assignment(ndb.Model):
 
 
 class AssignmentForm(messages.Message):
-    assignmentTitle = messages.StringField(1, required=True)
-    assignmentDesc = messages.StringField(2, required=True)
-    courseId = messages.StringField(3, required=True)
+    assignmentTitle = messages.StringField(1)
+    assignmentDesc = messages.StringField(2)
+    courseId = messages.StringField(3)
     uploaderId = messages.StringField(4)
     dueDate = messages.StringField(6)
     dueTime = messages.StringField(8)

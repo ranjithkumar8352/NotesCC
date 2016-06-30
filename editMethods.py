@@ -1,4 +1,5 @@
 from models import CollegeForm, ProfileForm, CourseForm, Response
+from models import AssignmentForm
 from google.appengine.ext import ndb
 
 
@@ -20,7 +21,7 @@ def editCollegeMethod(request):
 
 def editProfileMethod(request):
     try:
-        fields = ProfileForm.add_fields()
+        fields = ProfileForm.all_fields()
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
         profile = profileId.get()
         for field in fields:
@@ -36,7 +37,7 @@ def editProfileMethod(request):
 
 def editCourseMethod(request):
     try:
-        fields = CourseForm.add_fields()
+        fields = CourseForm.all_fields()
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
         course = courseId.get()
         for field in fields:
@@ -45,6 +46,22 @@ def editCourseMethod(request):
                 continue
             setattr(course, field.name, value)
         course.put()
+        return Response(response=1, description="OK")
+    except Exception, E:
+        return Response(response=1, description=str(E))
+
+
+def editAssignmentMethod(self, request):
+    try:
+        fields = AssignmentForm.all_fields()
+        assignmentId = ndb.Key(urlsafe=getattr(request, 'assignmentId'))
+        assignment = assignmentId.get()
+        for field in fields:
+            value = getattr(request, field.name)
+            if value is None or value == "" or value == []:
+                continue
+            setattr(assignment, field.name, value)
+        assignment.put()
         return Response(response=1, description="OK")
     except Exception, E:
         return Response(response=1, description=str(E))
