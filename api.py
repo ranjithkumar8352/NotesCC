@@ -24,6 +24,7 @@ from apiMethods import getAssignmentListMethod, getExamListMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
 from apiMethods import deleteMethod, unsubscribeCourseMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
+from apiTest import runScript
 
 
 @endpoints.api(name='notesapi', version='v1')
@@ -301,6 +302,16 @@ class NotesAPI(remote.Service):
     def searchNotes(self, request):
         return searchNBMethod(request)
 
+    @endpoints.method(
+        message_types.VoidMessage,
+        message_types.VoidMessage,
+        path='runScript',
+        http_method='GET',
+        name='runScript')
+    def runTestScript(self, request):
+        runScript()
+        return message_types.VoidMessage()
+        
     """@endpoints.method(
         message_types.VoidMessage,
         message_types.VoidMessage,
