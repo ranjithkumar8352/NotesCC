@@ -697,7 +697,7 @@ def createNoteBook(profileId, courseId):
     noteBookId = newNoteBook.put()
     profile.uploadedNoteBookIds.append(noteBookId)
     profile.put()
-    course.noteBookIds.append(noteBookId)   
+    course.noteBookIds.append(noteBookId)
     course.put()
     return noteBookId
 
