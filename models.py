@@ -375,6 +375,7 @@ class NoteBookDetailResponse(messages.Message):
     description = messages.StringField(11)
     bookmarkStatus = messages.IntegerField(13)
     colour = messages.StringField(14)
+    lastUpdated1 = messages.StringField(15)
 
 
 class NoteBookListRequest(messages.Message):
@@ -395,6 +396,7 @@ class NoteBookResponse(messages.Message):
     frequency = messages.IntegerField(7)
     lastUpdated = messages.StringField(8)
     colour = messages.StringField(9)
+    lastUpdated1 = messages.StringField(10)
 
 
 class NoteBookListResponse(messages.Message):
