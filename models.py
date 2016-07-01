@@ -141,6 +141,7 @@ class FeedCourseResponse(messages.Message):
     professorName = messages.StringField(9)
     colour = messages.StringField(10)
     elective = messages.StringField(11)
+    courseCode = messages.StringField(12)
 
 
 class FeedResponse(messages.Message):

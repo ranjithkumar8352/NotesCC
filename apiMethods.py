@@ -358,7 +358,7 @@ def feedCourseResponse(courseIds):
                                                startTime=course.startTime,
                                                endTime=course.endTime, colour=course.colour,
                                                recentNotes=recentNotes,
-                                               professorName=course.professorName, elective=course.elective))
+                                               professorName=course.professorName, elective=course.elective, courseCode=course.courseCode))
     return responseList
 
 
