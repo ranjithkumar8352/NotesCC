@@ -54,6 +54,8 @@ def searchCourseMethod(request):
                                         professorName=course.professorName, notesCount=len(course.noteBookIds),
                                         semester=course.semester)
         courseList.append(courseResponse)
+    if len(courseList) == 0:
+        return CourseListResponse(response=1, description="NOTHING")
     return CourseListResponse(response=0, description='OK', courseList=courseList, completed=1)
 
 
@@ -114,4 +116,6 @@ def searchNBMethod(request):
         noteBookList.append(NoteBookResponse(noteBookId=key, courseName=courseName, uploaderName=uploader.profileName,
                                              pages=pages, totalRating=noteBook.totalRating,
                                              frequency=noteBook.frequency, lastUpdated=noteBook.lastUpdated))
-    return NoteBookListResponse(response=1, noteBookList=noteBookList, description='OK')
+    if len(noteBookList) == 0:
+        return NoteBookListResponse(response=1, description="NOTHING")
+    return NoteBookListResponse(response=0, noteBookList=noteBookList, description='OK')
