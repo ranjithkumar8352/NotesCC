@@ -26,7 +26,7 @@ from apiMethods import deleteMethod, unsubscribeCourseMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 from apiTest import runScript
 from editMethods import editCollegeMethod, editProfileMethod, editCourseMethod
-from editMethods import editAssignmentMethod, editExamMethod
+from editMethods import editAssignmentMethod, editExamMethod, editNotesMethod
 
 
 @endpoints.api(name='notesapi', version='v1')
@@ -244,6 +244,18 @@ class NotesAPI(remote.Service):
         name='createNotes')
     def createNotes(self, request):
         return createNotesMethod(request)
+
+    editNotesResource = endpoints.ResourceContainer(NotesForm,
+                                                    notesId=messages.StringField(1))
+
+    @endpoints.method(
+        editNotesResource,
+        Response,
+        path='editNotes/{notesId}',
+        http_method='POST',
+        name='editNotes')
+    def editNotes(self, request):
+        return editNotesMethod(request)
 
     @endpoints.method(
         NoteBookRequest,
