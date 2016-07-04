@@ -194,6 +194,10 @@ def subscribeCourseMethod(request):
             courseId = ndb.Key(urlsafe=course)
         except Exception:
             return Response(response=1, description="No such courseId")
+        cacheVal = memcache.get(courseId.urlsafe())
+        if cacheVal is not None:
+            cacheVal[13].append(profileId)
+            memcache.set(courseId.urlsafe(), cacheVal)
         profile.subscribedCourseIds.append(courseId)
         courseIds.append(courseId)
     # Removing courses with same courseCode from profile.availableCourseIds
