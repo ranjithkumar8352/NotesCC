@@ -490,9 +490,10 @@ def createAssignmentMethod(request):
     if course is None:
         return Response(response=1, description="Invalid courseId")
     course.assignmentIds.append(assignmentId)
+    title = course.courseName
     course.put()
-    notificationText = "New assignment added to " + course.courseName + "\nDue Date: " + dueDate + ", " + dueTime
-    sendNotification(id=courseId.urlsafe(), text=notificationText)
+    notificationText = "New assignment added!"
+    sendNotification(id=courseId.urlsafe(), title=title, text=notificationText, type='assignment')
     return Response(response=0, description="OK", key=assignmentId.urlsafe())
 
 
@@ -524,9 +525,10 @@ def createExamMethod(request):
     if course is None:
         return Response(response=1, description="Invalid courseId")
     course.examIds.append(examId)
+    title = course.courseName
     course.put()
-    notificationText = "New Exam added to " + course.courseName + "\nDue Date: " + dueDate + ", " + dueTime
-    sendNotification(id=courseId.urlsafe(), text=notificationText)
+    notificationText = "New Exam added!"
+    sendNotification(id=courseId.urlsafe(),title=title, text=notificationText, type='exam')
     return Response(response=0, description="OK", key=examId.urlsafe())
 
 
@@ -742,9 +744,10 @@ def addToNoteBook(noteBookId, newNotes, notesDesc):
               notesList, course.colour, noteBook.bmUserList, noteBook.ratedUserIds,
               noteBook.ratingList, noteBook.uploaderId]
     memcache.set(noteBookId.urlsafe(), fields)
+    title = noteBook.courseName + ': ' + uploaderName
     noteBook.put()
-    notificationText = "New notes added to bookmarked notebook\n" + "Description: " + notesDesc
-    sendNotification(id=noteBookId.urlsafe(), text=notificationText)
+    notificationText = "New notes added!"
+    sendNotification(id=noteBookId.urlsafe(), title=title, text=notificationText, type='notes')
 
 
 def getNoteBook(request):
