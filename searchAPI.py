@@ -48,11 +48,14 @@ def searchCourseMethod(request):
         print courseId
         course = courseId.get()
         print course
+        if course is None:
+            continue
         courseResponse = CourseResponse(courseId=key, courseName=course.courseName,
                                         batchNames=course.batchNames, branchNames=course.branchNames,
                                         sectionNames=course.sectionNames, studentCount=len(course.studentIds),
                                         professorName=course.professorName, notesCount=len(course.noteBookIds),
-                                        semester=course.semester)
+                                        semester=course.semester, colour=course.colour,
+                                        elective=course.elective)
         courseList.append(courseResponse)
     if len(courseList) == 0:
         return CourseListResponse(response=1, description="NOTHING")
@@ -107,6 +110,8 @@ def searchNBMethod(request):
         key = doc.doc_id
         noteBookId = ndb.Key(urlsafe=key)
         noteBook = noteBookId.get()
+        if noteBook is None:
+            continue
         uploader = noteBook.uploaderId.get()
         courseName = doc.field('courseName').value
         pages = 0
@@ -115,6 +120,7 @@ def searchNBMethod(request):
             pages += len(notes.urlList)
         noteBookList.append(NoteBookResponse(noteBookId=key, courseName=courseName, uploaderName=uploader.profileName,
                                              pages=pages, totalRating=noteBook.totalRating,
+                                             views=noteBook.views,
                                              frequency=noteBook.frequency, lastUpdated=noteBook.lastUpdated))
     if len(noteBookList) == 0:
         return NoteBookListResponse(response=1, description="NOTHING")

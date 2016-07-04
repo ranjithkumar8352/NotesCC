@@ -11,6 +11,7 @@ from models import AssignmentResponse, ExamResponse, GetAssListResponse
 from models import GetExamListResponse, CollegeListResponse, CollegeDetails
 from models import BookmarkResponse
 from searchAPI import createNBDoc
+from FCM import sendNotification
 
 from google.appengine.ext import ndb
 from google.appengine.api import search
@@ -172,6 +173,7 @@ def addCourseMethod(request):
         if profile.key != profileId:
             profile.availableCourseIds.append(courseId)
             profile.put()
+
     return Response(response=0, description="OK", key=courseId.urlsafe())
 
 
@@ -489,6 +491,8 @@ def createAssignmentMethod(request):
         return Response(response=1, description="Invalid courseId")
     course.assignmentIds.append(assignmentId)
     course.put()
+    notificationText = "New assignment added to " + course.courseName + "\nDue Date: " + dueDate + ", " + dueTime
+    sendNotification(id=courseId.urlsafe(), text=notificationText)
     return Response(response=0, description="OK", key=assignmentId.urlsafe())
 
 
@@ -521,6 +525,8 @@ def createExamMethod(request):
         return Response(response=1, description="Invalid courseId")
     course.examIds.append(examId)
     course.put()
+    notificationText = "New Exam added to " + course.courseName + "\nDue Date: " + dueDate + ", " + dueTime
+    sendNotification(id=courseId.urlsafe(), text=notificationText)
     return Response(response=0, description="OK", key=examId.urlsafe())
 
 
@@ -662,7 +668,7 @@ def createNotesMethod(request):
             newNotes = Notes(date=date, urlList=urlList, notesDesc=notesDesc,
                              classNumber=str(len(noteBook.notesIds) + 1), title=title)
             try:
-                addToNoteBook(noteBook.key, newNotes)
+                addToNoteBook(noteBook.key, newNotes, notesDesc)
             except Exception, E:
                 return Response(response=1, description=str(E))
             createNBDoc(title, notesDesc, date, noteBook.key.urlsafe())
@@ -673,7 +679,7 @@ def createNotesMethod(request):
             newNotes = Notes(date=date, urlList=urlList, notesDesc=notesDesc,
                              classNumber='1', title=title)
             noteBookId = createNoteBook(profileId, courseId)
-            addToNoteBook(noteBookId, newNotes)
+            addToNoteBook(noteBookId, newNotes, notesDesc)
         except Exception, E:
             return Response(response=1, description=str(E))
         createNBDoc(title, notesDesc, date, noteBookId.urlsafe())
@@ -706,7 +712,7 @@ def createNoteBook(profileId, courseId):
     return noteBookId
 
 
-def addToNoteBook(noteBookId, newNotes):
+def addToNoteBook(noteBookId, newNotes, notesDesc):
     """addToNoteBook(noteBookId, newNotes)
        To add new notes to existing noteBook"""
     newNotes.noteBookId = noteBookId
@@ -737,6 +743,8 @@ def addToNoteBook(noteBookId, newNotes):
               noteBook.ratingList, noteBook.uploaderId]
     memcache.set(noteBookId.urlsafe(), fields)
     noteBook.put()
+    notificationText = "New notes added to bookmarked notebook\n" + "Description: " + notesDesc
+    sendNotification(id=noteBookId.urlsafe(), text=notificationText)
 
 
 def getNoteBook(request):

@@ -50,6 +50,8 @@ class ImageUploadAndroid(webapp2.RequestHandler):
                 print "type Missing in request\n"+self.request+'\n'+str(E)
                 return self.response.write("type Missing in request\n"+self.request+'\n'+str(E))
             bucketName = BUCKET_NAME
+            if len(fileList)==0:
+                urlList.append("http://guiaquebueno.com/Images/Restaurantes/Restaurante_no_image.jpg")
             try:
                 for file in fileList:
                     timestamp = "".join(str(datetime.datetime.now()).split())
