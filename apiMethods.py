@@ -358,7 +358,7 @@ def feedCourseResponse(courseIds):
                                                startTime=course.startTime,
                                                endTime=course.endTime, colour=course.colour,
                                                recentNotes=recentNotes,
-                                               professorName=course.professorName, elective=course.elective))
+                                               professorName=course.professorName, elective=course.elective, courseCode=course.courseCode))
     return responseList
 
 
@@ -773,13 +773,16 @@ def getNoteBook(request):
             isAuthor = 1
         else:
             isAuthor = 0
+        lastUpdated = cacheVal[2]
+        a = datetime.datetime.strptime(lastUpdated, "%Y-%m-%d %H:%M:%S.%f")
+        lastUpdated1 = a.strftime("%m/%d/%Y %I:%M:%S %p")
         return NoteBookDetailResponse(courseName=cacheVal[0],
                                       isAuthor=isAuthor, uploaderName=cacheVal[1],
                                       lastUpdated=cacheVal[2], views=memViews,
                                       rated=rated, frequency=cacheVal[3],
                                       pages=cacheVal[4], totalRating=cacheVal[5],
                                       notes=cacheVal[6], bookmarkStatus=bookmarkStatus,
-                                      response=0, colour=cacheVal[7],
+                                      response=0, colour=cacheVal[7], lastUpdated1=lastUpdated1,
                                       description="OK")
 
     noteBook = noteBookId.get()
@@ -823,6 +826,9 @@ def getNoteBook(request):
                                        classNumber=notes.classNumber,
                                        urlList=notes.urlList))
         pages += len(notes.urlList)
+    lastUpdated = noteBook.lastUpdated
+    a = datetime.datetime.strptime(lastUpdated, "%Y-%m-%d %H:%M:%S.%f")
+    lastUpdated1 = a.strftime("%m/%d/%Y %I:%M:%S %p")
     fields = [course.courseName, uploaderName, lastUpdated, frequency, pages, totalRating,
               notesList, course.colour, noteBook.bmUserList, noteBook.ratedUserIds,
               noteBook.ratingList, noteBook.uploaderId]
@@ -835,7 +841,7 @@ def getNoteBook(request):
                                   pages=pages, totalRating=totalRating,
                                   notes=notesList, bookmarkStatus=bookmarkStatus,
                                   response=0, colour=course.colour,
-                                  description="OK")
+                                  description="OK", lastUpdated1=lastUpdated1)
 
 
 def getNoteBookListMethod(request):
@@ -869,13 +875,17 @@ def getNoteBookListMethod(request):
                 if notes is None:
                     return NoteBookListResponse(response=1, description="Invalid notesId")
                 pages += len(notes.urlList)
+            lastUpdated = noteBook.lastUpdated
+            a = datetime.datetime.strptime(lastUpdated, "%Y-%m-%d %H:%M:%S.%f")
+            lastUpdated1 = a.strftime("%m/%d/%Y %I:%M:%S %p")
             new = NoteBookResponse(noteBookId=idurlsafe,
                                    courseName=course.courseName,
                                    uploaderName=uploader.profileName,
                                    views=noteBook.views, pages=pages,
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
-                                   lastUpdated=noteBook.lastUpdated, colour=course.colour)
+                                   lastUpdated=noteBook.lastUpdated, colour=course.colour,
+                                   lastUpdated1=lastUpdated1)
             noteBookList.append(new)
     elif bpid:
         try:
@@ -902,13 +912,17 @@ def getNoteBookListMethod(request):
                 if notes is None:
                     return NoteBookListResponse(response=1, description="Invalid notesId")
                 pages += len(notes.urlList)
+            lastUpdated = noteBook.lastUpdated
+            a = datetime.datetime.strptime(lastUpdated, "%Y-%m-%d %H:%M:%S.%f")
+            lastUpdated1 = a.strftime("%m/%d/%Y %I:%M:%S %p")
             new = NoteBookResponse(noteBookId=noteBookId.urlsafe(),
                                    courseName=course.courseName,
                                    uploaderName=uploader.profileName,
                                    views=noteBook.views, pages=pages,
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
-                                   lastUpdated=noteBook.lastUpdated, colour=course.colour)
+                                   lastUpdated=noteBook.lastUpdated, colour=course.colour,
+                                   lastUpdated1=lastUpdated1)
             noteBookList.append(new)
     elif upid:
         try:
@@ -935,13 +949,17 @@ def getNoteBookListMethod(request):
                 if notes is None:
                     return NoteBookListResponse(response=1, description="Invalid notesId")
                 pages += len(notes.urlList)
+            lastUpdated = noteBook.lastUpdated
+            a = datetime.datetime.strptime(lastUpdated, "%Y-%m-%d %H:%M:%S.%f")
+            lastUpdated1 = a.strftime("%m/%d/%Y %I:%M:%S %p")
             new = NoteBookResponse(noteBookId=noteBookId.urlsafe(),
                                    courseName=course.courseName,
                                    uploaderName=uploader.profileName,
                                    views=noteBook.views, pages=pages,
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
-                                   lastUpdated=noteBook.lastUpdated, colour=course.colour)
+                                   lastUpdated=noteBook.lastUpdated, colour=course.colour,
+                                   lastUpdated1=lastUpdated1)
             noteBookList.append(new)
     elif courseId:
         try:
@@ -963,13 +981,17 @@ def getNoteBookListMethod(request):
                 if notes is None:
                     return NoteBookListResponse(response=1, description="Invalid notesId")
                 pages += len(notes.urlList)
+            lastUpdated = noteBook.lastUpdated
+            a = datetime.datetime.strptime(lastUpdated, "%Y-%m-%d %H:%M:%S.%f")
+            lastUpdated1 = a.strftime("%m/%d/%Y %I:%M:%S %p")
             new = NoteBookResponse(noteBookId=noteBookId.urlsafe(),
                                    courseName=course.courseName,
                                    uploaderName=uploader.profileName,
                                    views=noteBook.views, pages=pages,
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
-                                   lastUpdated=noteBook.lastUpdated, colour=course.colour)
+                                   lastUpdated=lastUpdated, colour=course.colour,
+                                   lastUpdated1=lastUpdated1)
             noteBookList.append(new)
     elif profileId:
         try:
@@ -997,13 +1019,17 @@ def getNoteBookListMethod(request):
                     if notes is None:
                         return NoteBookListResponse(response=1, description="Invalid notesId")
                     pages += len(notes.urlList)
+                lastUpdated = noteBook.lastUpdated
+                a = datetime.datetime.strptime(lastUpdated, "%Y-%m-%d %H:%M:%S.%f")
+                lastUpdated1 = a.strftime("%m/%d/%Y %I:%M:%S %p")
                 new = NoteBookResponse(noteBookId=noteBookId.urlsafe(),
                                        courseName=course.courseName,
                                        uploaderName=uploader.profileName,
                                        views=noteBook.views, pages=pages,
                                        totalRating=noteBook.totalRating,
                                        frequency=noteBook.frequency,
-                                       lastUpdated=noteBook.lastUpdated, colour=course.colour)
+                                       lastUpdated=noteBook.lastUpdated, colour=course.colour,
+                                       lastUpdated1=lastUpdated1)
                 noteBookList.append(new)
     else:
         return NoteBookListResponse(response=1, description="Bad request")

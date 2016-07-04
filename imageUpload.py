@@ -226,18 +226,21 @@ class ImageUploadWeb(webapp2.RequestHandler):
         except Exception, E:
             print "file Missing in request\n"+self.request+'\n'+str(E)
             obj = {'response': 1, 'description': "file Missing in request\n"+self.request+'\n'+str(E)} 
+            self.response.headers['Content-Type'] = 'application/json'
             self.response.out.write(json.dumps(obj))
         try:
             profileId = self.request.get('profileId')
         except Exception, E:
             print "profileId Missing in request\n"+self.request+'\n'+str(E)
             obj = {'response': 1, 'description': "profileId Missing in request\n"+self.request+'\n'+str(E)} 
+            self.response.headers['Content-Type'] = 'application/json'
             self.response.out.write(json.dumps(obj))
         try:
             courseId = self.request.get('courseId')
         except Exception, E:
             print "courseId Missing in request\n"+self.request+'\n'+str(E)
             obj = {'response': 1, 'description': "courseId Missing in request\n"+self.request+'\n'+str(E)} 
+            self.response.headers['Content-Type'] = 'application/json'
             self.response.out.write(json.dumps(obj))
         bucketName = BUCKET_NAME
         urlList = []
@@ -250,6 +253,7 @@ class ImageUploadWeb(webapp2.RequestHandler):
             url = 'https://storage.googleapis.com' + fileName
             urlList.append(url)
             gcsFile.close()
+        self.response.headers['Content-Type'] = 'application/json'
         obj = {'response': 0, 'url': urlList} 
         self.response.out.write(json.dumps(obj))
     def get(self):
