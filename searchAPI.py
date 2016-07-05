@@ -62,7 +62,7 @@ def searchCourseMethod(request):
     return CourseListResponse(response=0, description='OK', courseList=courseList, completed=1)
 
 
-def createNBDoc(title, desc, date, key):
+def createNBDoc(title, desc, date, uploaderName, key):
     # if noteBook already exists
     index = search.Index('NoteBook')
     existingDoc = index.get(key)
@@ -80,7 +80,8 @@ def createNBDoc(title, desc, date, key):
                 search.TextField(name='title', value=newTitle),
                 search.TextField(name='desc', value=newDesc),
                 search.TextField(name='date', value=date),
-                search.TextField(name='courseName', value=course.courseName)
+                search.TextField(name='courseName', value=course.courseName),
+                search.TextField(name='uploaderName', value=uploaderName)
             ])
     else:
         document = search.Document(
@@ -90,6 +91,7 @@ def createNBDoc(title, desc, date, key):
                 search.TextField(name='desc', value=desc),
                 search.TextField(name='date', value=date),
                 search.TextField(name='courseName', value=course.courseName)
+                search.TextField(name='uploaderName', value=uploaderName)
             ])
     index.put(document)
 

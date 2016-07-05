@@ -73,7 +73,7 @@ class ImageUploadAndroid(webapp2.RequestHandler):
                 try:
                     date = self.request.get('date')
                 except Exception, E:
-                    print "date Missing from request\n"+self.request+'\n'+str(E)
+                    print "date Missing from request\n" + self.request + '\n'+str(E)
                     return self.response.write("date Missing from request\n"+self.request+'\n'+str(E))
                 url = PROJECT_URL + "/_ah/api/notesapi/v1/createNotes"
                 data = {'profileId': profileId, 'courseId': courseId, 'title': title, 'notesDesc': desc,
@@ -89,14 +89,14 @@ class ImageUploadAndroid(webapp2.RequestHandler):
                 obj = {
                     'response': 0,
                     'noteBookId': str(key)
-                  } 
+                }
                 self.response.out.write(json.dumps(obj))
             if type == 'assignment':
                 try:
                     dueDate = self.request.get('dueDate')
                 except Exception, E:
-                    print "dueDate Missing from request\n" + self.request+'\n'+str(E)
-                    self.response.write("dueDate Missing from request\n"+self.request+'\n'+str(E))
+                    print "dueDate Missing from request\n" + self.request + '\n' + str(E)
+                    self.response.write("dueDate Missing from request\n" + self.request + '\n' + str(E))
                 try:
                     dueTime = self.request.get('dueTime')
                 except:

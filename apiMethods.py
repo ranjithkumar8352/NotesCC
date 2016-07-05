@@ -673,7 +673,7 @@ def createNotesMethod(request):
                 addToNoteBook(noteBook.key, newNotes, notesDesc)
             except Exception, E:
                 return Response(response=1, description=str(E))
-            createNBDoc(title, notesDesc, date, noteBook.key.urlsafe())
+            createNBDoc(title, notesDesc, date, profileId.profileName, noteBook.key.urlsafe())
             return Response(response=0, description="OK",
                             key=noteBook.key.urlsafe())
     else:
@@ -684,7 +684,7 @@ def createNotesMethod(request):
             addToNoteBook(noteBookId, newNotes, notesDesc)
         except Exception, E:
             return Response(response=1, description=str(E))
-        createNBDoc(title, notesDesc, date, noteBookId.urlsafe())
+        createNBDoc(title, notesDesc, date, profileId.profileName, noteBookId.urlsafe())
         return Response(response=0, description="OK", key=noteBookId.urlsafe())
 
 
