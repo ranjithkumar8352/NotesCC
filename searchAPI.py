@@ -90,7 +90,7 @@ def createNBDoc(title, desc, date, uploaderName, key):
                 search.TextField(name='title', value=title),
                 search.TextField(name='desc', value=desc),
                 search.TextField(name='date', value=date),
-                search.TextField(name='courseName', value=course.courseName)
+                search.TextField(name='courseName', value=course.courseName),
                 search.TextField(name='uploaderName', value=uploaderName)
             ])
     index.put(document)
