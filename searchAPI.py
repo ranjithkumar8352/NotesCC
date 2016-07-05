@@ -64,6 +64,7 @@ def searchCourseMethod(request):
 
 def createNBDoc(title, desc, date, uploaderName, key):
     # if noteBook already exists
+    print title, desc, date, uploaderName, key
     index = search.Index('NoteBook')
     existingDoc = index.get(key)
     noteBookId = ndb.Key(urlsafe=key)

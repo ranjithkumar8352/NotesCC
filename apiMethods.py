@@ -665,6 +665,7 @@ def createNotesMethod(request):
     query = NoteBook.query(ndb.AND(NoteBook.courseId == courseId,
                                    NoteBook.uploaderId == profileId))
     noteBookResult = query.fetch()
+    profile = profileId.get()
     if noteBookResult:
         for noteBook in noteBookResult:
             newNotes = Notes(date=date, urlList=urlList, notesDesc=notesDesc,
@@ -673,7 +674,7 @@ def createNotesMethod(request):
                 addToNoteBook(noteBook.key, newNotes, notesDesc)
             except Exception, E:
                 return Response(response=1, description=str(E))
-            createNBDoc(title, notesDesc, date, profileId.profileName, noteBook.key.urlsafe())
+            createNBDoc(title, notesDesc, date, profile.profileName, noteBook.key.urlsafe())
             return Response(response=0, description="OK",
                             key=noteBook.key.urlsafe())
     else:
@@ -684,7 +685,7 @@ def createNotesMethod(request):
             addToNoteBook(noteBookId, newNotes, notesDesc)
         except Exception, E:
             return Response(response=1, description=str(E))
-        createNBDoc(title, notesDesc, date, profileId.profileName, noteBookId.urlsafe())
+        createNBDoc(title, notesDesc, date, profile.profileName, noteBookId.urlsafe())
         return Response(response=0, description="OK", key=noteBookId.urlsafe())
 
 
@@ -709,7 +710,7 @@ def createNoteBook(profileId, courseId):
     noteBookId = newNoteBook.put()
     profile.uploadedNoteBookIds.append(noteBookId)
     profile.put()
-    course.noteBookIds.append(noteBookId)   
+    course.noteBookIds.append(noteBookId)
     course.put()
     return noteBookId
 
@@ -744,7 +745,7 @@ def addToNoteBook(noteBookId, newNotes, notesDesc):
               notesList, course.colour, noteBook.bmUserList, noteBook.ratedUserIds,
               noteBook.ratingList, noteBook.uploaderId]
     memcache.set(noteBookId.urlsafe(), fields)
-    title = noteBook.courseName + ': ' + uploaderName
+    title = course.courseName + ': ' + uploaderName
     noteBook.put()
     notificationText = "New notes added!"
     sendNotification(id=noteBookId.urlsafe(), title=title, text=notificationText, type='notes')
