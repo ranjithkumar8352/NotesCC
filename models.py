@@ -17,18 +17,18 @@ class College(ndb.Model):
     collegeType = ndb.StringProperty()
     semStartDate = ndb.StringProperty()
     semEndDate = ndb.StringProperty()
-    studentCount = ndb.IntegerProperty()
-    noteBookCount = ndb.IntegerProperty()
+    studentCount = ndb.IntegerProperty(default=0)
+    noteBookCount = ndb.IntegerProperty(default=0)
     branchNameList = ndb.StringProperty(repeated=True)
 
 
 class CollegeForm(messages.Message):
-    collegeName = messages.StringField(1)
-    abbreviation = messages.StringField(2)
-    location = messages.StringField(3)
-    collegeType = messages.StringField(4)
-    semStartDate = messages.StringField(5)
-    semEndDate = messages.StringField(6)
+    collegeName = messages.StringField(1, required=True)
+    abbreviation = messages.StringField(2, required=True)
+    location = messages.StringField(3, required=True)
+    collegeType = messages.StringField(4, required=True)
+    semStartDate = messages.StringField(5, required=True)
+    semEndDate = messages.StringField(6, required=True)
     branchNameList = messages.StringField(7, repeated=True)
 
 
@@ -45,18 +45,18 @@ class Profile(ndb.Model):
     gcmId = ndb.StringProperty()
     uploadedNoteBookIds = ndb.KeyProperty(repeated=True, kind='NoteBook')
     bookmarkedNoteBookIds = ndb.KeyProperty(repeated=True, kind='NoteBook')
-    points = ndb.IntegerProperty()
+    points = ndb.IntegerProperty(default=0)
     email = ndb.StringProperty(required=True)
 
 
 class ProfileForm(messages.Message):
-    profileName = messages.StringField(1)
-    collegeId = messages.StringField(2)
+    profileName = messages.StringField(1, required=True)
+    collegeId = messages.StringField(2, required=True)
     batchName = messages.StringField(3)
     branchName = messages.StringField(4)
     sectionName = messages.StringField(5)
-    photoUrl = messages.StringField(10)
-    email = messages.StringField(14)
+    photoUrl = messages.StringField(10, required=True)
+    email = messages.StringField(14, required=True)
     gcmId = messages.StringField(15)
 
 
@@ -74,8 +74,8 @@ class Course(ndb.Model):
     adminIds = ndb.KeyProperty(repeated=True, kind='Profile')
     startTime = ndb.StringProperty(repeated=True)
     endTime = ndb.StringProperty(repeated=True)
-    professorName = ndb.StringProperty()
-    colour = ndb.StringProperty()
+    professorName = ndb.StringProperty(required=True)
+    colour = ndb.StringProperty(required=True)
     courseCode = ndb.StringProperty()
     studentIds = ndb.KeyProperty(repeated=True, kind='Profile')
     elective = ndb.StringProperty()
@@ -202,12 +202,12 @@ class Assignment(ndb.Model):
 
 
 class AssignmentForm(messages.Message):
-    assignmentTitle = messages.StringField(1)
-    assignmentDesc = messages.StringField(2)
-    courseId = messages.StringField(3)
-    uploaderId = messages.StringField(4)
-    dueDate = messages.StringField(6)
-    dueTime = messages.StringField(8)
+    assignmentTitle = messages.StringField(1, required=True)
+    assignmentDesc = messages.StringField(2, required=True)
+    courseId = messages.StringField(3, required=True)
+    uploaderId = messages.StringField(4, required=True)
+    dueDate = messages.StringField(6, required=True)
+    dueTime = messages.StringField(8, required=True)
     urlList = messages.StringField(7, repeated=True)
 
 

@@ -1,6 +1,7 @@
 import datetime
+import traceback
 
-from models import College, Course, Profile
+from models import College, CollegeForm, Course, Profile
 from models import Response, FeedCourseResponse, CourseListResponse, FeedResponse
 from models import TTCourseResponse, TimeTableResponse, StudentResponse
 from models import StudentListResponse, Assignment, Exam, CourseResponse
@@ -24,29 +25,48 @@ examOpened = set()
 courseUpdate = set()
 
 
+def setValue(eObject, mObject, e2m, skip=[]):
+    print mObject
+    if e2m == -1:
+        for field in mObject.all_fields():
+            if field.name in skip:
+                continue
+            value = getattr(mObject, field.name)
+            if field.required is True:
+                if str(field.type) == "<type 'unicode'>" and value == "":
+                    raise Exception("Invalid " + str(field.name))
+                else:
+                    setattr(eObject, field.name, value)
+            else:
+                setattr(eObject, field.name, value)
+    else:
+        for field in mObject.all_fields():
+            if field.name in skip:
+                continue
+            value = getattr(eObject, field.name)
+            setattr(mObject, field.name, value)
+
+
 def createCollegeMethod(request):
     """createCollegeMethod(request)
-        request (collegeName, abbreviation, location, collegeType, semStartDate,
-        semEndDate, branchNameList)
-        To create New college"""
-    collegeName = getattr(request, 'collegeName')
-    abbreviation = getattr(request, 'abbreviation')
-    location = getattr(request, 'location')
-    collegeType = getattr(request, 'collegeType', None)
-    semStartDate = getattr(request, 'semStartDate', None)
-    semEndDate = getattr(request, 'semEndDate', None)
-    branchNameList = getattr(request, 'branchNameList', [])
+    request (collegeName, abbreviation, location, collegeType, semStartDate,
+    semEndDate, branchNameList)
+    To create New college"""
+    newCollege = College()
+    try:
+        setValue(newCollege, request, -1)
+    except Exception, E:
+        print str(E)
+        traceback.print_stack()
+        return Response(response=1, description=str(E))
     # To find college with same name and location
-    queryString = ndb.AND(College.collegeName == collegeName, College.location == location)
+    queryString = ndb.AND(College.collegeName == newCollege.collegeName,
+                          College.location == newCollege.location)
     collegeSameDetails = College.query(queryString).fetch()
     if collegeSameDetails:
+        print "College already exists"
         return Response(response=2, description="College Already Exists")
     else:
-        newCollege = College(collegeName=collegeName, abbreviation=abbreviation,
-                             location=location, studentCount=0, noteBookCount=0,
-                             collegeType=collegeType, semStartDate=semStartDate,
-                             semEndDate=semEndDate, courseIds=[],
-                             branchNameList=branchNameList)
         key = newCollege.put()
         return Response(response=0, description="OK", key=key.urlsafe())
 
@@ -60,36 +80,33 @@ def createProfileMethod(request):
         collegeId = ndb.Key(urlsafe=getattr(request, 'collegeId'))
     except Exception:
         return Response(response=1, description="No such collegeId")
-    profileName = getattr(request, 'profileName')
-    batchName = getattr(request, 'batchName', None)
-    branchName = getattr(request, 'branchName', None)
-    sectionName = getattr(request, 'sectionName', None)
-    # Querie for compatible courses and stores in availableCourseIds
+    newProfile = Profile()
+    try:
+        setValue(newProfile, request, -1, skip=['collegeId'])
+    except Exception, E:
+        print str(E)
+        traceback.print_stack()
+        return Response(response=1, description=str(E))
+    # Query for compatible courses and stores in availableCourseIds
     availableCourseIds = []
     queryString = ndb.AND(Course.collegeId == collegeId,
-                          Course.batchNames == batchName,
-                          Course.branchNames == branchName,
-                          Course.sectionNames == sectionName)
+                          Course.batchNames == newProfile.batchName,
+                          Course.branchNames == newProfile.branchName,
+                          Course.sectionNames == newProfile.sectionName)
     for course in Course.query(queryString).fetch():
         availableCourseIds.append(course.key)
-    photoUrl = getattr(request, 'photoUrl')
-    gcmId = getattr(request, 'gcmId')
-    email = getattr(request, 'email')
     college = collegeId.get()
     # To get existing profiles (if any) with same email id
-    profileCheck = Profile.query(Profile.email == email).fetch()
+    profileCheck = Profile.query(Profile.email == newProfile.email).fetch()
     if college is None:
+        print "No such college ID"
         return Response(response=1, description="No such college ID")
     elif profileCheck:
+        print "Profile already registered"
         return Response(response=2, description="Profile already registered")
     else:
-        newProfile = Profile(profileName=profileName, collegeId=collegeId,
-                             batchName=batchName, branchName=branchName,
-                             sectionName=sectionName, subscribedCourseIds=[],
-                             availableCourseIds=availableCourseIds,
-                             administeredCourseIds=[], gcmId=gcmId,
-                             photoUrl=photoUrl, email=email, points=0,
-                             uploadedNoteBookIds=[], bookmarkedNoteBookIds=[])
+        setattr(newProfile, 'collegeId', collegeId)
+        setattr(newProfile, 'availableCourseIds', availableCourseIds)
         # increasing the studentCount in college
         college.studentCount += 1
         college.put()
@@ -105,52 +122,41 @@ def addCourseMethod(request):
     try:
         collegeId = ndb.Key(urlsafe=(getattr(request, 'collegeId')))
     except Exception:
-        return Response(response=1, description="No such collegeId")
-    courseName = getattr(request, 'courseName')
-    batchNames = getattr(request, 'batchNames', None)
-    branchNames = getattr(request, 'branchNames', None)
-    sectionNames = getattr(request, 'sectionNames', None)
-    semester = getattr(request, 'semester', None)
+        print "Invalid collegeId"
+        return Response(response=1, description="Invalid collegeId")
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
-        return Response(response=1, description="No such profileId")
+        print "Invalid profileId"
+        return Response(response=1, description="Invalid profileId")
+    newCourse = Course()
+    setValue(newCourse, request, -1, skip=['profileId', 'collegeId'])
     adminIds = []
     adminIds.append(profileId)
     studentIds = []
     studentIds.append(profileId)
-    date = getattr(request, 'date', [])
-    startTime = getattr(request, 'startTime', [])
-    endTime = getattr(request, 'endTime', [])
-    professorName = getattr(request, 'professorName', None)
-    colour = getattr(request, 'colour', None)
-    courseCode = getattr(request, 'courseCode', None)
-    elective = getattr(request, 'elective', '0')
     college = collegeId.get()
     profile = profileId.get()
     if college is None:
-        return Response(response=1, description="No such college ID")
+        print "Invalid collegeId"
+        return Response(response=1, description="Invalid collegeId")
     if profile is None:
-        return Response(response=1, description="No such profile ID")
+        print "Invalid profileId"
+        return Response(response=1, description="Invalid profileId")
     # To check if same course already exists
-    queryString = ndb.AND(Course.courseCode == courseCode,
+    queryString = ndb.AND(Course.courseCode == newCourse.courseCode,
                           Course.collegeId == collegeId,
-                          Course.sectionNames.IN(sectionNames),
-                          Course.branchNames.IN(branchNames),
-                          Course.batchNames.IN(batchNames),
-                          Course.professorName == professorName)
+                          Course.sectionNames.IN(newCourse.sectionNames),
+                          Course.branchNames.IN(newCourse.branchNames),
+                          Course.batchNames.IN(newCourse.batchNames),
+                          Course.professorName == newCourse.professorName)
     coursesWithSameCode = Course.query(queryString).fetch()
     if coursesWithSameCode:
+        print "Course already exists"
         return Response(response=2, description="Course already exists")
-
-    newCourse = Course(courseName=courseName, collegeId=collegeId,
-                       batchNames=batchNames, branchNames=branchNames,
-                       sectionNames=sectionNames, semester=semester,
-                       adminIds=adminIds, date=date,
-                       startTime=startTime, endTime=endTime,
-                       professorName=professorName, studentIds=studentIds,
-                       colour=colour, courseCode=courseCode,
-                       noteBookIds=[], assignmentIds=[], examIds=[], elective=elective)
+    setattr(newCourse, 'collegeId', collegeId)
+    setattr(newCourse, 'adminIds', adminIds)
+    setattr(newCourse, 'studentIds', studentIds)
     courseId = newCourse.put()
     # Adding profileId of creator to adminId
     for profileId in adminIds:
@@ -165,15 +171,14 @@ def addCourseMethod(request):
     profile.put()
     # To update the availableCourseIds of users
     queryString = ndb.AND(Profile.collegeId == collegeId,
-                          Profile.batchName.IN(batchNames),
-                          Profile.branchName.IN(branchNames),
-                          Profile.sectionName.IN(sectionNames))
+                          Profile.batchName.IN(newCourse.batchNames),
+                          Profile.branchName.IN(newCourse.branchNames),
+                          Profile.sectionName.IN(newCourse.sectionNames))
     profilesToUpdate = Profile.query(queryString).fetch()
     for profile in profilesToUpdate:
         if profile.key != profileId:
             profile.availableCourseIds.append(courseId)
             profile.put()
-
     return Response(response=0, description="OK", key=courseId.urlsafe())
 
 
@@ -184,18 +189,21 @@ def subscribeCourseMethod(request):
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
     except Exception:
-        return Response(response=1, description="No such profileId")
+        print "Invalid profileId"
+        return Response(response=1, description="Invalid profileId")
     courseIdList = getattr(request, 'courseIds')
     courseIds = []
     profile = profileId.get()
     if profile is None:
-        return Response(response=1, description="No such profileId")
+        print "Invalid profileId"
+        return Response(response=1, description="Invalid profileId")
     # Adding courseId to profile.subscribedCourseIds
     for course in courseIdList:
         try:
             courseId = ndb.Key(urlsafe=course)
         except Exception:
-            return Response(response=1, description="No such courseId")
+            print "Invalid courseId"
+            return Response(response=1, description="Invalid courseId")
         cacheVal = memcache.get(courseId.urlsafe())
         if cacheVal is not None:
             cacheVal[13].append(profileId)
@@ -470,10 +478,12 @@ def createAssignmentMethod(request):
     try:
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
     except Exception:
+        print "Invalid courseId"
         return Response(response=1, description="Invalid courseId")
     try:
         uploaderId = ndb.Key(urlsafe=getattr(request, 'uploaderId'))
     except Exception:
+        print "Invalid uploaderId"
         return Response(response=1, description="Invalid uploaderId")
     dueDate = getattr(request, 'dueDate')
     dueTime = getattr(request, 'dueTime')
@@ -482,12 +492,12 @@ def createAssignmentMethod(request):
                                assignmentDesc=assignmentDesc,
                                courseId=courseId, dateUploaded=dateUploaded,
                                uploaderId=uploaderId,
-                               assignmentViews=0, dueDate=dueDate,
-                               dueTime=dueTime, urlList=urlList,
-                               remindProfileIds=[])
+                               dueDate=dueDate,
+                               dueTime=dueTime, urlList=urlList)
     assignmentId = newAssignment.put()
     course = courseId.get()
     if course is None:
+        print "Invalid courseId"
         return Response(response=1, description="Invalid courseId")
     course.assignmentIds.append(assignmentId)
     title = course.courseName
