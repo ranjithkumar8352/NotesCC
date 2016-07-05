@@ -39,7 +39,7 @@ def searchCourseMethod(request):
         queryString = ' AND '.join(queryString)
         results = index.search(queryString)
     else:
-        results = index.search("")
+        results = []
     courseList = []
     for doc in results:
         key = doc.doc_id
@@ -71,9 +71,9 @@ def createNBDoc(title, desc, date, uploaderName, key):
     course = noteBook.courseId.get()
     if existingDoc:
         newDesc = existingDoc.fields[1].value
-        newDesc += desc
+        newDesc += ' ' + desc
         newTitle = existingDoc.fields[0].value
-        newTitle += title
+        newTitle += ' ' + title
         document = search.Document(
             doc_id=key,
             fields=[
@@ -106,7 +106,7 @@ def searchNBMethod(request):
         queryString = ' AND '.join(queryString)
         results = index.search(queryString)
     else:
-        results = index.search("")
+        results = []
     noteBookList = []
     for doc in results:
         key = doc.doc_id
