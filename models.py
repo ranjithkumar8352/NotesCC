@@ -1,5 +1,5 @@
 from google.appengine.ext import ndb
-from protorpc import messages
+from protorpc import messages, message_types
 
 
 class College(ndb.Model):
@@ -518,3 +518,24 @@ class BookmarkResponse(messages.Message):
 
 class SearchNBRequest(messages.Message):
     searchString = messages.StringField(1)
+
+
+class Notification(ndb.Model):
+    id = ndb.StringProperty()
+    type = ndb.StringProperty()
+    title = ndb.StringProperty()
+    text = ndb.StringProperty()
+    timeStamp = ndb.DateTimeProperty(indexed=True)
+    profileIdList = ndb.KeyProperty(kind='Profile', repeated=True, indexed=True)
+
+
+class NotificationResponse(messages.Message):
+    title = messages.StringField(1)
+    text = messages.StringField(2)
+    timeStamp = message_types.DateTimeField(3)
+    id = messages.StringField(5)
+    type = messages.StringField(6)
+
+
+class NotificationList(messages.Message):
+    notificationList = messages.MessageField(NotificationResponse, 1, repeated=True)

@@ -10,7 +10,7 @@ from models import NotesResponse, NoteBookDetailResponse, NoteBookListResponse
 from models import NoteBookResponse, CoursePageResponse, AssExamResponse
 from models import AssignmentResponse, ExamResponse, GetAssListResponse
 from models import GetExamListResponse, CollegeListResponse, CollegeDetails
-from models import BookmarkResponse
+from models import BookmarkResponse, Notification, NotificationResponse, NotificationList
 from searchAPI import createNBDoc
 from FCM import sendNotification
 
@@ -503,6 +503,8 @@ def createAssignmentMethod(request):
     title = course.courseName
     course.put()
     notificationText = "New assignment added!"
+    createNotification(course.studentIds, 'Campus Connect', notificationText,
+                       'assignment', assignmentId.urlsafe())
     sendNotification(id=courseId.urlsafe(), title=title, text=notificationText, type='assignment')
     return Response(response=0, description="OK", key=assignmentId.urlsafe())
 
@@ -514,7 +516,7 @@ def createExamMethod(request):
        To create a new exam"""
     examTitle = getattr(request, 'examTitle')
     examDesc = getattr(request, 'examDesc')
-    dateUploaded = str(datetime.datetime.now()+datetime.timedelta(hours=5, minutes=30))
+    dateUploaded = str(datetime.datetime.now() + datetime.timedelta(hours=5, minutes=30))
     try:
         courseId = ndb.Key(urlsafe=getattr(request, 'courseId'))
     except Exception:
@@ -538,6 +540,8 @@ def createExamMethod(request):
     title = course.courseName
     course.put()
     notificationText = "New Exam added!"
+    createNotification(course.studentIds, 'Campus Connect', notificationText,
+                       'exam', examId.urlsafe())
     sendNotification(id=courseId.urlsafe(),title=title, text=notificationText, type='exam')
     return Response(response=0, description="OK", key=examId.urlsafe())
 
@@ -731,6 +735,7 @@ def addToNoteBook(noteBookId, newNotes, notesDesc):
     newNotes.noteBookId = noteBookId
     notesId = newNotes.put()
     noteBook = noteBookId.get()
+    bmUserList = noteBook.bmUserList
     if noteBook is None:
         raise Exception("Invalid profileId")
     noteBook.notesIds.append(notesId)
@@ -758,6 +763,8 @@ def addToNoteBook(noteBookId, newNotes, notesDesc):
     title = course.courseName + ': ' + uploaderName
     noteBook.put()
     notificationText = "New notes added!"
+    createNotification(bmUserList, 'Campus Connect', notificationText,
+                       'notes', noteBookId.urlsafe())
     sendNotification(id=noteBookId.urlsafe(), title=title, text=notificationText, type='notes')
 
 
@@ -1653,3 +1660,22 @@ def deleteMethod(request):
         return deleteCourse(courseId)
     if collegeId:
         return deleteCollege(collegeId)
+
+
+def createNotification(profileIds, title, text, type, id):
+    timeStamp = datetime.datetime.now()
+    newNotification = Notification(type=type, id=id, title=title, text=text,
+                                   profileIdList=profileIds, timeStamp=timeStamp)
+    newNotification.put()
+
+
+def getNotificationMethod(request):
+    profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
+    results = Notification.query(Notification.profileIdList == profileId).order(-Notification.timeStamp)
+    notifList = []
+    for result in results:
+        notif = NotificationResponse(title=result.title, text=result.text,
+                                     timeStamp=result.timeStamp,
+                                     type=result.type, id=result.id)
+        notifList.append(notif)
+    return NotificationList(notificationList=notifList)

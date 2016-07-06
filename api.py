@@ -12,7 +12,7 @@ from models import NoteBookListResponse, RatingRequest, CoursePageRequest
 from models import CoursePageResponse, GetExamListResponse, GetAssListResponse, DeleteRequest
 from models import BookmarkRequest, CollegeListResponse, AddBranchRequest
 from models import SearchCourseRequest, BookmarkResponse, SearchNBRequest
-from models import UnsubscribeCourseRequest
+from models import UnsubscribeCourseRequest, NotificationList
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
 from apiMethods import courseListMethod, feedMethod, addAdminMethod
@@ -22,7 +22,7 @@ from apiMethods import createNotesMethod, getNoteBook, getNoteBookListMethod
 from apiMethods import rateThisMethod, coursePageMethod
 from apiMethods import getAssignmentListMethod, getExamListMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
-from apiMethods import deleteMethod, unsubscribeCourseMethod
+from apiMethods import deleteMethod, unsubscribeCourseMethod, getNotificationMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 from apiTest import runScript
 from editMethods import editCollegeMethod, editProfileMethod, editCourseMethod
@@ -386,4 +386,15 @@ class NotesAPI(remote.Service):
         runScript()
         return message_types.VoidMessage()
 
+    profileIdResource = endpoints.ResourceContainer(message_types.VoidMessage,
+                                                    profileId=messages.StringField(1))
+
+    @endpoints.method(
+        profileIdResource,
+        NotificationList,
+        path='getNot/{profileId}',
+        http_method='GET',
+        name='getNot')
+    def getNotification(self, request):
+        return getNotificationMethod(request)
 apiLists = endpoints.api_server([NotesAPI])
