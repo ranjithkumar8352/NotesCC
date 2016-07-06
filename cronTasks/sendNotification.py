@@ -2,15 +2,14 @@ import datetime
 from models import Notification
 from FCM import sendNotificationSingle
 
+from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
 
-curDate = datetime.date.today()
-curTime = datetime.time.now()
+curTime = datetime.datetime.now()
 prevTime = curTime - datetime.timedelta(hours=1)
-results = Notification.query(ndb.AND((Notification.date == curDate),
-                                     (Notification.time <= curTime),
-                                     (Notification.time >= prevTime)))
+results = Notification.query(ndb.AND((Notification.timeStamp <= curTime),
+                                     (Notification.timeStamp >= prevTime)))
 profileIds = {}
 for notification in results:
     for profileId in notification.profileIdList:
@@ -23,6 +22,8 @@ for profileId in profileIds:
     fcmId = memcache.get('fcm' + profileId.urlsafe())
     if fcmId is None:
         profile = profileId.get()
+        if profile is None:
+            continue
         fcmId = profile.gcmId
         memcache.add('fcm'+profileId.urlsafe(), fcmId, 3600)
     text = 'You have ' + str(count) + ' new notifications'

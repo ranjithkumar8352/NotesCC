@@ -26,7 +26,7 @@ handlers:
   script: cronTasks/updateNoteBook.py  
 - url: /task/updateCourse
   script: cronTasks/updateCourse.py
-- url: /task/notifications
+- url: /task/notification
   script: cronTasks/sendNotification.py
 
 libraries:
