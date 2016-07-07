@@ -1,19 +1,19 @@
 cron:
 - description: "updating views on assignment"
   url: /task/updateAssignment
-  schedule: every 1 hours
+  schedule: every 29 minutes
   target: crontask
 - description: "updating views on exam"
   url: /task/updateExam
-  schedule: every 1 hours
+  schedule: every 30 minutes
   target: crontask
 - description: "updating views/bookmark on noteBook"
   url: /task/updateNoteBook
-  schedule: every 1 hours
+  schedule: every 30 minutes
   target: crontask
 - description: "updating subscriptions on course"
   url: /task/updateCourse
-  schedule: every 1 hours
+  schedule: every 30 minutes
   target: crontask
 - description: "Sending hourly notification"
   url: /task/notification

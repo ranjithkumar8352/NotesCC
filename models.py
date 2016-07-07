@@ -192,7 +192,7 @@ class Assignment(ndb.Model):
     assignmentTitle = ndb.StringProperty(required=True)
     assignmentDesc = ndb.StringProperty(required=True)
     dueDate = ndb.StringProperty(required=True)
-    dueTime = ndb.StringProperty()
+    dueTime = ndb.StringProperty(required=True)
     courseId = ndb.KeyProperty(required=True, kind='Course')
     uploaderId = ndb.KeyProperty(kind='Profile')
     assignmentViews = ndb.IntegerProperty(default=0)
@@ -217,9 +217,9 @@ class Exam(ndb.Model):
     uploaderId = ndb.KeyProperty(kind='Profile')
     dateUploaded = ndb.StringProperty()
     dueDate = ndb.StringProperty(required=True)
-    dueTime = ndb.StringProperty()
-    examDesc = ndb.StringProperty()
-    examViews = ndb.IntegerProperty()
+    dueTime = ndb.StringProperty(required=True)
+    examDesc = ndb.StringProperty(required=True)
+    examViews = ndb.IntegerProperty(default=0)
     urlList = ndb.StringProperty(repeated=True)
     remindProfileIds = ndb.KeyProperty(repeated=True, kind='Profile')
 
@@ -228,10 +228,10 @@ class ExamForm(messages.Message):
     examTitle = messages.StringField(1)
     courseId = messages.StringField(2)
     uploaderId = messages.StringField(3)
-    dueDate = messages.StringField(5)
-    examDesc = messages.StringField(6)
-    dueTime = messages.StringField(8)
-    urlList = messages.StringField(9, repeated=True)
+    dueDate = messages.StringField(4)
+    examDesc = messages.StringField(5)
+    dueTime = messages.StringField(6)
+    urlList = messages.StringField(7, repeated=True)
 
 
 class GetAssignmentRequest(messages.Message):
@@ -322,9 +322,9 @@ class NoteBook(ndb.Model):
     notesIds = ndb.KeyProperty(repeated=True, kind='Notes')
     ratedUserIds = ndb.KeyProperty(repeated=True, kind='Profile')
     ratingList = ndb.IntegerProperty(repeated=True)
-    totalRating = ndb.StringProperty()
-    frequency = ndb.IntegerProperty()
-    views = ndb.IntegerProperty()
+    totalRating = ndb.StringProperty(default='0')
+    frequency = ndb.IntegerProperty(default=0)
+    views = ndb.IntegerProperty(default=0)
     lastUpdated = ndb.StringProperty()
     bmUserList = ndb.KeyProperty(repeated=True, kind='Profile')
 
@@ -339,13 +339,12 @@ class Notes(ndb.Model):
 
 
 class NotesForm(messages.Message):
-    profileId = messages.StringField(1)
-    date = messages.StringField(2)
+    profileId = messages.StringField(1, required=True)
+    date = messages.StringField(2, required=True)
     urlList = messages.StringField(3, repeated=True)
-    notesDesc = messages.StringField(4)
-    #classNumber = messages.StringField(5)
-    courseId = messages.StringField(6)
-    title = messages.StringField(7)
+    notesDesc = messages.StringField(4, required=True)
+    courseId = messages.StringField(6, required=True)
+    title = messages.StringField(7, required=True)
 
 
 class NoteBookRequest(messages.Message):
@@ -376,7 +375,6 @@ class NoteBookDetailResponse(messages.Message):
     description = messages.StringField(11)
     bookmarkStatus = messages.IntegerField(13)
     colour = messages.StringField(14)
-    lastUpdated1 = messages.StringField(15)
 
 
 class NoteBookListRequest(messages.Message):
@@ -397,7 +395,6 @@ class NoteBookResponse(messages.Message):
     frequency = messages.IntegerField(7)
     lastUpdated = messages.StringField(8)
     colour = messages.StringField(9)
-    lastUpdated1 = messages.StringField(10)
 
 
 class NoteBookListResponse(messages.Message):
