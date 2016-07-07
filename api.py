@@ -12,14 +12,14 @@ from models import NoteBookListResponse, RatingRequest, CoursePageRequest
 from models import CoursePageResponse, GetExamListResponse, GetAssListResponse, DeleteRequest
 from models import BookmarkRequest, CollegeListResponse, AddBranchRequest
 from models import SearchCourseRequest, BookmarkResponse, SearchNBRequest
-from models import UnsubscribeCourseRequest, NotificationList
+from models import UnsubscribeCourseRequest, NotificationList, BranchListResponse
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
 from apiMethods import courseListMethod, feedMethod, addAdminMethod
 from apiMethods import timeTableMethod, studentListMethod, createAssignmentMethod
 from apiMethods import createExamMethod, getAssignmentMethod, getExamMethod
 from apiMethods import createNotesMethod, getNoteBook, getNoteBookListMethod
-from apiMethods import rateThisMethod, coursePageMethod
+from apiMethods import rateThisMethod, coursePageMethod, branchListMethod
 from apiMethods import getAssignmentListMethod, getExamListMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
 from apiMethods import deleteMethod, unsubscribeCourseMethod, getNotificationMethod
@@ -397,4 +397,15 @@ class NotesAPI(remote.Service):
         name='getNot')
     def getNotification(self, request):
         return getNotificationMethod(request)
+
+    collegeIdResource = endpoints.ResourceContainer(message_types.VoidMessage,
+                                                    collegeId=messages.StringField(1))
+    @endpoints.method(
+        collegeIdResource,
+        BranchListResponse,
+        path='branchList/{collegeId}',
+        http_method='GET',
+        name='branchList')
+    def branchList(self, request):
+        return branchListMethod(request)
 apiLists = endpoints.api_server([NotesAPI])

@@ -9,7 +9,8 @@ from models import NotesResponse, NoteBookDetailResponse, NoteBookListResponse
 from models import NoteBookResponse, CoursePageResponse, AssExamResponse
 from models import AssignmentResponse, ExamResponse, GetAssListResponse
 from models import GetExamListResponse, CollegeListResponse, CollegeDetails
-from models import BookmarkResponse, Notification, NotificationResponse, NotificationList
+from models import BookmarkResponse, Notification, NotificationResponse
+from models import NotificationList, BranchListResponse
 from searchAPI import createNBDoc
 from FCM import sendNotification
 
@@ -1669,3 +1670,16 @@ def getNotificationMethod(request):
                                      type=result.type, id=result.id)
         notifList.append(notif)
     return NotificationList(notificationList=notifList)
+
+
+def branchListMethod(request):
+    try:
+        collegeId = ndb.Key(urlsafe=getattr(request, 'collegeId'))
+    except Exception:
+        print "Invalid collegeId"
+        return BranchListResponse(response=1, description='Invalid collegeId')
+    college = collegeId.get()
+    if college is None:
+        print "Invalid collegeId"
+        return BranchListResponse(response=1, description='Invalid collegeId')
+    return BranchListResponse(response=0, description='OK', branchList=college.branchNameList)

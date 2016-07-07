@@ -539,3 +539,9 @@ class NotificationResponse(messages.Message):
 
 class NotificationList(messages.Message):
     notificationList = messages.MessageField(NotificationResponse, 1, repeated=True)
+
+
+class BranchListResponse(messages.Message):
+    branchList = messages.StringField(1, repeated=True)
+    response = messages.IntegerField(2)
+    description = messages.StringField(3)
