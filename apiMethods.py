@@ -13,7 +13,6 @@ from models import GetExamListResponse, CollegeListResponse, CollegeDetails
 from models import BookmarkResponse, Notification, NotificationResponse, NotificationList
 from searchAPI import createNBDoc
 from FCM import sendNotification
-
 from google.appengine.ext import ndb
 from google.appengine.api import search
 from google.appengine.api import memcache
@@ -204,14 +203,14 @@ def subscribeCourseMethod(request):
         except Exception:
             print "Invalid courseId"
             return Response(response=1, description="Invalid courseId")
-        cacheVal = memcache.get(courseId.urlsafe())
-        if cacheVal is not None:
-            if profileId not in cacheVal[13]:
-                cacheVal[13].append(profileId)
-                memcache.set(courseId.urlsafe(), cacheVal)
         if profileId not in profile.subscribedCourseIds:
             profile.subscribedCourseIds.append(courseId)
             courseIds.append(courseId)
+            cacheVal = memcache.get(courseId.urlsafe())
+            if cacheVal is not None:
+                cacheVal[13].remove(profileId)
+                cacheVal[9] -= 1
+                memcache.set(courseId.urlsafe(), cacheVal)
     # Removing courses with same courseCode from profile.availableCourseIds
     courseCodes = []
     for courseId in courseIds:
@@ -537,6 +536,7 @@ def createAssignmentMethod(request):
 
     title = course.courseName
     course.put()
+    memcache.delete(courseId.urlsafe())
     notificationText = "New assignment added!"
     createNotification(course.studentIds, 'Campus Connect',
                        notificationText, 'assignment',
@@ -575,7 +575,7 @@ def createExamMethod(request):
     course.examIds.append(examId)
     title = course.courseName
     course.put()
-
+    memcache.delete(courseId.urlsafe())
     notificationText = "New Exam added!"
     createNotification(course.studentIds, 'Campus Connect',
                        notificationText, 'exam',
@@ -813,18 +813,20 @@ def addToNoteBook(noteBookId, newNotes):
     noteBookUploader = noteBook.uploaderId.get()
     uploaderName = noteBookUploader.profileName
     course = noteBook.courseId.get()
-    fields = [course.courseName, uploaderName, noteBook.lastUpdated,
-              noteBook.frequency, pages, noteBook.totalRating,
-              notesList, course.colour, noteBook.bmUserList,
-              noteBook.ratedUserIds, noteBook.ratingList,
-              noteBook.uploaderId]
-    memcache.set(noteBookId.urlsafe(), fields)
-
     title = course.courseName + ': ' + uploaderName
+    cacheVal = memcache.get(noteBookId.urlsafe())
+    if cacheVal is not None:
+        cacheVal[2] = noteBook.lastUpdated
+        cacheVal[3] += 1
+        cacheVal[4] = pages
+        cacheVal[6] = notesList
+        memcache.add(noteBookId.urlsafe(), cacheVal)
     noteBook.put()
     notificationText = "New notes added!"
-    createNotification(bmUserList, 'Campus Connect', notificationText,
-                       'notes', noteBookId.urlsafe())
+    if len(noteBook.bmUserList) != 0:
+        print len(noteBook.bmUserList)
+        createNotification(bmUserList, 'Campus Connect', notificationText,
+                           'notes', noteBookId.urlsafe())
     sendNotification(id=noteBookId.urlsafe(), title=title, text=notificationText, type='notes')
 
 
@@ -1147,17 +1149,6 @@ def rateThisMethod(request):
         return Response(response=1, description="Invalid profileId")
     rating = getattr(request, 'rating')
     noteBookId = ndb.Key(urlsafe=getattr(request, 'noteBookId'))
-    noteBookOpened.add(noteBookId.urlsafe())
-    cacheVal = memcache.get(noteBookId.urlsafe())
-    if cacheVal is not None:
-        if profileId in cacheVal[9]:
-            idx = cacheVal[9].index(profileId)
-            del(cacheVal[10][idx])
-            cacheVal[9].remove(profileId)
-        cacheVal[9].append(profileId)
-        cacheVal[10].append(rating)
-        memcache.set(noteBookId.urlsafe(), cacheVal)
-        return Response(response=0, description="OK")
     noteBook = noteBookId.get()
     if noteBook is None:
         print "Invalid noteBookId"
@@ -1168,6 +1159,11 @@ def rateThisMethod(request):
         noteBook.ratedUserIds.remove(profileId)
     noteBook.ratedUserIds.append(profileId)
     noteBook.ratingList.append(rating)
+    cacheVal = memcache.get(noteBookId.urlsafe())
+    if cacheVal is not None:
+        cacheVal[9] = noteBook.ratedUserIds
+        cacheVal[10] = noteBook.ratingList
+        memcache.set(noteBookId.urlsafe(), cacheVal)
     noteBook.put()
     return Response(response=0, description="OK")
 
@@ -1192,12 +1188,15 @@ def coursePageMethod(request):
         else:
             isSubscribed = 0
         return CoursePageResponse(response=0, description="OK", isSubscribed=isSubscribed,
-                                  courseName=cacheVal[0], date=cacheVal[1], startTime=cacheVal[2],
-                                  endTime=cacheVal[3], examCount=cacheVal[4], assignmentCount=cacheVal[5],
-                                  notesCount=cacheVal[6], examList=cacheVal[7], assignmentList=cacheVal[8],
-                                  studentCount=cacheVal[9], professorName=cacheVal[10], colour=cacheVal[11],
-                                  elective=cacheVal[12], collegeName=cacheVal[14], branchNames=cacheVal[15],
-                                  sectionNames=cacheVal[16], batchNames=cacheVal[17], semester=cacheVal[18])
+                                  courseName=cacheVal[0], date=cacheVal[1],
+                                  startTime=cacheVal[2], endTime=cacheVal[3],
+                                  examCount=cacheVal[4], assignmentCount=cacheVal[5],
+                                  notesCount=cacheVal[6], examList=cacheVal[7],
+                                  assignmentList=cacheVal[8], studentCount=cacheVal[9],
+                                  professorName=cacheVal[10], colour=cacheVal[11],
+                                  elective=cacheVal[12], collegeName=cacheVal[14],
+                                  branchNames=cacheVal[15], sectionNames=cacheVal[16],
+                                  batchNames=cacheVal[17], semester=cacheVal[18])
     course = courseId.get()
     if course is None:
         print "Invalid courseId"
@@ -1281,12 +1280,13 @@ def coursePageMethod(request):
             if(curDate - lastUpdated).days > 7:
                 continue
             recentNotes = recentNotes + 1
+    info = [collegeName, dueExams, dueAssignments, recentNotes, examList, assignmentList, studentCount]
     fields = [course.courseName, course.date, course.startTime, course.endTime,
-              dueExams, dueAssignments, recentNotes, examList,
-              assignmentList, studentCount, course.professorName, course.colour,
-              course.elective, course.studentIds, collegeName, course.branchNames,
+              info[1], info[2], info[3], info[4],
+              info[5], info[6], course.professorName, course.colour,
+              course.elective, course.studentIds, info[0], course.branchNames,
               course.sectionNames, course.batchNames, course.semester]
-    memcache.add(courseId.urlsafe(), fields, 3600)
+    memcache.add(course.key.urlsafe(), fields, 3600)
     return CoursePageResponse(response=0, description="OK", isSubscribed=isSubscribed,
                               courseName=course.courseName, date=course.date,
                               startTime=course.startTime, endTime=course.endTime,
@@ -1454,23 +1454,6 @@ def bookmarkMethod(request):
     except Exception:
         print "Invalid noteBookId"
         return BookmarkResponse(response=1, description="Invalid noteBookId")
-    noteBookOpened.add(noteBookId.urlsafe())
-    cacheVal = memcache.get(noteBookId.urlsafe())
-    if cacheVal is not None:
-        profile = profileId.get()
-        if profileId in cacheVal[8]:
-            cacheVal[8].remove(profileId)
-            if noteBookId in profile.bookmarkedNoteBookIds:
-                profile.bookmarkedNoteBookIds.remove(noteBookId)
-                bookmarkStatus = 0
-        else:
-            cacheVal[8].append(profileId)
-            bookmarkStatus = 1
-            if noteBookId not in profile.bookmarkedNoteBookIds:
-                profile.bookmarkedNoteBookIds.append(noteBookId)
-        profile.put()
-        memcache.set(noteBookId.urlsafe(), cacheVal)
-        return BookmarkResponse(response=0, description="OK", bookmarkStatus=bookmarkStatus)
     profile = profileId.get()
     noteBook = noteBookId.get()
     if noteBookId in profile.bookmarkedNoteBookIds:
@@ -1483,6 +1466,10 @@ def bookmarkMethod(request):
         if profileId not in noteBook.bmUserList:
             noteBook.bmUserList.append(profileId)
         status = 1
+    cacheVal = memcache.get(noteBookId.urlsafe())
+    if cacheVal is not None:
+        cacheVal[8] = noteBook.bmUserList
+    memcache.set(noteBookId.urlsafe(), cacheVal)
     profile.put()
     noteBook.put()
     return BookmarkResponse(response=0, description="OK", bookmarkStatus=status)
@@ -1497,6 +1484,7 @@ def clearAll():
         profile.key.delete()
     courses = Course.query().fetch()
     for course in courses:
+        memcache.delete(course.key.urlsafe())
         course.key.delete()
     notesList = Notes.query().fetch()
     for notes in notesList:
@@ -1518,7 +1506,8 @@ def clearAll():
             key = doc.doc_id
             ids.append(key)
         index.delete(ids)
-    results = search.Index('Course').search("NOT zoo")
+    for notif in Notification.query().fetch():
+        notif.key.delete()
 
 
 def collegeListMethod(request):
@@ -1554,21 +1543,6 @@ def unsubscribeCourseMethod(request):
         print "Invalid courseId\n" + str(E)
         return Response(response=1, description="Invaild courseId " + str(E))
     profile = profileId.get()
-    cacheVal = memcache.get(courseId.urlsafe())
-    courseUpdate.add(courseId.urlsafe())
-    if cacheVal is not None:
-        if profileId in cacheVal[13]:
-            if courseId in profile.subscribedCourseIds:
-                profile.subscribedCourseIds.remove(courseId)
-                profile.put()
-            cacheVal[13].remove(profileId)
-        else:
-            if courseId not in profile.subscribedCourseIds:
-                profile.subscribedCourseIds.append(courseId)
-                profile.put()
-            cacheVal[13].append(profileId)
-        memcache.set(courseId.urlsafe(), cacheVal)
-        return Response(response=0, description="OK")
     course = courseId.get()
     if profile is None:
         return Response(response=1, description="Invaild profileId")
@@ -1577,15 +1551,26 @@ def unsubscribeCourseMethod(request):
     if courseId in profile.subscribedCourseIds:
         profile.subscribedCourseIds.remove(courseId)
         profile.put()
+        cacheVal = memcache.get(courseId.urlsafe())
+        if cacheVal is not None:
+            cacheVal[9] -= 1
+            cacheVal[13].remove(profileId)
+            memcache.set(courseId.urlsafe(), cacheVal)
         if profileId in course.studentIds:
             course.studentIds.remove(profileId)
             course.put()
     else:
         profile.subscribedCourseIds.append(courseId)
         profile.put()
+        cacheVal = memcache.get(courseId.urlsafe())
+        if cacheVal is not None:
+            cacheVal[9] += 1
+            cacheVal[13].append(profileId)
+            memcache.set(courseId.urlsafe(), cacheVal)
         if profileId in course.studentIds:
             course.studentIds.append(profileId)
             course.put()
+
     return Response(response=0, description="OK")
 
 
@@ -1645,6 +1630,8 @@ def deleteAssignment(id):
     course.assignmentIds.remove(assignmentId)
     course.put()
     assignmentId.delete()
+    memcache.delete(assignmentId.urlsafe())
+    memcache.delete(course.key.urlsafe())
     return Response(response=0, description="OK")
 
 
@@ -1658,6 +1645,8 @@ def deleteExam(id):
     course.examIds.remove(examId)
     course.put()
     examId.delete()
+    memcache.delete(course.key.urlsafe())
+    memcache.delete(examId.urlsafe())
     return Response(response=0, description="OK")
 
 
@@ -1680,6 +1669,7 @@ def deleteProfile(id):
         examId = exam.key
         deleteExam(examId.urlsafe())
     for courseId in profile.administeredCourseIds:
+        memcache.delete(courseId.urlsafe())
         course = courseId.get()
         if len(course.adminIds) == 1:
             if len(course.studentIds) == 1:
@@ -1725,6 +1715,7 @@ def deleteCourse(id):
     college = course.collegeId.get()
     college.courseIds.remove(courseId)
     college.put()
+    memcache.delete(courseId.urlsafe())
     courseId.delete()
     search.Index('Course').delete([id])
     return Response(response=0, description='OK')
