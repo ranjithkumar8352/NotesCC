@@ -545,7 +545,7 @@ def createAssignmentMethod(request):
     createNotification(course.studentIds, 'Campus Connect',
                        notificationText, 'assignment',
                        assignmentId.urlsafe())
-    sendNotification(id=courseId.urlsafe(), title=title,
+    sendNotification(id=assignmentId.urlsafe(), title=title,
                      text=notificationText, type='assignment')
     return Response(response=0, description="OK", key=assignmentId.urlsafe())
 
@@ -584,7 +584,7 @@ def createExamMethod(request):
     createNotification(course.studentIds, 'Campus Connect',
                        notificationText, 'exam',
                        examId.urlsafe())
-    sendNotification(id=courseId.urlsafe(), title=title,
+    sendNotification(id=examId.urlsafe(), title=title,
                      text=notificationText, type='exam')
     return Response(response=0, description="OK", key=examId.urlsafe())
 
