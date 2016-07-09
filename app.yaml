@@ -18,6 +18,10 @@ handlers:
   script: imageUpload.app
 - url: /imgweb
   script: imageUpload.app
+- url: /changePic
+  script: imageUpload.app
+- url: /email
+  script: emailer.app
 - url: /task/updateAssignment
   script: cronTasks/updateAssignment.py
 - url: /task/updateExam
@@ -28,6 +32,8 @@ handlers:
   script: cronTasks/updateCourse.py
 - url: /task/notification
   script: cronTasks/sendNotification.py
+- url: /task/email
+  script: cronTasks/sendEmail.py
 
 libraries:
 - name: pycrypto

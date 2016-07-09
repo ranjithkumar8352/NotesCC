@@ -32,11 +32,13 @@ def editProfileMethod(request):
         profile = profileId.get()
         for field in fields:
             value = getattr(request, field.name, None)
+            if field.name == 'collegeId':
+                continue
             if value is None or value == "" or value == []:
                 continue
             setattr(profile, field.name, value)
         profile.put()
-        return Response(response=1, description="OK")
+        return Response(response=0, description="OK")
     except Exception, E:
         return Response(response=1, description=str(E))
 

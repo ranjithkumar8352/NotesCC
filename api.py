@@ -13,6 +13,7 @@ from models import CoursePageResponse, GetExamListResponse, GetAssListResponse, 
 from models import BookmarkRequest, CollegeListResponse, AddBranchRequest
 from models import SearchCourseRequest, BookmarkResponse, SearchNBRequest
 from models import UnsubscribeCourseRequest, NotificationList, BranchListResponse
+from models import EditProfileRequest, CollegeRequest
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
 from apiMethods import courseListMethod, feedMethod, addAdminMethod
@@ -20,14 +21,15 @@ from apiMethods import timeTableMethod, studentListMethod, createAssignmentMetho
 from apiMethods import createExamMethod, getAssignmentMethod, getExamMethod
 from apiMethods import createNotesMethod, getNoteBook, getNoteBookListMethod
 from apiMethods import rateThisMethod, coursePageMethod, branchListMethod
-from apiMethods import getAssignmentListMethod, getExamListMethod
+from apiMethods import getAssignmentListMethod, getExamListMethod, collegeRequestMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
 from apiMethods import deleteMethod, unsubscribeCourseMethod, getNotificationMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 from apiTest import runScript
 from editMethods import editCollegeMethod, editProfileMethod, editCourseMethod
 from editMethods import editAssignmentMethod, editExamMethod, editNotesMethod
-
+from sendEmail import send
+from createCSV import create
 
 @endpoints.api(name='notesapi', version='v1')
 class NotesAPI(remote.Service):
@@ -61,16 +63,14 @@ class NotesAPI(remote.Service):
     def createProfile(self, request):
         return createProfileMethod(request)
 
-    editProfileResource = endpoints.ResourceContainer(ProfileForm,
-                                                      profileId=messages.StringField(1))
-
     @endpoints.method(
-        editProfileResource,
+        EditProfileRequest,
         Response,
-        path='editProfile/{profileId}',
+        path='editProfile',
         http_method='POST',
         name='editProfile')
     def editProfile(self, request):
+        print request
         return editProfileMethod(request)
 
     @endpoints.method(
@@ -400,6 +400,7 @@ class NotesAPI(remote.Service):
 
     collegeIdResource = endpoints.ResourceContainer(message_types.VoidMessage,
                                                     collegeId=messages.StringField(1))
+
     @endpoints.method(
         collegeIdResource,
         BranchListResponse,
@@ -408,4 +409,34 @@ class NotesAPI(remote.Service):
         name='branchList')
     def branchList(self, request):
         return branchListMethod(request)
+
+    @endpoints.method(
+        message_types.VoidMessage,
+        message_types.VoidMessage,
+        path='mail',
+        http_method='GET',
+        name='mail')
+    def mail(self, request):
+        send()
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        message_types.VoidMessage,
+        message_types.VoidMessage,
+        path='createCSV',
+        http_method='GET',
+        name='createCSV')
+    def createCSV(self, request):
+        create()
+        return message_types.VoidMessage()
+
+    @endpoints.method(
+        CollegeRequest,
+        message_types.VoidMessage,
+        path='collegeRequest',
+        http_method='POST',
+        name='collegeRequest')
+    def collegeReuest(self, request):
+        collegeRequestMethod(request)
+        return message_types.VoidMessage()
 apiLists = endpoints.api_server([NotesAPI])

@@ -5,8 +5,45 @@ import cloudstorage as gcs
 import datetime
 from config import PROJECT_URL, BUCKET_NAME
 
+
+class ProfilePicUpload(webapp2.RequestHandler):
+    def options(self):
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
+        self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
+
+    def post(self):
+        self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+        self.response.headers['Content-Type'] = 'application/json'
+        try:
+            profileId = self.request.get('profileId')
+        except Exception, E:
+            print "profileId Missing in request\n" + self.request + '\n' + str(E)
+            return self.response.write("profileId Missing in request\n" + self.request + '\n' + str(E))
+        file = self.request.POST.get('file')
+        bucketName = BUCKET_NAME
+        fileName = bucketName + '/ProfilePic/' + profileId + '.jpg'
+        gcsFile = gcs.open(fileName, mode='w', content_type='image/jpeg',
+                           options={'x-goog-acl': 'public-read'})
+        gcsFile.write(file.value)
+        url = 'https://storage.googleapis.com' + fileName
+        gcsFile.close()
+        obj = {
+            'response': 0,
+            'url': str(url)
+        }
+        self.response.out.write(json.dumps(obj))
+
+    def get(self):
+        self.response.out.write("""<form method="POST" enctype="multipart/form-data">
+                                    <input type="file" name="file">
+                                    <input type="text" name="profileId">
+                                    <input type="submit" name="submit">
+                                   </form>""")
+
+
 class ImageUploadAndroid(webapp2.RequestHandler):
-    def options(self):      
+    def options(self):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
         self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
@@ -313,4 +350,5 @@ class ImageUploadWeb(webapp2.RequestHandler):
                     </body>
                     </html>""")
 app = webapp2.WSGIApplication([('/img', ImageUploadAndroid),
-                               ('/imgweb', ImageUploadWeb)], debug=True)
+                               ('/imgweb', ImageUploadWeb),
+                               ('/changePic', ProfilePicUpload)], debug=True)

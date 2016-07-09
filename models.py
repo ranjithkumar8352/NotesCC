@@ -542,3 +542,30 @@ class BranchListResponse(messages.Message):
     branchList = messages.StringField(1, repeated=True)
     response = messages.IntegerField(2)
     description = messages.StringField(3)
+
+
+class EditProfileRequest(messages.Message):
+    profileName = messages.StringField(1)
+    collegeId = messages.StringField(2)
+    batchName = messages.StringField(3)
+    branchName = messages.StringField(4)
+    sectionName = messages.StringField(5)
+    photoUrl = messages.StringField(10)
+    email = messages.StringField(14)
+    gcmId = messages.StringField(15)
+    profileId = messages.StringField(6)
+
+
+class CollegeRequest(messages.Message):
+    collegeName = messages.StringField(1)
+    location = messages.StringField(2)
+    name = messages.StringField(3)
+    phone = messages.StringField(4)
+
+
+class CollegeRequestModel(ndb.Model):
+    collegeName = ndb.StringProperty()
+    location = ndb.StringProperty()
+    name = ndb.StringProperty()
+    phone = ndb.StringProperty()
+    timeStamp = ndb.DateTimeProperty()

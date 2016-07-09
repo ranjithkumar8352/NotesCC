@@ -19,3 +19,7 @@ cron:
   url: /task/notification
   schedule: every 1 hours
   target: crontask
+- description: "Sending Email notification"
+  url: /task/email
+  schedule: every 24 hours
+  target: crontask

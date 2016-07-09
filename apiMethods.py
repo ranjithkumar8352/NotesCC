@@ -11,9 +11,11 @@ from models import NoteBookResponse, CoursePageResponse, AssExamResponse
 from models import AssignmentResponse, ExamResponse, GetAssListResponse
 from models import GetExamListResponse, CollegeListResponse, CollegeDetails
 from models import BookmarkResponse, Notification, NotificationResponse
-from models import NotificationList, BranchListResponse
+from models import NotificationList, BranchListResponse, CollegeRequestModel
 from searchAPI import createNBDoc
 from FCM import sendNotification
+from sparkpost import SparkPost
+
 from google.appengine.ext import ndb
 from google.appengine.api import search
 from google.appengine.api import memcache
@@ -68,6 +70,7 @@ def createCollegeMethod(request):
         return Response(response=2, description="College Already Exists")
     else:
         key = newCollege.put()
+        memcache.add(key.urlsafe(), 0, 86400)
         return Response(response=0, description="OK", key=key.urlsafe())
 
 
@@ -209,7 +212,7 @@ def subscribeCourseMethod(request):
             courseIds.append(courseId)
             cacheVal = memcache.get(courseId.urlsafe())
             if cacheVal is not None:
-                cacheVal[13].remove(profileId)
+                cacheVal[13].append(profileId)
                 cacheVal[9] -= 1
                 memcache.set(courseId.urlsafe(), cacheVal)
     # Removing courses with same courseCode from profile.availableCourseIds
@@ -613,6 +616,7 @@ def getAssignmentMethod(request):
             memcache.add('views' + assignmentId.urlsafe(), memViews)
         if isAuthor == 0:
             memcache.incr('views' + assignmentId.urlsafe())
+        views = memcache.get('views' + assignmentId.urlsafe())
         return GetAssignmentResponse(response=0, description="OK",
                                      isAuthor=isAuthor,
                                      assignmentTitle=cacheVal[0],
@@ -623,7 +627,7 @@ def getAssignmentMethod(request):
                                      dueTime=cacheVal[5],
                                      urlList=cacheVal[6],
                                      courseName=cacheVal[7],
-                                     views=memViews + 1)
+                                     views=views)
     assignment = assignmentId.get()
     if assignment is None:
         print "Invalid assignmentId"
@@ -633,7 +637,8 @@ def getAssignmentMethod(request):
     else:
         isAuthor = 0
     uploaderName = assignment.uploaderId.get().profileName
-    assignment.assignmentViews = assignment.assignmentViews + 1
+    if isAuthor == 1:
+        assignment.assignmentViews = assignment.assignmentViews + 1
     course = assignment.courseId.get()
     assignment.put()
     fields = [assignment.assignmentTitle, assignment.assignmentDesc, assignment.dateUploaded,
@@ -681,12 +686,13 @@ def getExamMethod(request):
             memcache.add('views' + examId.urlsafe(), memViews)
         if isAuthor == 0:
             memcache.incr('views' + examId.urlsafe())
+        views = memcache.get('views' + examId.urlsafe())
         return GetExamResponse(response=0, description="OK",
                                isAuthor=isAuthor, examTitle=cacheVal[0],
                                examDesc=cacheVal[1], lastUpdated=cacheVal[2],
                                uploaderName=cacheVal[3], dueDate=cacheVal[4],
                                dueTime=cacheVal[5], urlList=cacheVal[6],
-                               courseName=cacheVal[7], views=memViews + 1)
+                               courseName=cacheVal[7], views=views)
     exam = examId.get()
     if exam is None:
         print "Invalid examId"
@@ -696,7 +702,8 @@ def getExamMethod(request):
     else:
         isAuthor = 0
     uploaderName = exam.uploaderId.get().profileName
-    exam.examViews = exam.examViews + 1
+    if isAuthor == 1:
+        exam.examViews = exam.examViews + 1
     exam.put()
     course = exam.courseId.get()
     fields = [exam.examTitle, exam.examDesc, exam.dateUploaded, uploaderName,
@@ -728,6 +735,7 @@ def createNotesMethod(request):
         print "Invalid courseId"
         return Response(response=1, description="Invalid courseId")
     profile = profileId.get()
+    memcache.incr(profile.collegeId.urlsafe())
     if profile is None:
         print "Invalid profileId"
         return Response(response=1, description="Invalid profileId")
@@ -872,9 +880,10 @@ def getNoteBook(request):
             isAuthor = 0
         if isAuthor == 0:
             memcache.incr('views' + noteBookId.urlsafe())
+        views = memcache.get('views' + noteBookId.urlsafe())
         return NoteBookDetailResponse(courseName=cacheVal[0],
                                       isAuthor=isAuthor, uploaderName=cacheVal[1],
-                                      lastUpdated=cacheVal[2], views=memViews + 1,
+                                      lastUpdated=cacheVal[2], views=memViews,
                                       rated=rated, frequency=cacheVal[3],
                                       pages=cacheVal[4], totalRating=cacheVal[5],
                                       notes=cacheVal[6], bookmarkStatus=bookmarkStatus,
@@ -904,7 +913,9 @@ def getNoteBook(request):
         return NoteBookDetailResponse(response=1, description="Invalid courseId")
     uploaderName = noteBookUploader.profileName
     lastUpdated = noteBook.lastUpdated
-    views = noteBook.views + 1
+    views = noteBook.views
+    if isAuthor == 0:
+        views = noteBook.views + 1
     noteBook.views = views
     noteBook.put()
     frequency = noteBook.frequency
@@ -1788,3 +1799,24 @@ def branchListMethod(request):
         print "Invalid collegeId"
         return BranchListResponse(response=1, description='Invalid collegeId')
     return BranchListResponse(response=0, description='OK', branchList=college.branchNameList)
+
+
+def collegeRequestMethod(request):
+    collegeName = getattr(request, 'collegeName')
+    location = getattr(request, 'location')
+    name = getattr(request, 'name')
+    phone = getattr(request, 'phone')
+    college = CollegeRequestModel(collegeName=collegeName,
+                                  location=location, name=name,
+                                  phone=phone, timeStamp=datetime.datetime.now())
+    college.put()
+    sp = SparkPost('d5eda063a40ae19610612ea5d0804f20d294e62d')
+    body = """<h1>Campus Connect</h1><br>There is a request to create new College
+              <br>""" + collegeName + """, """ + location + """
+              <br>by """ + name + """, """ + phone
+    response = sp.transmissions.send(recipients=['saurav24081996@gmail.com', 'aayush@campusconnect.cc'],
+                                     html=body,
+                                     from_email={'email': 'aayush@campusconnect.cc', 'name': 'Campus Connect'},
+                                     subject='New College',
+                                     )
+    print(response)
