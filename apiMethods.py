@@ -763,7 +763,7 @@ def createNotesMethod(request):
             noteBookId = createNoteBook(profileId, courseId)
             addToNoteBook(noteBookId, newNotes)
         except Exception, E:
-            print str(E) + "SSSSSSSSsss"
+            print str(E)
             return Response(response=1, description=str(E))
         createNBDoc(newNotes.title, newNotes.notesDesc,
                     profile.profileName, noteBookId.urlsafe())
@@ -829,7 +829,7 @@ def addToNoteBook(noteBookId, newNotes):
         cacheVal[3] += 1
         cacheVal[4] = pages
         cacheVal[6] = notesList
-        memcache.add(noteBookId.urlsafe(), cacheVal)
+        memcache.set(noteBookId.urlsafe(), cacheVal)
     noteBook.put()
     notificationText = "New notes added!"
     if len(noteBook.bmUserList) != 0:
@@ -1102,6 +1102,7 @@ def getNoteBookListMethod(request):
                                    lastUpdated=noteBook.lastUpdated,
                                    colour=course.colour)
             noteBookList.append(new)
+            noteBookList.sort(key=lambda x: x.lastUpdated, reverse=True)
     elif profileId:
         try:
             profileId = ndb.Key(urlsafe=profileId)

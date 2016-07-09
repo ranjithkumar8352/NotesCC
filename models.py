@@ -81,6 +81,11 @@ class Course(ndb.Model):
     elective = ndb.StringProperty()
 
 
+class MergeCourseRequest(messages.Message):
+    courseIdSource = messages.StringField(1)
+    courseIdDest = messages.StringField(2)
+
+
 class CourseForm(messages.Message):
     courseName = messages.StringField(1)
     collegeId = messages.StringField(2)
