@@ -19,7 +19,7 @@ gcsFile = gcs.open(fileName, mode='w', content_type='text/csv',
 gcsFile.write(data)
 gcsFile.write("\n")
 gcsFile.write("Date,College,Courses,Students,Notebooks,UploadsToday\n")
-body = ""
+body = "Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;College&nbsp;Courses&nbsp;Students&nbsp;Notebooks&nbsp;UploadsToday<br>"
 for college in College.query().fetch():
     num = memcache.get(college.key.urlsafe())
     if num is None:
@@ -27,8 +27,8 @@ for college in College.query().fetch():
         num = "Lost"
     det = [str(today), str(college.collegeName), str(len(college.courseIds)),
            str(college.studentCount), str(college.noteBookCount), str(num)]
-    body += ",".join(det)
-    body += "\n"
+    body += "&nbsp;".join(det)
+    body += "<br>"
     gcsFile.write(",".join(det))
     gcsFile.write("\n")
     num = memcache.set(college.key.urlsafe(), 0)
@@ -38,8 +38,8 @@ emailBody = """<H1>Campus Connect<br></H1>
                Here are todays stats<br>""" + body + """<br>link:
                https://storage.googleapis.com/uploadnotes-2016.appspot.com/summary.csv"""
 sp = SparkPost('d5eda063a40ae19610612ea5d0804f20d294e62d')
-response = sp.transmissions.send(recipients=['saurav24081996@gmail.com', 'aayushxagrawal@gmail.com'],
+response = sp.transmissions.send(recipients=['saurav24081996@gmail.com'],
                                  html=emailBody,
                                  from_email={'email': 'aayush@campusconnect.cc', 'name': 'Campus Connect'},
                                  subject='OOOOH!!! YEAHHHH',
-                                 )
+                                )

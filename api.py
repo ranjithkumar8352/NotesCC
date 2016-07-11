@@ -28,8 +28,9 @@ from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 from apiTest import runScript
 from editMethods import editCollegeMethod, editProfileMethod, editCourseMethod
 from editMethods import editAssignmentMethod, editExamMethod, editNotesMethod
-from sendEmail import send
+from sendEmail import sendMailNow
 from createCSV import create
+
 
 @endpoints.api(name='notesapi', version='v1')
 class NotesAPI(remote.Service):
@@ -417,7 +418,7 @@ class NotesAPI(remote.Service):
         http_method='GET',
         name='mail')
     def mail(self, request):
-        send()
+        sendMailNow()
         return message_types.VoidMessage()
 
     @endpoints.method(
@@ -439,4 +440,5 @@ class NotesAPI(remote.Service):
     def collegeReuest(self, request):
         collegeRequestMethod(request)
         return message_types.VoidMessage()
+
 apiLists = endpoints.api_server([NotesAPI])
