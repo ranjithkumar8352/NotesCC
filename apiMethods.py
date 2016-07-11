@@ -15,6 +15,7 @@ from models import NotificationList, BranchListResponse, CollegeRequestModel
 from searchAPI import createNBDoc
 from FCM import sendNotification
 from sparkpost import SparkPost
+from config import CLG_STATS_TIME
 
 from google.appengine.ext import ndb
 from google.appengine.api import search
@@ -70,7 +71,8 @@ def createCollegeMethod(request):
         return Response(response=2, description="College Already Exists")
     else:
         key = newCollege.put()
-        memcache.add(key.urlsafe(), 0, 86400)
+        memcache.add(key.urlsafe(), 0, CLG_STATS_TIME)
+        memcache.add('stu' + key.urlsafe(), 0, CLG_STATS_TIME)
         return Response(response=0, description="OK", key=key.urlsafe())
 
 
@@ -99,6 +101,7 @@ def createProfileMethod(request):
     for course in Course.query(queryString).fetch():
         availableCourseIds.append(course.key)
     college = collegeId.get()
+    memcache.incr('stu' + collegeId.urlsafe())
     # To get existing profiles (if any) with same email id
     profileCheck = Profile.query(Profile.email == newProfile.email).fetch()
     if college is None:

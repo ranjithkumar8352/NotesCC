@@ -6,3 +6,6 @@ BUCKET_NAME = '/' + PROJECT_ID + '.appspot.com'
 WEBSITE_URL = 'https://campusconnect-2016.herokuapp.com'
 FCM_URL = 'https://fcm.googleapis.com/fcm/send'
 FCM_AUTH_KEY = 'AIzaSyD4MtcG4R0LrZ42nskF1lpBQSYq0JT-a6Y'
+
+# Cache Data Expiration Time
+CLG_STATS_TIME = 172800
