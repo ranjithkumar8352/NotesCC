@@ -574,3 +574,15 @@ class CollegeRequestModel(ndb.Model):
     name = ndb.StringProperty()
     phone = ndb.StringProperty()
     timeStamp = ndb.DateTimeProperty()
+
+
+class ReportCourse(ndb.Model):
+    courseId = ndb.KeyProperty(kind='Course')
+    profileId = ndb.KeyProperty(kind='Profile')
+    description = ndb.StringProperty()
+
+
+class ReportRequest(messages.Message):
+    key = messages.StringField(1)
+    profileId = messages.StringField(2)
+    description = messages.StringField(3)

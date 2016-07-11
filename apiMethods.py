@@ -12,8 +12,10 @@ from models import AssignmentResponse, ExamResponse, GetAssListResponse
 from models import GetExamListResponse, CollegeListResponse, CollegeDetails
 from models import BookmarkResponse, Notification, NotificationResponse
 from models import NotificationList, BranchListResponse, CollegeRequestModel
+from models import ReportCourse
 from searchAPI import createNBDoc
 from FCM import sendNotification
+from sendEmail import sendEmail
 from sparkpost import SparkPost
 from config import CLG_STATS_TIME
 
@@ -1824,3 +1826,24 @@ def collegeRequestMethod(request):
                                      subject='New College',
                                      )
     print(response)
+
+
+def reportCourseMethod(request):
+    courseId = ndb.Key(urlsafe=getattr(request, 'key'))
+    profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
+    course = courseId.get()
+    profile = profileId.get()
+    college = course.collegeId.get()
+    desc = getattr(request, 'description')
+    newReport = ReportCourse(courseId=courseId, profileId=profileId,
+                             description=desc)
+    newReport.put()
+    body = "<h1>CAMPUS CONNECT</h1><br>"
+    body += "Course is Reported<br>"
+    body += "College: " + college.collegeName
+    body += "Details<br>courseId: " + courseId.urlsafe()
+    body += "<br>Course Name: " + course.courseName
+    body += "<br>By: " + profile.profileName
+    body += "<br>profileId: " + profileId.urlsafe()
+    sendEmail(body=body)
+    return Response(response=0, description='OK')

@@ -13,7 +13,7 @@ from models import CoursePageResponse, GetExamListResponse, GetAssListResponse, 
 from models import BookmarkRequest, CollegeListResponse, AddBranchRequest
 from models import SearchCourseRequest, BookmarkResponse, SearchNBRequest
 from models import UnsubscribeCourseRequest, NotificationList, BranchListResponse
-from models import EditProfileRequest, CollegeRequest
+from models import EditProfileRequest, CollegeRequest, ReportRequest
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
 from apiMethods import courseListMethod, feedMethod, addAdminMethod
@@ -24,6 +24,7 @@ from apiMethods import rateThisMethod, coursePageMethod, branchListMethod
 from apiMethods import getAssignmentListMethod, getExamListMethod, collegeRequestMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
 from apiMethods import deleteMethod, unsubscribeCourseMethod, getNotificationMethod
+from apiMethods import reportCourseMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 from apiTest import runScript
 from editMethods import editCollegeMethod, editProfileMethod, editCourseMethod
@@ -440,5 +441,14 @@ class NotesAPI(remote.Service):
     def collegeReuest(self, request):
         collegeRequestMethod(request)
         return message_types.VoidMessage()
+
+    @endpoints.method(
+        ReportRequest,
+        Response,
+        path='reportCourse',
+        http_method='POST',
+        name='reportCourse')
+    def reportCourse(self, request):
+        return reportCourseMethod(request)
 
 apiLists = endpoints.api_server([NotesAPI])
