@@ -452,7 +452,7 @@ class CoursePageResponse(messages.Message):
     sectionNames = messages.StringField(20, repeated=True)
     semester = messages.StringField(21)
     collegeName = messages.StringField(22)
-    isAdmin = messages.StringField(23)
+    isAdmin = messages.IntegerField(23)
 
 
 class BookmarkRequest(messages.Message):
