@@ -6,6 +6,16 @@ from sparkpost import SparkPost
 from google.appengine.api import memcache
 
 
+def sendEmail(subject, body):
+    sp = SparkPost('d5eda063a40ae19610612ea5d0804f20d294e62d')
+    response = sp.transmissions.send(recipients=['saurav24081996@gmail.com', 'aayush@campusconnect.cc'],
+                                     html=body,
+                                     from_email={'email': 'aayush@campusconnect.cc', 'name': 'Campus Connect'},
+                                     subject=subject,
+                                     )
+    print response
+
+
 def sendMailNow():
     today = datetime.date.today()
     bucketName = BUCKET_NAME
@@ -43,20 +53,4 @@ def sendMailNow():
     emailBody = """<H1>Campus Connect<br></H1>
                    Here are todays stats<br>""" + body + """<br>link:
                    https://storage.googleapis.com/uploadnotes-2016.appspot.com/summary.csv"""
-    sp = SparkPost('d5eda063a40ae19610612ea5d0804f20d294e62d')
-    response = sp.transmissions.send(recipients=['saurav24081996@gmail.com'],
-                                     html=emailBody,
-                                     from_email={'email': 'aayush@campusconnect.cc', 'name': 'Campus Connect'},
-                                     subject='OOOOH!!! YEAHHHH',
-                                     )
-    print response
-
-
-def sendEmail(body):
-    sp = SparkPost('d5eda063a40ae19610612ea5d0804f20d294e62d')
-    response = sp.transmissions.send(recipients=['saurav24081996@gmail.com'],
-                                     html=body,
-                                     from_email={'email': 'aayush@campusconnect.cc', 'name': 'Campus Connect'},
-                                     subject='COURSE REPORTED',
-                                     )
-    print response
+    sendEmail(subject='OOOH!!!! YEAH!', body=emailBody)

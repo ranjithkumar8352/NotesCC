@@ -12,7 +12,7 @@ from models import AssignmentResponse, ExamResponse, GetAssListResponse
 from models import GetExamListResponse, CollegeListResponse, CollegeDetails
 from models import BookmarkResponse, Notification, NotificationResponse
 from models import NotificationList, BranchListResponse, CollegeRequestModel
-from models import ReportCourse
+from models import Report
 from searchAPI import createNBDoc
 from FCM import sendNotification
 from sendEmail import sendEmail
@@ -550,7 +550,7 @@ def createAssignmentMethod(request):
     createNotification(course.studentIds, 'Campus Connect',
                        notificationText, 'assignment',
                        assignmentId.urlsafe())
-    sendNotification(id=assignmentId.urlsafe(), title=title,
+    sendNotification(topicName=courseId.urlsafe(), id=assignmentId.urlsafe(), title=title,
                      text=notificationText, type='assignment')
     return Response(response=0, description="OK", key=assignmentId.urlsafe())
 
@@ -589,7 +589,7 @@ def createExamMethod(request):
     createNotification(course.studentIds, 'Campus Connect',
                        notificationText, 'exam',
                        examId.urlsafe())
-    sendNotification(id=examId.urlsafe(), title=title,
+    sendNotification(topicName=courseId.urlsafe(), id=examId.urlsafe(), title=title,
                      text=notificationText, type='exam')
     return Response(response=0, description="OK", key=examId.urlsafe())
 
@@ -841,7 +841,8 @@ def addToNoteBook(noteBookId, newNotes):
         print len(noteBook.bmUserList)
         createNotification(bmUserList, 'Campus Connect', notificationText,
                            'notes', noteBookId.urlsafe())
-    sendNotification(id=noteBookId.urlsafe(), title=title, text=notificationText, type='notes')
+    sendNotification(topicName=noteBookId.urlsafe(), id=noteBookId.urlsafe(),
+                     title=title, text=notificationText, type='notes')
 
 
 def getNoteBook(request):
@@ -1776,7 +1777,7 @@ def deleteMethod(request):
 
 
 def createNotification(profileIds, title, text, type, id):
-    timeStamp = datetime.datetime.now()
+    timeStamp = datetime.datetime.now() + datetime.timedelta(hours=5, minutes=30)
     newNotification = Notification(type=type, id=id, title=title, text=text,
                                    profileIdList=profileIds, timeStamp=timeStamp)
     newNotification.put()
@@ -1814,7 +1815,7 @@ def collegeRequestMethod(request):
     phone = getattr(request, 'phone')
     college = CollegeRequestModel(collegeName=collegeName,
                                   location=location, name=name,
-                                  phone=phone, timeStamp=datetime.datetime.now())
+                                  phone=phone, timeStamp=datetime.datetime.now()+datetime.timedelta(hours=5, minutes=30))
     college.put()
     sp = SparkPost('d5eda063a40ae19610612ea5d0804f20d294e62d')
     body = """<h1>Campus Connect</h1><br>There is a request to create new College
@@ -1828,22 +1829,20 @@ def collegeRequestMethod(request):
     print(response)
 
 
-def reportCourseMethod(request):
-    courseId = ndb.Key(urlsafe=getattr(request, 'key'))
+def reportMethod(request):
+    id = ndb.Key(urlsafe=getattr(request, 'key'))
     profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
-    course = courseId.get()
     profile = profileId.get()
-    college = course.collegeId.get()
+    college = profile.collegeId.get()
     desc = getattr(request, 'description')
-    newReport = ReportCourse(courseId=courseId, profileId=profileId,
-                             description=desc)
+    newReport = Report(id=id, profileId=profileId,
+                       description=desc)
     newReport.put()
     body = "<h1>CAMPUS CONNECT</h1><br>"
-    body += "Course is Reported<br>"
+    body += "Something is Reported<br>"
     body += "College: " + college.collegeName
-    body += "Details<br>courseId: " + courseId.urlsafe()
-    body += "<br>Course Name: " + course.courseName
+    body += "<br>Details<br>id: " + id.urlsafe()
     body += "<br>By: " + profile.profileName
     body += "<br>profileId: " + profileId.urlsafe()
-    sendEmail(body=body)
+    sendEmail(subject='Something is Reported', body=body)
     return Response(response=0, description='OK')

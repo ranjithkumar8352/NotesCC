@@ -142,7 +142,7 @@ class FeedCourseResponse(messages.Message):
     recentNotes = messages.IntegerField(4)
     date = messages.StringField(5, repeated=True)
     startTime = messages.StringField(6, repeated=True)
-    endTime = messages.StringField(7, repeated=True) 
+    endTime = messages.StringField(7, repeated=True)
     professorName = messages.StringField(9)
     colour = messages.StringField(10)
     elective = messages.StringField(11)
@@ -576,8 +576,8 @@ class CollegeRequestModel(ndb.Model):
     timeStamp = ndb.DateTimeProperty()
 
 
-class ReportCourse(ndb.Model):
-    courseId = ndb.KeyProperty(kind='Course')
+class Report(ndb.Model):
+    id = ndb.KeyProperty()
     profileId = ndb.KeyProperty(kind='Profile')
     description = ndb.StringProperty()
 

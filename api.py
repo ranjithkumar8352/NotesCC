@@ -24,7 +24,7 @@ from apiMethods import rateThisMethod, coursePageMethod, branchListMethod
 from apiMethods import getAssignmentListMethod, getExamListMethod, collegeRequestMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
 from apiMethods import deleteMethod, unsubscribeCourseMethod, getNotificationMethod
-from apiMethods import reportCourseMethod
+from apiMethods import reportMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 from apiTest import runScript
 from editMethods import editCollegeMethod, editProfileMethod, editCourseMethod
@@ -445,10 +445,10 @@ class NotesAPI(remote.Service):
     @endpoints.method(
         ReportRequest,
         Response,
-        path='reportCourse',
+        path='report',
         http_method='POST',
-        name='reportCourse')
+        name='report')
     def reportCourse(self, request):
-        return reportCourseMethod(request)
+        return reportMethod(request)
 
 apiLists = endpoints.api_server([NotesAPI])

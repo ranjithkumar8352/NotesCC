@@ -19,12 +19,14 @@ for notification in results:
             profileIds[profileId] = 0
 for profileId in profileIds:
     count = profileIds[profileId]
+    if count == 0:
+        continue
     fcmId = memcache.get('fcm' + profileId.urlsafe())
     if fcmId is None:
         profile = profileId.get()
         if profile is None:
             continue
         fcmId = profile.gcmId
-        memcache.add('fcm'+profileId.urlsafe(), fcmId, 3600)
+        memcache.add('fcm' + profileId.urlsafe(), fcmId, 3600)
     text = 'You have ' + str(count) + ' new notifications'
     sendNotificationSingle(fcmId, 'hour', 'Campus Connect', text)
