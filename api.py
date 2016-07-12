@@ -26,7 +26,6 @@ from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMet
 from apiMethods import deleteMethod, unsubscribeCourseMethod, getNotificationMethod
 from apiMethods import reportMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
-from apiTest import runScript
 from editMethods import editCollegeMethod, editProfileMethod, editCourseMethod
 from editMethods import editAssignmentMethod, editExamMethod, editNotesMethod
 from sendEmail import sendMailNow
@@ -377,16 +376,6 @@ class NotesAPI(remote.Service):
         name='searchNotes')
     def searchNotes(self, request):
         return searchNBMethod(request)
-
-    @endpoints.method(
-        message_types.VoidMessage,
-        message_types.VoidMessage,
-        path='runScript',
-        http_method='GET',
-        name='runScript')
-    def runTestScript(self, request):
-        runScript()
-        return message_types.VoidMessage()
 
     profileIdResource = endpoints.ResourceContainer(message_types.VoidMessage,
                                                     profileId=messages.StringField(1))

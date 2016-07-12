@@ -1,6 +1,6 @@
-import json
-import urllib2
+mimport urllib2
 from config import PROJECT_URL
+# PROJECT_URL = 'http://localhost:8080'
 collegeList = []
 collegeIdList = []
 profileList = []
@@ -15,127 +15,25 @@ examList = []
 examIdList = []
 
 
-def createCollegeList():
-    collegeList.append({'abbreviation': 'TC1', 'collegeName': 'Test College 1', 'collegeType': 'Test Type 1',
-                        'location': 'Test Location 1', 'semStartDate': '22-07-2016', 'semEndDate': '23-12:2016',
-                        'branchNameList': ['CSE', 'ECE', 'MECH']})
-    collegeList.append({'abbreviation': 'TC2', 'collegeName': 'Test College 2', 'collegeType': 'Test Type 2',
-                        'location': 'Test Location 2', 'semStartDate': '21-07-2016', 'semEndDate': '29-11-2016',
-                        'branchNameList': ['CSE', 'ECE']})
-    collegeList.append({'abbreviation': 'TC3', 'collegeName': 'Test College 3', 'collegeType': 'Test Type 3',
-                        'location': 'Test Location 3', 'semStartDate': '01-08-2016', 'semEndDate': '24-12-2016',
-                        'branchNameList': ['CSE', 'ECE', 'MECH']})
-    collegeList.append({'abbreviation': 'TC4', 'collegeName': 'Test College 4', 'collegeType': 'Test Type 4',
-                        'location': 'Test Location 4', 'semStartDate': '24-06-2016', 'semEndDate': '23-01-2016',
-                        'branchNameList': ['CSE', 'ECE', 'MECH']})
-
-
-def createProfileList():
-    profileList.append({'profileName': 'Test Profile 1', 'collegeId': collegeIdList[0], 'email': 'testemail1@gmail.com',
-                        'gcmId': '2408', 'sectionName': 'A', 'batchName': '2014', 'branchName': ' CSE',
-                        'photoUrl': 'https://s-media-cache-ak0.pinimg.com/avatars/shrutishrm512_1451826368_140.jpeg'
-                        })
-    profileList.append({'profileName': 'Test Profile 2', 'collegeId': collegeIdList[0], 'email': 'testemail2@gmail.com',
-                        'gcmId': '1710', 'sectionName': 'A', 'batchName': '2014', 'branchName': 'CSE',
-                        'photoUrl': 'http://cdn.wonderfulengineering.com/wp-content/uploads/2016/01/cool-wallpaper-3.jpg'})
-    profileList.append({'profileName': 'Test Profile 4', 'collegeId': collegeIdList[1], 'email': 'testemail4@gmail.com',
-                        'photoUrl': 'http://kingofwallpapers.com/boy/boy-025.jpg', 'sectionName': 'A', 'batchName': '2014',
-                        'branchName': 'CSE', 'gcmId': '1310'})
-    profileList.append({'profileName': 'Test Profile 5', 'collegeId': collegeIdList[1], 'email': 'testemail5@gmail.com',
-                        'gcmId': '1410', 'photoUrl': 'https://static.pexels.com/photos/6413/people-eyes-playing-young.jpg',
-                        'sectionName': 'A', 'batchName': '2014', 'branchName': 'CSE'})
-    profileList.append({'profileName': 'Test Profile 3', 'collegeId': collegeIdList[0], 'email': 'testemail3@gmail.com',
-                        'gcmId': '1110', 'photoUrl': 'https://static.pexels.com/photos/7720/night-animal-dog-pet.jpg',
-                        'sectionName': 'A', 'batchName': '2014', 'branchName': 'ECE'})
-    profileList.append({'profileName': 'Test Profile 6', 'collegeId': collegeIdList[1], 'email': 'testemail6@gmail.com',
-                        'gcmId': '1420', 'photoUrl': 'http://science-all.com/images/wallpapers/boy-pic/boy-pic-8.jpg',
-                        'sectionName': 'A', 'batchName': '2014', 'branchName': 'ECE'})
-
-
-def createCourseList():
-    courseList.append({'courseName': 'Test Course 1', 'courseCode': 'TCourse1', 'professorName': 'Test Professor 1',
-                       'colour': '#ee5451', 'batchNames': ['2014'], 'branchNames': ['CSE'], 'sectionNames': ['A'],
-                       'semester': 'Odd', 'date': ['1', '2', '5'], 'startTime': ['12: 00', '13: 00', '14: 00'],
-                       'endTime': ['13: 00', '14: 00', '15: 00'], 'profileId': profileIdList[1],
-                       'collegeId': collegeIdList[0], 'elective': '1'})
-    courseList.append({'courseName': 'Test Course 2', 'courseCode': 'TCourse2', 'professorName': 'Test Professor 2',
-                       'colour': '#e47373', 'batchNames': ['2014'], 'branchNames': ['ECE'], 'sectionNames': ['A'],
-                       'semester': 'Odd', 'date': ['1', '3', '5'], 'startTime': ['12: 00', '13: 00', '14: 00'],
-                       'endTime': ['13: 00', '14: 00', '15: 00'], 'profileId': profileIdList[0],
-                       'collegeId': collegeIdList[0], 'elective': '1'})
-    courseList.append({'courseName': 'Test Course 3', 'courseCode': 'TCourse3', 'professorName': 'Test Professor 3',
-                       'colour': '#ed999a', 'batchNames': ['2014'], 'branchNames': ['CSE'], 'sectionNames': ['A'],
-                       'semester': 'Odd', 'date': ['1', '4'], 'startTime': ['13: 00', '14: 00'],
-                       'endTime': ['14: 00', '15: 00'], 'profileId': profileIdList[1],
-                       'collegeId': collegeIdList[0], 'elective': '0'})
-    courseList.append({'courseName': 'Test Course 4', 'courseCode': 'TCourse4', 'professorName': 'Test Professor 4',
-                       'colour': '#80cac3', 'batchNames': ['2014'], 'branchNames': ['CSE'], 'sectionNames': ['A'],
-                       'semester': 'Odd', 'date': ['1', '2', '5'], 'startTime': ['12: 00', '13: 00', '14: 00'],
-                       'endTime': ['13: 00', '14: 00', '15: 00'], 'profileId': profileIdList[2],
-                       'collegeId': collegeIdList[1], 'elective': '1'})
-    courseList.append({'courseName': 'Test Course 5', 'courseCode': 'TCourse5', 'professorName': 'Test Professor 5',
-                       'colour': '#4cb5ab', 'batchNames': ['2014'], 'branchNames': ['CSE'], 'sectionNames': ['A'],
-                       'semester': 'Odd', 'date': ['1', '2', '5'], 'startTime': ['12: 00', '13: 00', '14: 00'],
-                       'endTime': ['13: 00', '14: 00', '15: 00'], 'profileId': profileIdList[3],
-                       'collegeId': collegeIdList[1], 'elective': '1'})
-    courseList.append({'courseName': 'Test Course 6', 'courseCode': 'TCourse6', 'professorName': 'Test Professor 6',
-                       'colour': '#25a599', 'batchNames': ['2014'], 'branchNames': ['CSE'], 'sectionNames': ['A'],
-                       'semester': 'Odd', 'date': ['1', '3', '5'], 'startTime': ['12: 00', '13: 00', '14: 00'],
-                       'endTime': ['13: 00', '14: 00', '15: 00'], 'profileId': profileIdList[0],
-                       'collegeId': collegeIdList[0], 'elective': '0'})
-
-
-def createNoteList():
-    notesList.append({'courseId': courseIdList[0], 'date': '22:06:2016', 'notesDesc': 'NotesDescription1',
-                      'profileId': profileIdList[0], 'title': 'Notes Title1',
-                      'urlList': ['http://tartarus.org/gareth/maths/Complex_Methods/rjs/cm1_q02vi.jpg',
-                                  'http://dronstudy.com/wp-content/uploads/2015/01/Exercise-2.1_opt_02.jpg',
-                                  'http://vle.woodhouse.ac.uk/topicdocs/maths/`%20work/S2%20summary%20notes%20for%20revision%20by%20Damini.jpg',
-                                  'http://img10.deviantart.net/cf6b/i/2010/277/8/d/math_notes_by_cptmcmuffinz-d303z7k.jpg']})
-    notesList.append({'courseId': courseIdList[0], 'date': '24:06:2016', 'notesDesc': 'NotesDescription2',
-                      'profileId': profileIdList[0], 'title': 'Notes Title2',
-                      'urlList': ['http://www.mathplane.com/yahoo_site_admin/assets/images/additional_derivatives_natural_logs.186145208_large.png',
-                                  'http://science.hyde.wikispaces.net/file/view/PolyVision_01_13_12_11_08_03.jpg/292006929/PolyVision_01_13_12_11_08_03.jpg',
-                                  'http://leah4sci.com/wp-content/uploads/2014/04/Carboxylic-Acid-Derivative-Study-Guide-Cheat-Sheet-by-Leah4sci.jpg']})
-    notesList.append({'courseId': courseIdList[5], 'date': '21:06:2016', 'notesDesc': 'NotesDescription3',
-                      'profileId': profileIdList[1], 'title': 'Notes Title3',
-                      'urlList': ['http://image.slidesharecdn.com/form4addmathsnote-140118081550-phpapp02/95/form-4-add-maths-note-6-638.jpg?cb=1390032984',
-                                  'http://image.slidesharecdn.com/basicbusinessmath-studynotes-131221043822-phpapp01/95/basic-business-math-study-notes-2-638.jpg?cb=1388105510',
-                                  'http://dronstudy.com/wp-content/uploads/2015/01/7117.jpg']})
-
-
-def createAssignmentList():
-    assignmentList.append({'assignmentTitle': 'Test assignment 1', 'assignmentDesc': 'ASSIGNMent Desc1',
-                           'dueDate': '24-06-2016', 'dueTime': '12: 00',
-                           'urlList': ['http: //thinkswap.com/pdf_thumbnails/22706_maths_notes_2u.jpg?2',
-                                       'https: //farm3.staticflickr.com/2929/13941904157_34b15196ea_o.jpg'],
-                           'uploaderId': profileIdList[1], 'courseId': courseIdList[5]})
-    assignmentList.append({'assignmentTitle': 'Test assignment 2', 'assignmentDesc': 'ASSIGNMent Desc2',
-                           'dueDate': '25-06-2016', 'dueTime': '12: 00',
-                           'urlList': ['http: //1.bp.blogspot.com/-jUULRomYuaI/UUTNRj_UxkI/AAAAAAAABtE/gSNzNqI7Ep4/s1600/010+graphs.jpg',
-                                       'http: //3.bp.blogspot.com/-1y2JBBZFNVs/UQkRNsmAlYI/AAAAAAAAAnw/AwU0eIqt3uM/s1600/CHAP+4+P01.jpg'],
-                           'uploaderId': profileIdList[0], 'courseId': courseIdList[0]})
-
-
-def createExamList():
-    examList.append({'uploaderId': profileIdList[1], 'courseId': courseIdList[5],
-                     'examTitle': 'Exam 1', 'examDesc': 'Exam Description 1',
-                     'dueDate': '22-07-2016', 'dueTime': '00:00',
-                     'urlList': ['http://missschmucker.weebly.com/uploads/3/0/7/9/30797277/log_notes_2.jpg',
-                                 'http://www.crystalight.com.sg/wp-content/uploads/2014/09/NB-109-PVC-Exe-Log-Book-notes.jpg',
-                                 'http://iblog.dearbornschools.org/aliahms/wp-content/uploads/sites/1468/2016/02/prince-and-pauper-cornell-notes-scene.jpg']})
-    examList.append({'uploaderId': profileIdList[0], 'courseId': courseIdList[0],
-                     'examTitle': 'Exam 2', 'examDesc': 'Exam Description 2',
-                     'dueDate': '23-07-2016', 'dueTime': '00:00',
-                     'urlList': ['http://2.bp.blogspot.com/-AT5gDWRGIIU/UvIPt6jOWhI/AAAAAAAAAt4/meRkpX0dbRU/s1600/Picture20.png',
-                                 'http://3.bp.blogspot.com/-FFS8S_3tfuc/TaxT-VPTZPI/AAAAAAAABps/SoXbO7aQs0Y/s1600/httpserverinstall.jpg']})
-
-
-def createCollege():
-    createCollegeList()
+def runScript():
+    collegeList.append({'abbreviation': 'LNMIIT', 'collegeName': 'The LNM Institute of Information Technology',
+                        'collegeType': 'Engineering', 'location': 'Jaipur', 'semStartDate': '23-07-2016',
+                        'semEndDate': '23-12: 2016', 'branchNameList': ['CSE', 'ECE', 'MME', 'CCE']})
+    collegeList.append({'abbreviation': 'BITS', 'collegeName': 'Birla Institute of Technology',
+                        'collegeType': 'Engineering', 'location': 'Pilani', 'semStartDate': '24-07-2016',
+                        'semEndDate': '29-11-2016', 'branchNameList': ['CSE', 'ECE', 'MECH', 'IT']})
+    collegeList.append({'abbreviation': 'NIT-K', 'collegeName': 'National Institute of Technology',
+                        'collegeType': 'Engineering', 'location': 'Suratkal', 'semStartDate': '01-08-2016',
+                        'semEndDate': '24-12-2016', 'branchNameList': ['CSE', 'CHEM', 'MECH']})
+    collegeList.append({'abbreviation': 'IIIT-H', 'collegeName': 'International Institute of Information Technology',
+                        'collegeType': 'Engineering', 'location': 'Hyderabad', 'semStartDate': '24-06-2016',
+                        'semEndDate': '23-01-2016', 'branchNameList': ['CSE', 'CHEM', 'ECE']})
+    collegeList.append({'abbreviation': 'IIT-K', 'collegeName': 'Indian Institute of Technology',
+                        'collegeType': 'Engineering', 'location': 'Kanpur', 'semStartDate': '24-07-2016',
+                        'semEndDate': '23-01-2016', 'branchNameList': ['CSE', 'CHEM', 'ECE', 'CIVIL']})
     url = PROJECT_URL + "/_ah/api/notesapi/v1/createCollege"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    for i in range(4):
+    for i in range(5):
         req = urllib2.Request(url, json.dumps(collegeList[i]), header)
         response = urllib2.urlopen(req)
         response = json.loads(response.read())
@@ -144,29 +42,32 @@ def createCollege():
         key = response.get('key')
         collegeIdList.append(key)
         print key
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/collegeList"
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    req = urllib2.Request(url)
-    response = urllib2.urlopen(req)
-    response = json.loads(response.read())
-    clist = response.get('collegeList')
-    for c in clist:
-        if c.get('collegeName') == 'Test College 1':
-            if c.get('branchNames') != ['CSE', 'ECE', 'MECH']:
-                print "BUG IN createCollege API/ collegeList API. Test College 1"
-        if c.get('collegeName') == 'Test College 2':
-            if c.get('branchNames') != ['CSE', 'ECE']:
-                print "BUG IN createCollege API/ collegeList API. Test College 2"
-        if c.get('collegeName') == 'Test College 3':
-            if c.get('branchNames') != ['CSE', 'ECE', 'MECH']:
-                print "BUG IN createCollege API/ collegeList API. Test College 3"
-        if c.get('collegeName') == 'Test College 4':
-            if c.get('branchNames') != ['CSE', 'ECE', 'MECH']:
-                print "BUG IN createCollege API/ collegeList API. Test College 4"
 
+    profileList.append({'profileName': 'Saurav Mehrotra', 'collegeId': collegeIdList[0],
+                        'email': 'mehrotra.saurav@gmail.com', 'gcmId': '2408',
+                        'photoUrl': 'https: //yt3.ggpht.com/-hs9-C7jg9HY/AAAAAAAAAAI/AAAAAAAAAAA/pJg26_wdsQs/s100-c-k-no-rj-c0xffffff/photo.jpg',
+                        'sectionName': 'A', 'batchName': '2014', 'branchName': 'CSE'})
+    profileList.append({'profileName': 'Shikhar Mangla', 'collegeId': collegeIdList[0],
+                        'email': 'manglashikhar@gmail.com', 'gcmId': '2111',
+                        'photoUrl': 'https: //media.licdn.com/mpr/mpr/shrinknp_200_200/AAEAAQAAAAAAAAW8AAAAJDRlZGU3ZmQ4LTgzOTQtNDE2OC1iNTc1LTYyNGZkYzQ0MDc1Mg.jpg',
+                        'sectionName': 'A', 'batchName': '2014', 'branchName': 'ECE'})
+    profileList.append({'profileName': 'Shruti Sharma', 'collegeId': collegeIdList[0],
+                        'email': 'shrutishrm@gmail.com', 'gcmId': '1710',
+                        'photoUrl': 'https: //storage.googleapis.com/uploadingtest-2016.appspot.com/2.jpg',
+                        'sectionName': 'A', 'batchName': '2014', 'branchName': 'CSE'})
+    profileList.append({'profileName': 'Vanshita Tilwani', 'collegeId': collegeIdList[0],
+                        'email': 'cutevanshi@gmail.com', 'gcmId': '2309',
+                        'photoUrl': 'https: //lh6.googleusercontent.com/-Pb7PYfgobyE/AAAAAAAAAAI/AAAAAAAADTo/EOL9vnlYI00/photo.jpg',
+                        'sectionName': 'A', 'batchName': '2014', 'branchName': 'CCE'})
+    profileList.append({'profileName': 'Kanuj Prem Arora', 'collegeId': collegeIdList[0],
+                        'email': 'kanuj96@gmail.com', 'gcmId': '1111',
+                        'photoUrl': 'https: //yt3.ggpht.com/-7YYHiAsNhS0/AAAAAAAAAAI/AAAAAAAAAAA/6N1YAkYoMEk/s900-c-k-no-rj-c0xffffff/photo.jpg',
+                        'sectionName': 'A', 'batchName': '2014', 'branchName': 'CSE'})
+    profileList.append({'profileName': 'Shivam Gupta', 'collegeId': collegeIdList[0],
+                        'email': 'shivamgpt@gmail.com', 'gcmId': '2319',
+                        'photoUrl': 'http: //www.desportivos.lnmiit.ac.in/images/team/shivamgupta.png',
+                        'sectionName': 'A', 'batchName': '2014', 'branchName': 'CSE'})
 
-def createProfile():
-    createProfileList()
     url = PROJECT_URL + "/_ah/api/notesapi/v1/createProfile"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     for i in range(6):
@@ -179,12 +80,34 @@ def createProfile():
         profileIdList.append(key)
         print key
 
-
-def createCourse():
-    createCourseList()
+    courseList.append({'courseName': 'DATA STRUCTURE', 'courseCode': 'DS', 'professorName': 'Rajbeer Kaur',
+                       'colour': '#ee5451', 'batchNames': ['2014'], 'branchNames': ['CSE'], 'sectionNames': ['A'],
+                       'semester': 'Odd', 'date': ['1', '2', '3'], 'startTime': ['10: 00', '11: 00', '12: 00'],
+                       'endTime': ['11: 00', '12: 00', '13: 00'], 'profileId': profileIdList[0],
+                       'collegeId': collegeIdList[0], 'elective': '0'})
+    courseList.append({'courseName': 'MATHS', 'courseCode': 'M1', 'professorName': 'Ajit Patel', 'colour': '#e47373',
+                       'batchNames': ['2014'], 'branchNames': ['CSE'], 'sectionNames': ['A'], 'semester': 'Odd',
+                       'date': ['2', '3', '4'], 'startTime': ['12: 00', '13: 00', '14: 00'],
+                       'endTime': ['13: 00', '14: 00', '15: 00'], 'profileId': profileIdList[0],
+                       'collegeId': collegeIdList[0], 'elective': '0'})
+    courseList.append({'courseName': 'Optimization Techniques', 'courseCode': 'OT', 'professorName': 'Manish Garg',
+                       'colour': '#ed999a', 'batchNames': ['2014'], 'branchNames': ['CSE'], 'sectionNames': ['A'],
+                       'semester': 'Odd', 'date': ['1', '3', '5'], 'startTime': ['11: 00', '14: 00', '09: 00'],
+                       'endTime': ['13: 00', '15: 00', '10: 00'], 'profileId': profileIdList[2],
+                       'collegeId': collegeIdList[0], 'elective': '1'})
+    courseList.append({'courseName': 'MICRO ECONOMICS', 'courseCode': 'ECO', 'professorName': 'Surinder Nehra',
+                       'colour': '#80cac3', 'batchNames': ['2014'], 'branchNames': ['CSE'], 'sectionNames': ['A'],
+                       'semester': 'Odd', 'date': ['1', '2'], 'startTime': ['13: 00', '14: 00'],
+                       'endTime': ['14: 00', '15: 00'], 'profileId': profileIdList[1], 'collegeId': collegeIdList[0],
+                       'elective': '0'})
+    courseList.append({'courseName': 'INTRODUCTION TO C', 'courseCode': 'ITC', 'professorName': 'Preety Singh',
+                       'colour': '#4cb5ab', 'batchNames': ['2014'], 'branchNames': ['CSE'], 'sectionNames': ['A'],
+                       'semester': 'Odd', 'date': ['3', '4', '5'], 'startTime': ['15: 00', '15: 00', '12: 00'],
+                       'endTime': ['16: 00', '16: 00', '13: 00'], 'profileId': profileIdList[2],
+                       'collegeId': collegeIdList[0], 'elective': '0'})
     url = PROJECT_URL + "/_ah/api/notesapi/v1/addCourse"
     header = {'Content-Type': 'application/json; charset=UTF-8'}
-    for i in range(6):
+    for i in range(5):
         req = urllib2.Request(url, json.dumps(courseList[i]), header)
         response = urllib2.urlopen(req)
         response = json.loads(response.read())
@@ -194,104 +117,240 @@ def createCourse():
         courseIdList.append(key)
         print key
 
+    notesList.append({'courseId': courseIdList[0], 'date': '22/06/2016', 'notesDesc': 'Minimum Spanning Trees',
+                      'profileId': profileIdList[0], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/1.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/2.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/3.png']})
+    notesList.append({'courseId': courseIdList[0], 'date': '24/06/2016', 'notesDesc': 'Minimum Spanning Trees cont.',
+                      'profileId': profileIdList[0], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/4.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/6.png']})
+    notesList.append({'courseId': courseIdList[0], 'date': '26/06/2016', 'notesDesc': 'Prims Algorithm Introduction',
+                      'profileId': profileIdList[2], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/8.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/9.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/10.png']})
+    notesList.append({'courseId': courseIdList[0], 'date': '28/06/2016', 'notesDesc': 'Examples to prim algorithm',
+                      'profileId': profileIdList[2], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/11.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/12.png']})
+    notesList.append({'courseId': courseIdList[0], 'date': '01/07/2016', 'notesDesc': 'Kruskal Algorithm Introduction',
+                      'profileId': profileIdList[3], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/13.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/14.png']})
+    notesList.append({'courseId': courseIdList[0], 'date': '03/07/2016', 'notesDesc': 'Examples to Kruskal algorithm',
+                      'profileId': profileIdList[3], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png']})
+    notesList.append({'courseId': courseIdList[0], 'date': '22/06/2016', 'notesDesc': 'Minimum Spanning Trees',
+                      'profileId': profileIdList[4], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/1.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/2.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/3.png']})
+    notesList.append({'courseId': courseIdList[0], 'date': '24/06/2016', 'notesDesc': 'Minimum Spanning Trees cont.',
+                      'profileId': profileIdList[4], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/4.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png']})
+    notesList.append({'courseId': courseIdList[0], 'date': '26/06/2016', 'notesDesc': 'Prims Algorithm Introduction',
+                      'profileId': profileIdList[5], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/8.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/9.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/10.png']})
+    notesList.append({'courseId': courseIdList[0], 'date': '28/06/2016', 'notesDesc': 'Examples to prim algorithm',
+                      'profileId': profileIdList[5], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/11.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/12.png']})
 
-def addBranch():
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/addBranch"
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    data = {'branchName': 'CIVIL', 'collegeId': collegeIdList[1]}
-    req = urllib2.Request(url, json.dumps(data), header)
-    response = urllib2.urlopen(req)
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/collegeList"
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    req = urllib2.Request(url)
-    response = urllib2.urlopen(req)
-    response = json.loads(response.read())
-    clist = response.get('collegeList')
-    for c in clist:
-        if c.get('collegeName') == 'Test College 1':
-            if c.get('branchNames') != ['CSE', 'ECE', 'MECH']:
-                print "BUG IN createCollege API/ collegeList API. Test College 1"
-        if c.get('collegeName') == 'Test College 2':
-            if c.get('branchNames') != ['CSE', 'ECE', 'CIVIL']:
-                print "BUG IN createCollege API/ collegeList API. Test College 2"
-        if c.get('collegeName') == 'Test College 3':
-            if c.get('branchNames') != ['CSE', 'ECE', 'MECH']:
-                print "BUG IN createCollege API/ collegeList API. Test College 3"
-        if c.get('collegeName') == 'Test College 4':
-            if c.get('branchNames') != ['CSE', 'ECE', 'MECH']:
-                print "BUG IN createCollege API/ collegeList API. Test College 4"
+    notesList.append({'courseId': courseIdList[1], 'date': '22/06/2016', 'notesDesc': 'Minimum Spanning Trees',
+                      'profileId': profileIdList[0], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/1.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/2.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/3.png']})
+    notesList.append({'courseId': courseIdList[1], 'date': '24/06/2016', 'notesDesc': 'Minimum Spanning Trees cont.',
+                      'profileId': profileIdList[0], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/4.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/6.png']})
+    notesList.append({'courseId': courseIdList[1], 'date': '26/06/2016', 'notesDesc': 'Prims Algorithm Introduction',
+                      'profileId': profileIdList[2], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/8.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/9.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/10.png']})
+    notesList.append({'courseId': courseIdList[1], 'date': '28/06/2016', 'notesDesc': 'Examples to prim algorithm',
+                      'profileId': profileIdList[2], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/11.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/12.png']})
+    notesList.append({'courseId': courseIdList[1], 'date': '01/07/2016', 'notesDesc': 'Kruskal Algorithm Introduction',
+                      'profileId': profileIdList[3], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/13.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/14.png']})
+    notesList.append({'courseId': courseIdList[1], 'date': '03/07/2016', 'notesDesc': 'Examples to Kruskal algorithm',
+                      'profileId': profileIdList[3], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png']})
+    notesList.append({'courseId': courseIdList[1], 'date': '22/06/2016', 'notesDesc': 'Minimum Spanning Trees',
+                      'profileId': profileIdList[4], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/1.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/2.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/3.png']})
+    notesList.append({'courseId': courseIdList[1], 'date': '24/06/2016', 'notesDesc': 'Minimum Spanning Trees cont.',
+                      'profileId': profileIdList[4], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/4.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/6.png']})
+    notesList.append({'courseId': courseIdList[1], 'date': '26/06/2016', 'notesDesc': 'Prims Algorithm Introduction',
+                      'profileId': profileIdList[5], 'title': 'Algorithms',
+                      'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/8.png',
+                                 'https://storage.googleapis.com/uploadingtest-2016.appspot.com/9.png',
+                                 'https://storage.googleapis.com/uploadingtest-2016.appspot.com/10.png']})
+    notesList.append({'courseId': courseIdList[1], 'date': '28/06/2016', 'notesDesc': 'Examples to prim algorithm',
+                      'profileId': profileIdList[5], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/11.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/12.png']})
 
+    notesList.append({'courseId': courseIdList[2], 'date': '22/06/2016', 'notesDesc': 'Minimum Spanning Trees',
+                      'profileId': profileIdList[0], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/1.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/2.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/3.png']})
+    notesList.append({'courseId': courseIdList[2], 'date': '24/06/2016', 'notesDesc': 'Minimum Spanning Trees cont.',
+                      'profileId': profileIdList[0], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/4.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/6.png']})
+    notesList.append({'courseId': courseIdList[2], 'date': '26/06/2016', 'notesDesc': 'Prims Algorithm Introduction',
+                      'profileId': profileIdList[2], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/8.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/9.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/10.png']})
+    notesList.append({'courseId': courseIdList[2], 'date': '28/06/2016', 'notesDesc': 'Examples to prim algorithm',
+                      'profileId': profileIdList[2], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/11.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/12.png']})
+    notesList.append({'courseId': courseIdList[2], 'date': '01/07/2016', 'notesDesc': 'Kruskal Algorithm Introduction',
+                      'profileId': profileIdList[3], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/13.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/14.png']})
+    notesList.append({'courseId': courseIdList[2], 'date': '03/07/2016', 'notesDesc': 'Examples to Kruskal algorithm',
+                      'profileId': profileIdList[3], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png']})
+    notesList.append({'courseId': courseIdList[2], 'date': '22/06/2016', 'notesDesc': 'Minimum Spanning Trees',
+                      'profileId': profileIdList[4], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/1.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/2.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/3.png']})
+    notesList.append({'courseId': courseIdList[2], 'date': '24/06/2016', 'notesDesc': 'Minimum Spanning Trees cont.',
+                      'profileId': profileIdList[4], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/4.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/6.png']})
+    notesList.append({'courseId': courseIdList[2], 'date': '26/06/2016', 'notesDesc': 'Prims Algorithm Introduction',
+                      'profileId': profileIdList[5], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/8.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/9.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/10.png']})
+    notesList.append({'courseId': courseIdList[2], 'date': '28/06/2016', 'notesDesc': 'Examples to prim algorithm',
+                      'profileId': profileIdList[5], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/11.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/12.png']})
 
-def addAdmin():
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/addAdmin/" + courseIdList[0]
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    data = {'profileId': profileIdList[5]}
-    req = urllib2.Request(url, json.dumps(data), header)
-    response = urllib2.urlopen(req)
-    response = json.loads(response.read())
-    if response.get('response') != '0':
-        print response
+    notesList.append({'courseId': courseIdList[3], 'date': '22/06/2016', 'notesDesc': 'Minimum Spanning Trees',
+                      'profileId': profileIdList[0], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/1.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/2.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/3.png']})
+    notesList.append({'courseId': courseIdList[3], 'date': '24/06/2016', 'notesDesc': 'Minimum Spanning Trees cont.',
+                      'profileId': profileIdList[0], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/4.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/6.png']})
+    notesList.append({'courseId': courseIdList[3], 'date': '26/06/2016', 'notesDesc': 'Prims Algorithm Introduction',
+                      'profileId': profileIdList[2], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/8.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/9.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/10.png']})
+    notesList.append({'courseId': courseIdList[3], 'date': '28/06/2016', 'notesDesc': 'Examples to prim algorithm',
+                      'profileId': profileIdList[2], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/11.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/12.png']})
+    notesList.append({'courseId': courseIdList[3], 'date': '01/07/2016', 'notesDesc': 'Kruskal Algorithm Introduction',
+                      'profileId': profileIdList[3], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/13.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/14.png']})
+    notesList.append({'courseId': courseIdList[3], 'date': '03/07/2016', 'notesDesc': 'Examples to Kruskal algorithm',
+                      'profileId': profileIdList[3], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png']})
+    notesList.append({'courseId': courseIdList[3], 'date': '22/06/2016', 'notesDesc': 'Minimum Spanning Trees',
+                      'profileId': profileIdList[4], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/1.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/2.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/3.png']})
+    notesList.append({'courseId': courseIdList[3], 'date': '24/06/2016', 'notesDesc': 'Minimum Spanning Trees cont.',
+                      'profileId': profileIdList[4], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/4.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/6.png']})
+    notesList.append({'courseId': courseIdList[3], 'date': '26/06/2016', 'notesDesc': 'Prims Algorithm Introduction',
+                      'profileId': profileIdList[5], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/8.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/9.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/10.png']})
+    notesList.append({'courseId': courseIdList[3], 'date': '28/06/2016', 'notesDesc': 'Examples to prim algorithm',
+                      'profileId': profileIdList[5], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/11.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/12.png']})
 
-
-def courseListMethod():
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/courseList/1"
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    for id in profileIdList:
-        data = {'profileId': id}
-        req = urllib2.Request(url, json.dumps(data), header)
-        response = urllib2.urlopen(req)
-        response = json.loads(response.read())
-        if response.get('response') != '0':
-            print response
-
-
-def coursePage():
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/coursePage/"
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    for pid in profileIdList:
-        for cid in courseIdList:
-            data = {'profileId': pid, 'courseId': cid}
-            req = urllib2.Request(url, json.dumps(data), header)
-            response = urllib2.urlopen(req)
-            response = json.loads(response.read())
-            if response.get('response') != '0':
-                print response
-
-
-def subscribeCourseList():
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/subscribeCourse/"
-    data = {'profileId': profileIdList[0], 'courseIds': [courseIdList[0], courseIdList[2]]}
-    req = urllib2.Request(url, json.dumps(data), header)
-    response = urllib2.urlopen(req)
-    response = json.loads(response.read())
-    if response.get('response') != '0':
-        print response
-    data = {'profileId': profileIdList[1], 'courseIds': [courseIdList[5]]}
-    req = urllib2.Request(url, json.dumps(data), header)
-    response = urllib2.urlopen(req)
-    response = json.loads(response.read())
-    if response.get('response') != '0':
-        print response
-    data = {'profileId': profileIdList[5], 'courseIds': [courseIdList[0]]}
-    req = urllib2.Request(url, json.dumps(data), header)
-    response = urllib2.urlopen(req)
-    response = json.loads(response.read())
-    if response.get('response') != '0':
-        print response
-
-
-def feed():
-    for pid in profileIdList:
-        url = PROJECT_URL + "/_ah/api/notesapi/v1/feed/" + pid
-        req = urllib2.Request(url)
-        response = urllib2.urlopen(req)
-        response = json.loads(response.read())
-        if response.get('response') != '0':
-            print response
-
-
-def createNotes():
+    notesList.append({'courseId': courseIdList[4], 'date': '22/06/2016', 'notesDesc': 'Minimum Spanning Trees',
+                      'profileId': profileIdList[0], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/1.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/2.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/3.png']})
+    notesList.append({'courseId': courseIdList[4], 'date': '24/06/2016', 'notesDesc': 'Minimum Spanning Trees cont.',
+                      'profileId': profileIdList[0], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/4.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/6.png']})
+    notesList.append({'courseId': courseIdList[4], 'date': '26/06/2016', 'notesDesc': 'Prims Algorithm Introduction',
+                      'profileId': profileIdList[2], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/8.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/9.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/10.png']})
+    notesList.append({'courseId': courseIdList[4], 'date': '28/06/2016', 'notesDesc': 'Examples to prim algorithm',
+                      'profileId': profileIdList[2], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/11.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/12.png']})
+    notesList.append({'courseId': courseIdList[4], 'date': '01/07/2016', 'notesDesc': 'Kruskal Algorithm Introduction',
+                      'profileId': profileIdList[3], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/13.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/14.png']})
+    notesList.append({'courseId': courseIdList[4], 'date': '03/07/2016', 'notesDesc': 'Examples to Kruskal algorithm',
+                      'profileId': profileIdList[3], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png']})
+    notesList.append({'courseId': courseIdList[4], 'date': '22/06/2016', 'notesDesc': 'Minimum Spanning Trees',
+                      'profileId': profileIdList[4], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/1.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/2.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/3.png']})
+    notesList.append({'courseId': courseIdList[4], 'date': '24/06/2016', 'notesDesc': 'Minimum Spanning Trees cont.',
+                      'profileId': profileIdList[4], 'title': 'MST',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/4.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/5.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/6.png']})
+    notesList.append({'courseId': courseIdList[4], 'date': '26/06/2016', 'notesDesc': 'Prims Algorithm Introduction',
+                      'profileId': profileIdList[5], 'title': 'Algorithms',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/8.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/9.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/10.png']})
+    notesList.append({'courseId': courseIdList[4], 'date': '28/06/2016', 'notesDesc': 'Examples to prim algorithm',
+                      'profileId': profileIdList[5], 'title': 'Algorithm',
+                      'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/11.png',
+                                  'https://storage.googleapis.com/uploadingtest-2016.appspot.com/12.png']})
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     url = PROJECT_URL + "/_ah/api/notesapi/v1/createNotes"
     for data in notesList:
@@ -304,8 +363,81 @@ def createNotes():
             if response.get('key') is not None:
                 noteBookIdList.append(response.get('key'))
 
-
-def createAssignment():
+    assignmentList.append({
+        'assignmentTitle': 'Assignment 1', 'assignmentDesc': 'This assignment consists of 2 pages with each',
+        'dueDate': '05-07-2016', 'dueTime': '12:00',
+        'urlList': [
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png'],
+        'uploaderId': profileIdList[0], 'courseId': courseIdList[0]})
+    assignmentList.append({
+        'assignmentTitle': 'Assignment 2', 'assignmentDesc': 'This assignment consists of 3 pages with each',
+        'dueDate': '05-07-2016', 'dueTime': '12:00',
+        'urlList': [
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/17.png'],
+        'uploaderId': profileIdList[2], 'courseId': courseIdList[0]})
+    assignmentList.append({
+        'assignmentTitle': 'Assignment 1', 'assignmentDesc': 'This assignment consists of 2 pages with each',
+        'dueDate': '05-07-2016', 'dueTime': '12:00',
+        'urlList': [
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png'],
+        'uploaderId': profileIdList[0], 'courseId': courseIdList[1]})
+    assignmentList.append({
+        'assignmentTitle': 'Assignment 2', 'assignmentDesc': 'This assignment consists of 3 pages with each',
+        'dueDate': '05-07-2016', 'dueTime': '12:00',
+        'urlList': [
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/17.png'],
+        'uploaderId': profileIdList[2], 'courseId': courseIdList[1]})
+    assignmentList.append({
+        'assignmentTitle': 'Assignment 1', 'assignmentDesc': 'This assignment consists of 2 pages with each',
+        'dueDate': '05-07-2016', 'dueTime': '12:00',
+        'urlList': [
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png'],
+        'uploaderId': profileIdList[0], 'courseId': courseIdList[2]})
+    assignmentList.append({
+        'assignmentTitle': 'Assignment 2', 'assignmentDesc': 'This assignment consists of 3 pages with each',
+        'dueDate': '05-07-2016', 'dueTime': '12:00',
+        'urlList': [
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/17.png'],
+        'uploaderId': profileIdList[2], 'courseId': courseIdList[2]})
+    assignmentList.append({
+        'assignmentTitle': 'Assignment 1', 'assignmentDesc': 'This assignment consists of 2 pages with each',
+        'dueDate': '05-07-2016', 'dueTime': '12:00',
+        'urlList': [
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png'],
+        'uploaderId': profileIdList[0], 'courseId': courseIdList[3]})
+    assignmentList.append({
+        'assignmentTitle': 'Assignment 2', 'assignmentDesc': 'This assignment consists of 3 pages with each',
+        'dueDate': '05-07-2016', 'dueTime': '12:00',
+        'urlList': [
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/17.png'],
+        'uploaderId': profileIdList[2], 'courseId': courseIdList[3]})
+    assignmentList.append({
+        'assignmentTitle': 'Assignment 1', 'assignmentDesc': 'This assignment consists of 2 pages with each',
+        'dueDate': '05-07-2016', 'dueTime': '12:00',
+        'urlList': [
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png'],
+        'uploaderId': profileIdList[0], 'courseId': courseIdList[4]})
+    assignmentList.append({
+        'assignmentTitle': 'Assignment 2', 'assignmentDesc': 'This assignment consists of 3 pages with each',
+        'dueDate': '05-07-2016', 'dueTime': '12:00',
+        'urlList': [
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png',
+            'https://storage.googleapis.com/uploadingtest-2016.appspot.com/17.png'],
+        'uploaderId': profileIdList[2], 'courseId': courseIdList[4]})
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     url = PROJECT_URL + "/_ah/api/notesapi/v1/createAssignment"
     for data in assignmentList:
@@ -318,8 +450,46 @@ def createAssignment():
             if response.get('key') is not None:
                 assignmentIdList.append(response.get('key'))
 
-
-def createExam():
+    examList.append({
+        'uploaderId': profileIdList[0], 'courseId': courseIdList[0], 'examTitle': 'Mid Term Exam',
+        'examDesc': 'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime': '10:00',
+        'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({
+        'uploaderId': profileIdList[2], 'courseId': courseIdList[0], 'examTitle': 'Mid Term Exam',
+        'examDesc': 'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime': '10:00',
+        'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({
+        'uploaderId': profileIdList[0], 'courseId': courseIdList[1], 'examTitle': 'Mid Term Exam',
+        'examDesc': 'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime': '10:00',
+        'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({
+        'uploaderId': profileIdList[2], 'courseId': courseIdList[1], 'examTitle': 'Mid Term Exam',
+        'examDesc': 'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime': '10:00',
+        'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({
+        'uploaderId': profileIdList[0], 'courseId': courseIdList[2], 'examTitle': 'Mid Term Exam',
+        'examDesc': 'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime': '10:00',
+        'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({
+        'uploaderId': profileIdList[2], 'courseId': courseIdList[2], 'examTitle': 'Mid Term Exam',
+        'examDesc': 'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime': '10:00',
+        'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({
+        'uploaderId': profileIdList[0], 'courseId': courseIdList[3], 'examTitle': 'Mid Term Exam',
+        'examDesc': 'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime': '10:00',
+        'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({
+        'uploaderId': profileIdList[2], 'courseId': courseIdList[3], 'examTitle': 'Mid Term Exam',
+        'examDesc': 'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime': '10:00',
+        'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({
+        'uploaderId': profileIdList[0], 'courseId': courseIdList[4], 'examTitle': 'Mid Term Exam',
+        'examDesc': 'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime': '10:00',
+        'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({
+        'uploaderId': profileIdList[2], 'courseId': courseIdList[4], 'examTitle': 'Mid Term Exam',
+        'examDesc': 'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime': '10:00',
+        'urlList': ['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
     header = {'Content-Type': 'application/json; charset=UTF-8'}
     url = PROJECT_URL + "/_ah/api/notesapi/v1/createExam"
     for data in examList:
@@ -331,153 +501,3 @@ def createExam():
         else:
             if response.get('key') is not None:
                 examIdList.append(response.get('key'))
-
-
-def assignmentListAPI():
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/assignmentList"
-    for courseId in courseIdList:
-        req = urllib2.Request(url, json.dumps({'courseId': courseId}), header)
-        response = urllib2.urlopen(req)
-        response = json.loads(response.read())
-        if response.get('response') != '0':
-            print response
-
-
-def examListAPI():
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/examList"
-    for courseId in courseIdList:
-        req = urllib2.Request(url, json.dumps({'courseId': courseId}), header)
-        response = urllib2.urlopen(req)
-        response = json.loads(response.read())
-        if response.get('response') != '0':
-            print response
-
-
-def noteBookListAPI():
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/notebookList"
-    for courseId in courseIdList:
-        req = urllib2.Request(url, json.dumps({'courseId': courseId}), header)
-        response = urllib2.urlopen(req)
-        response = json.loads(response.read())
-        if response.get('response') != '0':
-            print response
-    for field in ['bpid', 'upid', 'profileId']:
-        for value in profileIdList:
-            req = urllib2.Request(url, json.dumps({field: value}), header)
-            response = urllib2.urlopen(req)
-            response = json.loads(response.read())
-            if response.get('response') != '0':
-                print response
-
-
-def bookmarkNoteBook():
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/bookmarkNoteBook"
-    req = urllib2.Request(url, json.dumps({'noteBookId': noteBookIdList[0],
-                                           'profileId': profileIdList[1]}), header)
-    response = urllib2.urlopen(req)
-    response = json.loads(response.read())
-    if response.get('response') != '0':
-        print response
-
-
-def rateThis(rating):
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    url = PROJECT_URL + "/_ah/api/notesapi/v1/rateThis"
-    req = urllib2.Request(url, json.dumps({'noteBookId': noteBookIdList[0],
-                                           'profileId': profileIdList[1],
-                                           'rating': rating}), header)
-    response = urllib2.urlopen(req)
-    response = json.loads(response.read())
-    if response.get('response') != '0':
-        print response
-
-
-def studentList():
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    for courseId in courseIdList:
-        for profileId in profileIdList:
-            url = PROJECT_URL + "/_ah/api/notesapi/v1/studentList/" + courseId
-            req = urllib2.Request(url, json.dumps({'profileId': profileIdList[1]}), header)
-            response = urllib2.urlopen(req)
-            response = json.loads(response.read())
-            if response.get('response') != '0':
-                print response
-
-
-def getNoteBookAPI():
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    for noteBookId in noteBookIdList:
-        for profileId in profileIdList:
-            url = PROJECT_URL + "/_ah/api/notesapi/v1/getNoteBook"
-            req = urllib2.Request(url, json.dumps({'profileId': profileIdList[1],
-                                                   'noteBookId': noteBookId}), header)
-            response = urllib2.urlopen(req)
-            response = json.loads(response.read())
-            if response.get('response') != '0':
-                print response
-
-
-def getExamAPI():
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    for examId in examIdList:
-        for profileId in profileIdList:
-            url = PROJECT_URL + "/_ah/api/notesapi/v1/getExam"
-            req = urllib2.Request(url, json.dumps({'profileId': profileIdList[1],
-                                                   'examId': examId}), header)
-            response = urllib2.urlopen(req)
-            response = json.loads(response.read())
-            if response.get('response') != '0':
-                print response
-
-
-def getAssignmentAPI():
-    header = {'Content-Type': 'application/json; charset=UTF-8'}
-    for assignmentId in assignmentIdList:
-        for profileId in profileIdList:
-            url = PROJECT_URL + "/_ah/api/notesapi/v1/getAssignment"
-            req = urllib2.Request(url, json.dumps({'profileId': profileIdList[1],
-                                                   'assignmentId': assignmentId}), header)
-            response = urllib2.urlopen(req)
-            response = json.loads(response.read())
-            if response.get('response') != '0':
-                print response
-
-
-def runScript():
-    createCollege()
-    createProfile()
-    createCourse()
-    addBranch()
-    addAdmin()
-    #courseListMethod()
-    #coursePage()
-    #feed()
-    subscribeCourseList()
-    createNoteList()
-    createNotes()
-    createAssignmentList()
-    createAssignment()
-    createExamList()
-    createExam()
-    #feed()
-    #assignmentListAPI()
-    #examListAPI()
-    #noteBookListAPI()
-    #bookmarkNoteBook()
-    #coursePage()
-    rateThis(4)
-    #studentList()
-    #getNoteBookAPI()
-    #getAssignmentAPI()
-    #getExamAPI()
-    print collegeIdList
-    print profileIdList
-    print courseIdList
-    print noteBookIdList
-    print assignmentIdList
-    print examIdList
-

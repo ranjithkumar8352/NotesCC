@@ -731,6 +731,7 @@ def createNotesMethod(request):
        To create new Notes"""
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
+        print profileId
     except Exception:
         print "Invalid profileId"
         return Response(response=1, description="Invalid profileId")
@@ -1206,6 +1207,10 @@ def coursePageMethod(request):
             isSubscribed = 1
         else:
             isSubscribed = 0
+        if profileId in cacheVal[19]:
+            isAdmin = 1
+        else:
+            isAdmin = 0
         return CoursePageResponse(response=0, description="OK", isSubscribed=isSubscribed,
                                   courseName=cacheVal[0], date=cacheVal[1],
                                   startTime=cacheVal[2], endTime=cacheVal[3],
@@ -1215,7 +1220,8 @@ def coursePageMethod(request):
                                   professorName=cacheVal[10], colour=cacheVal[11],
                                   elective=cacheVal[12], collegeName=cacheVal[14],
                                   branchNames=cacheVal[15], sectionNames=cacheVal[16],
-                                  batchNames=cacheVal[17], semester=cacheVal[18])
+                                  batchNames=cacheVal[17], semester=cacheVal[18],
+                                  isAdmin=isAdmin)
     course = courseId.get()
     if course is None:
         print "Invalid courseId"
@@ -1304,8 +1310,13 @@ def coursePageMethod(request):
               info[1], info[2], info[3], info[4],
               info[5], info[6], course.professorName, course.colour,
               course.elective, course.studentIds, info[0], course.branchNames,
-              course.sectionNames, course.batchNames, course.semester]
+              course.sectionNames, course.batchNames, course.semester,
+              course.adminIds]
     memcache.add(course.key.urlsafe(), fields, 3600)
+    if profileId in course.adminIds:
+        isAdmin = 1
+    else:
+        isAdmin = 0
     return CoursePageResponse(response=0, description="OK", isSubscribed=isSubscribed,
                               courseName=course.courseName, date=course.date,
                               startTime=course.startTime, endTime=course.endTime,
@@ -1316,7 +1327,8 @@ def coursePageMethod(request):
                               elective=course.elective, collegeName=collegeName,
                               branchNames=course.branchNames,
                               sectionNames=course.sectionNames,
-                              batchNames=course.batchNames, semester=course.semester)
+                              batchNames=course.batchNames,
+                              semester=course.semester, isAdmin=isAdmin)
 
 
 def getAssignmentListMethod(request):
@@ -1497,6 +1509,8 @@ def bookmarkMethod(request):
 def clearAll():
     colleges = College.query().fetch()
     for college in colleges:
+        memcache.delete(college.key.urlsafe())
+        memcache.delete('stu' + college.key.urlsafe())
         college.key.delete()
     profiles = Profile.query().fetch()
     for profile in profiles:
@@ -1504,18 +1518,26 @@ def clearAll():
     courses = Course.query().fetch()
     for course in courses:
         memcache.delete(course.key.urlsafe())
+        memcache.delete('views' + course.key.urlsafe())
         course.key.delete()
     notesList = Notes.query().fetch()
     for notes in notesList:
+        memcache.delete(notes.key.urlsafe())
         notes.key.delete()
     noteBookList = NoteBook.query().fetch()
     for noteBook in noteBookList:
+        memcache.delete(noteBook.key.urlsafe())
+        memcache.delete('views' + noteBook.key.urlsafe())
         noteBook.key.delete()
     assignmentList = Assignment.query().fetch()
     for assignment in assignmentList:
+        memcache.delete(assignment.key.urlsafe())
+        memcache.delete('views' + assignment.key.urlsafe())
         assignment.key.delete()
     examList = Exam.query().fetch()
     for exam in examList:
+        memcache.delete(exam.key.urlsafe())
+        memcache.delete('views' + exam.key.urlsafe())
         exam.key.delete()
     idx = [search.Index('Course'), search.Index('NoteBook')]
     for index in idx:
