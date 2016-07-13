@@ -400,6 +400,7 @@ class NoteBookResponse(messages.Message):
     frequency = messages.IntegerField(7)
     lastUpdated = messages.StringField(8)
     colour = messages.StringField(9)
+    courseId = messages.StringField(10)
 
 
 class NoteBookListResponse(messages.Message):
@@ -452,7 +453,8 @@ class CoursePageResponse(messages.Message):
     sectionNames = messages.StringField(20, repeated=True)
     semester = messages.StringField(21)
     collegeName = messages.StringField(22)
-    isAdmin = messages.IntegerField(23)
+    isAdmin = messages.IntegerField (23)
+    courseCode = messages.StringField(24)
 
 
 class BookmarkRequest(messages.Message):

@@ -30,6 +30,7 @@ from editMethods import editCollegeMethod, editProfileMethod, editCourseMethod
 from editMethods import editAssignmentMethod, editExamMethod, editNotesMethod
 from sendEmail import sendMailNow
 from createCSV import create
+from apiMethods import rectify
 
 
 @endpoints.api(name='notesapi', version='v1')
@@ -439,5 +440,15 @@ class NotesAPI(remote.Service):
         name='report')
     def reportCourse(self, request):
         return reportMethod(request)
+
+    @endpoints.method(
+        message_types.VoidMessage,
+        message_types.VoidMessage,
+        path='rectify',
+        http_method='GET',
+        name='rectify')
+    def rectify(self, request):
+        rectify()
+        return message_types.VoidMessage()
 
 apiLists = endpoints.api_server([NotesAPI])

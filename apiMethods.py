@@ -218,7 +218,7 @@ def subscribeCourseMethod(request):
             cacheVal = memcache.get(courseId.urlsafe())
             if cacheVal is not None:
                 cacheVal[13].append(profileId)
-                cacheVal[9] -= 1
+                cacheVal[9] += 1
                 memcache.set(courseId.urlsafe(), cacheVal)
     # Removing courses with same courseCode from profile.availableCourseIds
     courseCodes = []
@@ -433,15 +433,29 @@ def addAdminMethod(request):
         print "Invalid courseId"
         return Response(response=1, description="Invalid courseId")
     profile = profileId.get()
+    cacheVal = memcache.get(courseId.urlsafe())
     if profile is None:
         print "Invalid profileId"
         return Response(response=1, description="Invalid profileId")
     if courseId not in profile.administeredCourseIds:
         profile.administeredCourseIds.append(courseId)
-    if profileId in course.adminIds:
-        course.adminIds.append(profileId)
-    if courseId in profile.availableCourseIds:
-        profile.availableCourseIds.remove(courseId)
+        if profileId not in course.adminIds:
+            course.adminIds.append(profileId)
+        if cacheVal is not None:
+            if profileId in cacheVal[19]:
+                cacheVal[19].append(profileId)
+                memcache.set(courseId.urlsafe(), cacheVal)
+        if courseId in profile.availableCourseIds:
+            if courseId in profile.availableCourseIds:
+                profile.availableCourseIds.remove(courseId)
+    else:
+        profile.administeredCourseIds.remove(courseId)
+        if profileId in course.adminIds:
+            course.adminIds.remove(profileId)
+        if cacheVal is not None:
+            if profileId in cacheVal[19]:
+                cacheVal[19].remove(profileId)
+                memcache.set(courseId.urlsafe(), cacheVal)
     profile.put()
     course.put()
     return Response(response=0, description="OK")
@@ -508,6 +522,8 @@ def studentListMethod(request):
             else:
                 isAdmin2 = 0
             student = studentId.get()
+            if student is None:
+                continue
             studentList.append(StudentResponse(profileId=studentId.urlsafe(),
                                                profileName=student.profileName,
                                                photoUrl=student.photoUrl,
@@ -1040,7 +1056,8 @@ def getNoteBookListMethod(request):
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
                                    lastUpdated=noteBook.lastUpdated,
-                                   colour=course.colour)
+                                   colour=course.colour,
+                                   courseId=course.key.urlsafe())
             noteBookList.append(new)
     elif upid:
         try:
@@ -1078,7 +1095,8 @@ def getNoteBookListMethod(request):
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
                                    lastUpdated=noteBook.lastUpdated,
-                                   colour=course.colour)
+                                   colour=course.colour,
+                                   courseId=course.key.urlsafe())
             noteBookList.append(new)
     elif courseId:
         try:
@@ -1107,7 +1125,8 @@ def getNoteBookListMethod(request):
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
                                    lastUpdated=noteBook.lastUpdated,
-                                   colour=course.colour)
+                                   colour=course.colour,
+                                   courseId=course.key.urlsafe())
             noteBookList.append(new)
             noteBookList.sort(key=lambda x: x.lastUpdated, reverse=True)
     elif profileId:
@@ -1149,7 +1168,8 @@ def getNoteBookListMethod(request):
                                        totalRating=noteBook.totalRating,
                                        frequency=noteBook.frequency,
                                        lastUpdated=noteBook.lastUpdated,
-                                       colour=course.colour)
+                                       colour=course.colour,
+                                       courseId=course.key.urlsafe())
                 noteBookList.append(new)
     else:
         print "Bad request"
@@ -1221,7 +1241,7 @@ def coursePageMethod(request):
                                   elective=cacheVal[12], collegeName=cacheVal[14],
                                   branchNames=cacheVal[15], sectionNames=cacheVal[16],
                                   batchNames=cacheVal[17], semester=cacheVal[18],
-                                  isAdmin=isAdmin)
+                                  isAdmin=isAdmin, courseCode=cacheVal[20])
     course = courseId.get()
     if course is None:
         print "Invalid courseId"
@@ -1311,7 +1331,7 @@ def coursePageMethod(request):
               info[5], info[6], course.professorName, course.colour,
               course.elective, course.studentIds, info[0], course.branchNames,
               course.sectionNames, course.batchNames, course.semester,
-              course.adminIds]
+              course.adminIds, course.courseCode]
     memcache.add(course.key.urlsafe(), fields, 3600)
     if profileId in course.adminIds:
         isAdmin = 1
@@ -1328,7 +1348,8 @@ def coursePageMethod(request):
                               branchNames=course.branchNames,
                               sectionNames=course.sectionNames,
                               batchNames=course.batchNames,
-                              semester=course.semester, isAdmin=isAdmin)
+                              semester=course.semester, isAdmin=isAdmin,
+                              courseCode=course.courseCode)
 
 
 def getAssignmentListMethod(request):
@@ -1608,7 +1629,7 @@ def unsubscribeCourseMethod(request):
             cacheVal[9] += 1
             cacheVal[13].append(profileId)
             memcache.set(courseId.urlsafe(), cacheVal)
-        if profileId in course.studentIds:
+        if profileId not in course.studentIds:
             course.studentIds.append(profileId)
             course.put()
 
@@ -1868,3 +1889,15 @@ def reportMethod(request):
     body += "<br>profileId: " + profileId.urlsafe()
     sendEmail(subject='Something is Reported', body=body)
     return Response(response=0, description='OK')
+
+
+def rectify():
+    courseList = Course.query().fetch()
+    for course in courseList:
+        for profileId in course.studentIds:
+            if profileId.get() is None:
+                course.studentIds.remove(profileId)
+        for profileId in course.adminIds:
+            if profileId.get() is None:
+                course.adminIds.remove(profileId)
+        course.put()
