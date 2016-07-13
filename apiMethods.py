@@ -866,8 +866,10 @@ def createNotesMethod(request):
     if profile is None:
         print "Invalid profileId"
         return Response(response=1, description="Invalid profileId")
+
     newNotes = Notes()
-    setValue(newNotes, request, -1, ['courseId', 'profileId'])
+    # storing details
+    setattr(newNotes, 'date', getattr(newNotes, 'date'))
     # CHECKS IF NOTEBOOK WITH SAME profileID AND courseId already exists
     query = NoteBook.query(ndb.AND(NoteBook.courseId == courseId,
                                    NoteBook.uploaderId == profileId))

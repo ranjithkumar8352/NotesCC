@@ -13,6 +13,9 @@ class ProfilePicUpload(webapp2.RequestHandler):
         self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
 
     def post(self):
+        self.response.headers['Access-Control-Allow-Origin'] = '*'
+        self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
+        self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
         self.response.headers.add_header('Access-Control-Allow-Origin', '*')
         self.response.headers['Content-Type'] = 'application/json'
         try:
@@ -35,6 +38,7 @@ class ProfilePicUpload(webapp2.RequestHandler):
         self.response.out.write(json.dumps(obj))
 
     def get(self):
+        self.response.headers.add_header('Access-Control-Allow-Origin', '*')
         self.response.out.write("""<form method="POST" enctype="multipart/form-data">
                                     <input type="file" name="file">
                                     <input type="text" name="profileId">
