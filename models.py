@@ -13,13 +13,13 @@ class College(ndb.Model):
     collegeName = ndb.StringProperty(required=True)
     abbreviation = ndb.StringProperty(required=True)
     location = ndb.StringProperty(required=True)
-    courseIds = ndb.KeyProperty(repeated=True, kind='Course')
     collegeType = ndb.StringProperty()
     semStartDate = ndb.StringProperty()
     semEndDate = ndb.StringProperty()
+    branchNameList = ndb.StringProperty(repeated=True)
+    courseIds = ndb.KeyProperty(repeated=True, kind='Course')
     studentCount = ndb.IntegerProperty(default=0)
     noteBookCount = ndb.IntegerProperty(default=0)
-    branchNameList = ndb.StringProperty(repeated=True)
 
 
 class CollegeForm(messages.Message):
@@ -81,11 +81,6 @@ class Course(ndb.Model):
     elective = ndb.StringProperty()
 
 
-class MergeCourseRequest(messages.Message):
-    courseIdSource = messages.StringField(1)
-    courseIdDest = messages.StringField(2)
-
-
 class CourseForm(messages.Message):
     courseName = messages.StringField(1)
     collegeId = messages.StringField(2)
@@ -101,6 +96,11 @@ class CourseForm(messages.Message):
     courseCode = messages.StringField(12)
     date = messages.StringField(13, repeated=True)
     elective = messages.StringField(14)
+
+
+class MergeCourseRequest(messages.Message):
+    courseIdSource = messages.StringField(1)
+    courseIdDest = messages.StringField(2)
 
 
 class SubscribeCourseRequest(messages.Message):
