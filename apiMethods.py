@@ -466,15 +466,17 @@ def addAdminMethod(request):
         print str(E)
         return Response(response=1, description=str(E))
 
+    print profile, course
     if courseId not in profile.administeredCourseIds:
+        print "Here"
         # profile is not the admin
         administeredCourseIds = set(profile.administeredCourseIds)
         administeredCourseIds.add(courseId)
         profile.administeredCourseIds = list(administeredCourseIds)
         adminIds = set(course.adminIds)
         adminIds.add(profileId)
-        course.adminIds = list(course.adminIds)
-
+        course.adminIds = list(adminIds)
+        print course
         # adding admin to memcache
         cacheVal = memcache.get(courseId.urlsafe())
         if cacheVal is not None:
@@ -487,20 +489,22 @@ def addAdminMethod(request):
         profile.availableCourseIds = list(availableCourseIds)
     else:
         # profile is already the admin
-        administeredCourseIds = profile.administeredCourseIds
+        administeredCourseIds = set(profile.administeredCourseIds)
         administeredCourseIds.discard(courseId)
         profile.administeredCourseIds = list(administeredCourseIds)
         adminIds = set(course.adminIds)
         adminIds.discard(profileId)
+        course.adminIds = list(adminIds)
 
         # setting in memcache
+        cacheVal = memcache.get(courseId.urlsafe())
         if cacheVal is not None:
             cv = set(cacheVal[19])
             cv.discard(profileId)
             cacheVal[19] = cv
             memcache.set(courseId.urlsafe(), cacheVal)
-    profile.put()
     course.put()
+    profile.put()
     return Response(response=0, description="OK")
 
 
@@ -558,6 +562,8 @@ def studentListMethod(request):
 
     # creating the list of profile
     studentList = []
+    print course
+    print course.adminIds
     for studentId in course.studentIds:
         # whether the student is admin
         if studentId in course.adminIds:
