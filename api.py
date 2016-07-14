@@ -14,6 +14,8 @@ from models import BookmarkRequest, CollegeListResponse, AddBranchRequest
 from models import SearchCourseRequest, BookmarkResponse, SearchNBRequest
 from models import UnsubscribeCourseRequest, NotificationList, BranchListResponse
 from models import EditProfileRequest, CollegeRequest, ReportRequest
+from models import EditCollegeRequest, EditCourseRequest, EditAssignmentRequest
+from models import EditExamRequest, EditNotesRequest
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
 from apiMethods import courseListMethod, feedMethod, addAdminMethod
@@ -44,13 +46,10 @@ class NotesAPI(remote.Service):
     def createCollege(self, request):
         return createCollegeMethod(request)
 
-    editCollegeResource = endpoints.ResourceContainer(CollegeForm,
-                                                      collegeId=messages.StringField(1))
-
     @endpoints.method(
-        editCollegeResource,
+        EditCollegeRequest,
         Response,
-        path='editCollege/{collegeId}',
+        path='editCollege',
         http_method='POST',
         name='editCollege')
     def editCollege(self, request):
@@ -87,13 +86,10 @@ class NotesAPI(remote.Service):
             createCourseDoc(request, response.key)
         return response
 
-    editCourseResource = endpoints.ResourceContainer(CourseForm,
-                                                     courseId=messages.StringField(1))
-
     @endpoints.method(
-        editCourseResource,
+        EditCourseRequest,
         Response,
-        path='editCourse/{courseId}',
+        path='editCourse',
         http_method='POST',
         name='editCourse')
     def editCourse(self, request):
@@ -187,13 +183,10 @@ class NotesAPI(remote.Service):
     def createAssignment(self, request):
         return createAssignmentMethod(request)
 
-    editAssignmentResource = endpoints.ResourceContainer(AssignmentForm,
-                                                         assignmentId=messages.StringField(1))
-
     @endpoints.method(
-        editAssignmentResource,
+        EditAssignmentRequest,
         Response,
-        path='editAssignment/{assignmentId}',
+        path='editAssignment',
         http_method='POST',
         name='editAssignment')
     def editAssignment(self, request):
@@ -208,13 +201,10 @@ class NotesAPI(remote.Service):
     def createExam(self, request):
         return createExamMethod(request)
 
-    editExamResource = endpoints.ResourceContainer(AssignmentForm,
-                                                   examId=messages.StringField(1))
-
     @endpoints.method(
-        editExamResource,
+        EditExamRequest,
         Response,
-        path='editExam/{examId}',
+        path='editExam',
         http_method='POST',
         name='editExam')
     def editExam(self, request):
@@ -251,9 +241,9 @@ class NotesAPI(remote.Service):
                                                     notesId=messages.StringField(1))
 
     @endpoints.method(
-        editNotesResource,
+        EditNotesRequest,
         Response,
-        path='editNotes/{notesId}',
+        path='editNotes',
         http_method='POST',
         name='editNotes')
     def editNotes(self, request):

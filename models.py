@@ -32,6 +32,17 @@ class CollegeForm(messages.Message):
     branchNameList = messages.StringField(7, repeated=True)
 
 
+class EditCollegeRequest(messages.Message):
+    collegeName = messages.StringField(1)
+    abbreviation = messages.StringField(2)
+    location = messages.StringField(3)
+    collegeType = messages.StringField(4)
+    semStartDate = messages.StringField(5)
+    semEndDate = messages.StringField(6)
+    branchNameList = messages.StringField(7)
+    collegeId = messages.StringField(8, required=True)
+
+
 class Profile(ndb.Model):
     profileName = ndb.StringProperty(required=True)
     collegeId = ndb.KeyProperty(required=True, kind='College')
@@ -97,6 +108,23 @@ class CourseForm(messages.Message):
     date = messages.StringField(13, repeated=True)
     elective = messages.StringField(14)
 
+
+class EditCourseRequest(messages.Message):
+    courseName = messages.StringField(1)
+    collegeId = messages.StringField(2)
+    batchNames = messages.StringField(3, repeated=True)
+    branchNames = messages.StringField(10, repeated=True)
+    sectionNames = messages.StringField(4, repeated=True)
+    semester = messages.StringField(5)
+    startTime = messages.StringField(6, repeated=True)
+    endTime = messages.StringField(7, repeated=True)
+    professorName = messages.StringField(8)
+    profileId = messages.StringField(9)
+    colour = messages.StringField(11)
+    courseCode = messages.StringField(12)
+    date = messages.StringField(13, repeated=True)
+    elective = messages.StringField(14)    
+    courseId = messages.StringField(15)
 
 class MergeCourseRequest(messages.Message):
     courseIdSource = messages.StringField(1)
@@ -216,6 +244,17 @@ class AssignmentForm(messages.Message):
     urlList = messages.StringField(7, repeated=True)
 
 
+class EditAssignmentRequest(messages.Message):
+    assignmentTitle = messages.StringField(1)
+    assignmentDesc = messages.StringField(2)
+    courseId = messages.StringField(3)
+    uploaderId = messages.StringField(4)
+    dueDate = messages.StringField(5)
+    dueTime = messages.StringField(6)
+    urlList = messages.StringField(7)
+    assignmentId = messages.StringField(8)
+
+
 class Exam(ndb.Model):
     examTitle = ndb.StringProperty()
     courseId = ndb.KeyProperty(kind='Course')
@@ -237,6 +276,17 @@ class ExamForm(messages.Message):
     examDesc = messages.StringField(5)
     dueTime = messages.StringField(6)
     urlList = messages.StringField(7, repeated=True)
+
+
+class EditExamRequest(messages.Message):
+    examTitle = messages.StringField(1)
+    courseId = messages.StringField(2)
+    uploaderId = messages.StringField(3)
+    dueDate = messages.StringField(4)
+    examDesc = messages.StringField(5)
+    dueTime = messages.StringField(6)
+    urlList = messages.StringField(7, repeated=True)
+    examId = messages.StringField(8)
 
 
 class GetAssignmentRequest(messages.Message):
@@ -352,6 +402,16 @@ class NotesForm(messages.Message):
     title = messages.StringField(7, required=True)
 
 
+class EditNotesRequest(messages.Message):
+    profileId = messages.StringField(1)
+    date = messages.StringField(2)
+    urlList = messages.StringField(3, repeated=True)
+    notesDesc = messages.StringField(4)
+    courseId = messages.StringField(6)
+    title = messages.StringField(7)
+    notesId = messages.StringField(8)
+
+
 class NoteBookRequest(messages.Message):
     profileId = messages.StringField(1)
     noteBookId = messages.StringField(2)
@@ -453,7 +513,7 @@ class CoursePageResponse(messages.Message):
     sectionNames = messages.StringField(20, repeated=True)
     semester = messages.StringField(21)
     collegeName = messages.StringField(22)
-    isAdmin = messages.IntegerField (23)
+    isAdmin = messages.IntegerField(23)
     courseCode = messages.StringField(24)
 
 
