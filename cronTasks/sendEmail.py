@@ -3,6 +3,9 @@ from models import College
 import datetime
 from config import BUCKET_NAME, CLG_STATS_TIME
 from sparkpost import SparkPost
+
+from slack import slackWebHook
+
 from google.appengine.api import memcache
 
 
@@ -48,3 +51,4 @@ response = sp.transmissions.send(recipients=['saurav24081996@gmail.com', 'aayush
                                  from_email={'email': 'aayush@campusconnect.cc', 'name': 'Campus Connect'},
                                  subject='OOOOH!!! YEAHHHH',
                                  )
+slackWebHook()

@@ -9,3 +9,6 @@ FCM_AUTH_KEY = 'AIzaSyD4MtcG4R0LrZ42nskF1lpBQSYq0JT-a6Y'
 
 # Cache Data Expiration Time
 CLG_STATS_TIME = 172800
+
+# Slack
+WEBHOOK_URLS = ['https://hooks.slack.com/services/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']

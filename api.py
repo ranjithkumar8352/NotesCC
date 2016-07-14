@@ -33,6 +33,7 @@ from editMethods import editAssignmentMethod, editExamMethod, editNotesMethod
 from sendEmail import sendMailNow
 from createCSV import create
 from apiMethods import rectify
+from slack import slackWebHook
 
 
 @endpoints.api(name='notesapi', version='v1')
@@ -441,4 +442,16 @@ class NotesAPI(remote.Service):
         rectify()
         return message_types.VoidMessage()
 
+    stringRes = endpoints.ResourceContainer(message_types.VoidMessage,
+                                            text=messages.StringField(1))
+
+    @endpoints.method(
+        stringRes,
+        message_types.VoidMessage,
+        path='slack',
+        http_method='GET',
+        name='slack')
+    def slack(self, request):
+        slackWebHook()
+        return message_types.VoidMessage()
 apiLists = endpoints.api_server([NotesAPI])
