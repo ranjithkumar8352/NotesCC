@@ -23,3 +23,7 @@ cron:
   url: /task/email
   schedule: every 24 hours
   target: crontask
+- description: My Daily Backup
+  url: /_ah/datastore_admin/backup.create?name=backup&kind=Course&kind=College&kind=Profile&kind=Assignment&kind=Exam&kind=Notes&kind&NoteBook&kind=Notification&kind=CollegeRequestModel&filesystem=gs&gs_bucket_name=uploadnotes-2016.appspot.com/backup
+  schedule: every 24 hours
+  target: ah-builtin-python-bundle
