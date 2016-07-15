@@ -188,6 +188,7 @@ class FeedResponse(messages.Message):
     photoUrl = messages.StringField(5)
     availableCourseList = messages.MessageField(FeedCourseResponse, 6, repeated=True)
     subscribedCourseList = messages.MessageField(FeedCourseResponse, 7, repeated=True)
+    newNotifications = messages.StringField(9)
 
 
 class ProfileIdRequest(messages.Message):
@@ -442,6 +443,7 @@ class NoteBookDetailResponse(messages.Message):
     description = messages.StringField(11)
     bookmarkStatus = messages.IntegerField(13)
     colour = messages.StringField(14)
+    numUsersRated = messages.StringField(17)
 
 
 class NoteBookListRequest(messages.Message):
@@ -594,6 +596,7 @@ class Notification(ndb.Model):
     text = ndb.StringProperty()
     timeStamp = ndb.DateTimeProperty(indexed=True)
     profileIdList = ndb.KeyProperty(kind='Profile', repeated=True, indexed=True)
+    courseId = ndb.StringProperty()
 
 
 class NotificationResponse(messages.Message):
@@ -602,10 +605,12 @@ class NotificationResponse(messages.Message):
     timeStamp = message_types.DateTimeField(3)
     id = messages.StringField(5)
     type = messages.StringField(6)
+    courseId = messages.StringField(7)
 
 
 class NotificationList(messages.Message):
     notificationList = messages.MessageField(NotificationResponse, 1, repeated=True)
+    total = messages.StringField(2)
 
 
 class BranchListResponse(messages.Message):

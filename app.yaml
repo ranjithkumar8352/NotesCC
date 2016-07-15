@@ -27,13 +27,13 @@ handlers:
 - url: /task/updateExam
   script: cronTasks/updateExam.py
 - url: /task/updateNoteBook
-  script: cronTasks/updateNoteBook.py  
-- url: /task/updateCourse
-  script: cronTasks/updateCourse.py
+  script: cronTasks/updateNoteBook.py
 - url: /task/notification
   script: cronTasks/sendNotification.py
 - url: /task/email
   script: cronTasks/sendEmail.py
+- url: /task/delNotification
+  script: cronTasks/deleteNotification.py
 
 libraries:
 - name: pycrypto

@@ -14,10 +14,10 @@ from models import BookmarkResponse, Notification, NotificationResponse
 from models import NotificationList, BranchListResponse, CollegeRequestModel
 from models import Report
 from searchAPI import createNBDoc
-from FCM import sendNotification
+from FCM import sendNotification, sendNotificationSingle
 from sendEmail import sendEmail
 from sparkpost import SparkPost
-from config import CLG_STATS_TIME
+from config import CLG_STATS_TIME, NOTIFICATION_TIME
 
 from google.appengine.ext import ndb
 from google.appengine.api import search
@@ -27,7 +27,6 @@ from google.appengine.api import memcache
 noteBookOpened = set()
 assignmentOpened = set()
 examOpened = set()
-courseUpdate = set()
 
 
 def createCollegeMethod(request):
@@ -112,6 +111,7 @@ def createProfileMethod(request):
         college.studentCount += 1
         college.put()
         key = newProfile.put()
+        memcache.add(key.urlsafe(), 0, NOTIFICATION_TIME)
         return Response(response=0, description="OK", key=key.urlsafe())
 
 
@@ -369,11 +369,16 @@ def feedMethod(request):
         print traceback.print_stack()
         return FeedResponse(response=1, description='in subscribedCourses ' + str(E))
     collegeId = profile.collegeId
+    numNotification = memcache.get('notif' + profileId.urlsafe())
+    if numNotification is None:
+        memcache.add('notif' + profileId.urlsafe(), 0, NOTIFICATION_TIME)
+        numNotification = 0
     return FeedResponse(response=0, description="OK", profileName=profileName,
                         points=points, photoUrl=photoUrl,
                         availableCourseList=availableCourseList,
                         subscribedCourseList=subscribedCourseList,
-                        collegeId=collegeId.urlsafe())
+                        collegeId=collegeId.urlsafe(),
+                        newNotifications=str(numNotification))
 
 
 def feedCourseResponse(courseIds):
@@ -506,6 +511,14 @@ def addAdminMethod(request):
             memcache.set(courseId.urlsafe(), cacheVal)
     course.put()
     profile.put()
+
+    # creating notification
+    notifText = 'You have been made the admin of ' + course.courseName
+    createNotification([profileId], 'Campus Connect', notifText, 'admin', courseId=courseId.urlsafe())
+
+    # sending downstream FCM notification
+    sendNotificationSingle(profile.gcmId, 'admin', 'Campus Connect', notifText)
+
     return Response(response=0, description="OK")
 
 
@@ -633,7 +646,7 @@ def createAssignmentMethod(request):
     notificationText = "New assignment added!"
     createNotification(course.studentIds, 'Campus Connect',
                        notificationText, 'assignment',
-                       assignmentId.urlsafe())
+                       assignmentId.urlsafe(), courseId.urlsafe())
     sendNotification(topicName=courseId.urlsafe(), id=assignmentId.urlsafe(), title=title,
                      text=notificationText, type='assignment')
     return Response(response=0, description="OK", key=assignmentId.urlsafe())
@@ -687,7 +700,7 @@ def createExamMethod(request):
     notificationText = "New Exam added!"
     createNotification(course.studentIds, 'Campus Connect',
                        notificationText, 'exam',
-                       examId.urlsafe())
+                       examId.urlsafe(), courseId.urlsafe())
     sendNotification(topicName=courseId.urlsafe(), id=examId.urlsafe(), title=title,
                      text=notificationText, type='exam')
     return Response(response=0, description="OK", key=examId.urlsafe())
@@ -977,7 +990,7 @@ def addToNoteBook(noteBookId, newNotes):
     if len(noteBook.bmUserList) != 0:
         print len(noteBook.bmUserList)
         createNotification(bmUserList, 'Campus Connect', notificationText,
-                           'notes', noteBookId.urlsafe())
+                           'notes', noteBookId.urlsafe(), noteBook.courseId.urlsafe())
     sendNotification(topicName=noteBookId.urlsafe(), id=noteBookId.urlsafe(),
                      title=title, text=notificationText, type='notes')
 
@@ -1031,6 +1044,7 @@ def getNoteBook(request):
                                       pages=cacheVal[4], totalRating=cacheVal[5],
                                       notes=cacheVal[6], bookmarkStatus=bookmarkStatus,
                                       response=0, colour=cacheVal[7],
+                                      numUsersRated=str(len(cacheVal[9])),
                                       description="OK")
 
     noteBook = noteBookId.get()
@@ -1095,6 +1109,7 @@ def getNoteBook(request):
                                   pages=pages, totalRating=totalRating,
                                   notes=notesList, bookmarkStatus=bookmarkStatus,
                                   response=0, colour=course.colour,
+                                  numUsersRated=str(len(noteBook.ratingList)),
                                   description="OK")
 
 
@@ -1335,6 +1350,12 @@ def rateThisMethod(request):
         cacheVal[5] = noteBook.totalRating
         memcache.set(noteBookId.urlsafe(), cacheVal)
     noteBook.put()
+
+    # creating notification
+    notifText = 'Someone rated your notebook!!! Suspense!'
+    createNotification([noteBook.uploaderId], 'Campus Connect', notifText,
+                       'notes', noteBookId.urlsafe(), noteBook.courseId.urlsafe())
+
     return Response(response=0, description="OK")
 
 
@@ -1659,52 +1680,18 @@ def bookmarkMethod(request):
         memcache.set(noteBookId.urlsafe(), cacheVal)
     profile.put()
     noteBook.put()
+
+    # creating notification
+    notifText = 'Congrats!!! Peoples are loving you notebook'
+    createNotification([noteBook.uploaderId], 'Campus Connect', notifText,
+                       'notes', noteBookId.urlsafe(), noteBook.courseId.urlsafe())
     return BookmarkResponse(response=0, description="OK", bookmarkStatus=status)
 
 
 def clearAll():
-    colleges = College.query().fetch()
-    for college in colleges:
-        memcache.delete(college.key.urlsafe())
-        memcache.delete('stu' + college.key.urlsafe())
-        college.key.delete()
-    profiles = Profile.query().fetch()
-    for profile in profiles:
-        profile.key.delete()
-    courses = Course.query().fetch()
-    for course in courses:
-        memcache.delete(course.key.urlsafe())
-        memcache.delete('views' + course.key.urlsafe())
-        course.key.delete()
-    notesList = Notes.query().fetch()
-    for notes in notesList:
-        memcache.delete(notes.key.urlsafe())
-        notes.key.delete()
-    noteBookList = NoteBook.query().fetch()
-    for noteBook in noteBookList:
-        memcache.delete(noteBook.key.urlsafe())
-        memcache.delete('views' + noteBook.key.urlsafe())
-        noteBook.key.delete()
-    assignmentList = Assignment.query().fetch()
-    for assignment in assignmentList:
-        memcache.delete(assignment.key.urlsafe())
-        memcache.delete('views' + assignment.key.urlsafe())
-        assignment.key.delete()
-    examList = Exam.query().fetch()
-    for exam in examList:
-        memcache.delete(exam.key.urlsafe())
-        memcache.delete('views' + exam.key.urlsafe())
-        exam.key.delete()
-    idx = [search.Index('Course'), search.Index('NoteBook')]
-    for index in idx:
-        ids = []
-        results = index.search("NOT zoo")
-        for doc in results:
-            key = doc.doc_id
-            ids.append(key)
-        index.delete(ids)
-    for notif in Notification.query().fetch():
-        notif.key.delete()
+    q = ndb.Query()
+    for entity in q.fetch():
+        entity.key.delete()
 
 
 def collegeListMethod(request):
@@ -1956,10 +1943,18 @@ def deleteMethod(request):
         return deleteCollege(collegeId)
 
 
-def createNotification(profileIds, title, text, type, id):
+def createNotification(profileIds, title, text, type, id=None, courseId=None):
+    """createNotification(profileIds, title, text, type, id, courseId=None)"""
+    for profileId in profileIds:
+        urlsafeId = profileId.urlsafe()
+        if memcache.get('notif' + urlsafeId) is None:
+            memcache.add('notif' + urlsafeId, 0, NOTIFICATION_TIME)
+        else:
+            memcache.incr('notif' + urlsafeId)
     timeStamp = datetime.datetime.now() + datetime.timedelta(hours=5, minutes=30)
     newNotification = Notification(type=type, id=id, title=title, text=text,
-                                   profileIdList=profileIds, timeStamp=timeStamp)
+                                   profileIdList=profileIds, timeStamp=timeStamp,
+                                   courseId=courseId)
     newNotification.put()
 
 
@@ -1970,9 +1965,16 @@ def getNotificationMethod(request):
     for result in results:
         notif = NotificationResponse(title=result.title, text=result.text,
                                      timeStamp=result.timeStamp,
-                                     type=result.type, id=result.id)
+                                     type=result.type, id=result.id,
+                                     courseId=result.courseId)
         notifList.append(notif)
-    return NotificationList(notificationList=notifList)
+
+    # reseting cache of newNotifications to 0
+    if memcache.get('notif' + profileId.urlsafe()) is None:
+        memcache.add('notif' + profileId.urlsafe(), 0, NOTIFICATION_TIME)
+    else:
+        memcache.set('notif' + profileId.urlsafe(), 0)
+    return NotificationList(notificationList=notifList, total=str(len(notifList)))
 
 
 def branchListMethod(request):
@@ -1995,7 +1997,9 @@ def collegeRequestMethod(request):
     phone = getattr(request, 'phone')
     college = CollegeRequestModel(collegeName=collegeName,
                                   location=location, name=name,
-                                  phone=phone, timeStamp=datetime.datetime.now()+datetime.timedelta(hours=5, minutes=30))
+                                  phone=phone,
+                                  timeStamp=datetime.datetime.now() +
+                                  datetime.timedelta(hours=5, minutes=30))
     college.put()
     sp = SparkPost('d5eda063a40ae19610612ea5d0804f20d294e62d')
     body = """<h1>Campus Connect</h1><br>There is a request to create new College
