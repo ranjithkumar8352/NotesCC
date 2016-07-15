@@ -9,22 +9,22 @@ def createCourseDoc(request, key):
     professorName = getattr(request, 'professorName')
     courseCode = getattr(request, 'courseCode')
     # semester = getattr(request, 'semester')
-    # branchNames = getattr(request, 'branchNames')
-    # batchNames = getattr(request, 'batchNames')
-    # sectionNames = getattr(request, 'sectionNames')
-    # branchNames = branchNames.join(' ')
-    # sectionNames = sectionNames.join(' ')
-    # batchNames = batchNames.join(' ')
+    branchNames = getattr(request, 'branchNames')
+    batchNames = getattr(request, 'batchNames')
+    sectionNames = getattr(request, 'sectionNames')
+    branchNames = ' '.join(branchNames)
+    sectionNames = ' '.join(sectionNames)
+    batchNames = ' '.join(batchNames)
     document = search.Document(
         doc_id=key,
         fields=[
             search.TextField(name='courseName', value=courseName),
             search.TextField(name='professorName', value=professorName),
-            search.TextField(name='courseCode', value=courseCode)
+            search.TextField(name='courseCode', value=courseCode),
             # search.TextField(name='semester', value=semester),
-            # search.TextField(name='branchNames', value=branchNames),
-            # search.TextField(name='batchNames', value=batchNames),
-            # search.TextField(name='sectionNames', value=sectionNames)
+            search.TextField(name='branchNames', value=branchNames),
+            search.TextField(name='batchNames', value=batchNames),
+            search.TextField(name='sectionNames', value=sectionNames)
         ])
     search.Index(name='Course').put(document)
 

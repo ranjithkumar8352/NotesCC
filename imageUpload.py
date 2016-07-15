@@ -82,7 +82,7 @@ class ImageUploadAndroid(webapp2.RequestHandler):
             try:
                 desc = self.request.get('desc')
             except Exception, E:
-                print "desc Missing in request\n"+str(self.request)+'\n'+str(E)
+                print "desc Missing in request\n" + str(self.request)+'\n' + str(E)
                 return self.response.write("desc Missing in request\n"+str(self.request)+'\n'+str(E))
             print "Number of files to be uploaded" + str(len(fileList))
             try:

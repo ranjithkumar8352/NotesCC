@@ -1689,8 +1689,34 @@ def bookmarkMethod(request):
 
 
 def clearAll():
-    q = ndb.Query()
-    for entity in q.fetch():
+    q = College.query()
+    for entity in q:
+        entity.key.delete()
+    q = Profile.query()
+    for entity in q:
+        entity.key.delete()
+    q = Course.query()
+    for entity in q:
+        search.Index('Course').delete([entity.key.urlsafe()])
+        entity.key.delete()
+    q = Assignment.query()
+    for entity in q:
+        entity.key.delete()
+    q = CollegeRequestModel.query()
+    for entity in q:
+        entity.key.delete()
+    q = Exam.query()
+    for entity in q:
+        entity.key.delete()
+    q = NoteBook.query()
+    for entity in q:
+        search.Index('NoteBook').delete([entity.key.urlsafe()])
+        entity.key.delete()
+    q = Notes.query()
+    for entity in q:
+        entity.key.delete()
+    q = Notification.query()
+    for entity in q:
         entity.key.delete()
 
 
