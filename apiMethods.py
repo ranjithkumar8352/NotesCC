@@ -738,7 +738,7 @@ def getAssignmentMethod(request):
                 print "Invalid assignmentId"
                 return GetAssignmentResponse(response=1, description="Invalid assignmentId")
             memViews = assignment.assignmentViews
-            memcache.add('views' + assignmentId.urlsafe(), memViews)
+            memcache.add('views' + assignmentId.urlsafe(), memViews, 86400)
         if isAuthor == 0:
             memcache.incr('views' + assignmentId.urlsafe())
         views = memcache.get('views' + assignmentId.urlsafe())
@@ -767,12 +767,12 @@ def getAssignmentMethod(request):
     fields = [assignment.assignmentTitle, assignment.assignmentDesc, assignment.dateUploaded,
               uploaderName, assignment.dueDate, assignment.dueTime, assignment.urlList,
               course.courseName, assignment.uploaderId]
-    memcache.add(assignmentId.urlsafe(), fields, 3600)
+    memcache.add(assignmentId.urlsafe(), fields, 86400)
     if memcache.get('views' + assignmentId.urlsafe()) is None:
         if isAuthor == 0:
-            memcache.add('views' + assignmentId.urlsafe(), assignment.assignmentViews + 1, 3600)
+            memcache.add('views' + assignmentId.urlsafe(), assignment.assignmentViews + 1, 86400)
         else:
-            memcache.add('views' + assignmentId.urlsafe(), assignment.assignmentViews, 3600)
+            memcache.add('views' + assignmentId.urlsafe(), assignment.assignmentViews, 86400)
     else:
         if isAuthor == 0:
             memcache.incr('views' + assignmentId.urlsafe())
@@ -821,7 +821,7 @@ def getExamMethod(request):
                 print "Invalid examId"
                 return GetExamResponse(response=1, description="Invalid examId")
             memViews = exam.examViews
-            memcache.add('views' + examId.urlsafe(), memViews)
+            memcache.add('views' + examId.urlsafe(), memViews, 86400)
         if isAuthor == 0:
             memcache.incr('views' + examId.urlsafe())
         views = memcache.get('views' + examId.urlsafe())
@@ -848,13 +848,13 @@ def getExamMethod(request):
 
     if memcache.get('views' + examId.urlsafe()) is None:
         if isAuthor == 0:
-            memcache.add('views' + examId.urlsafe(), exam.examViews + 1, 3600)
+            memcache.add('views' + examId.urlsafe(), exam.examViews + 1, 86400)
         else:
-            memcache.add('views' + examId.urlsafe(), exam.examViews, 3600)
+            memcache.add('views' + examId.urlsafe(), exam.examViews, 86400)
     else:
         if isAuthor == 0:
             memcache.incr('views' + examId.urlsafe())
-    memcache.add(examId.urlsafe(), fields, 3600)
+    memcache.add(examId.urlsafe(), fields, 86400)
     views = memcache.get('views' + examId.urlsafe())
     return GetExamResponse(response=0, description="OK",
                            isAuthor=isAuthor, views=views,
@@ -1016,7 +1016,7 @@ def getNoteBook(request):
         if memViews is None:
             noteBook = noteBookId.get()
             memViews = noteBook.views
-            memcache.add('views' + noteBookId.urlsafe(), memViews, 3600)
+            memcache.add('views' + noteBookId.urlsafe(), memViews, 86400)
         noteBookOpened.add(noteBookId.urlsafe())
         bmUserList = cacheVal[8]
         if profileId in bmUserList:
@@ -1093,12 +1093,12 @@ def getNoteBook(request):
     fields = [course.courseName, uploaderName, lastUpdated, frequency, pages, totalRating,
               notesList, course.colour, noteBook.bmUserList, noteBook.ratedUserIds,
               noteBook.ratingList, noteBook.uploaderId]
-    memcache.add(noteBookId.urlsafe(), fields, 3600)
+    memcache.add(noteBookId.urlsafe(), fields, 86400)
     if memcache.get('views' + noteBookId.urlsafe()) is None:
         if isAuthor == 1:
-            memcache.add('views' + noteBookId.urlsafe(), views + 1, 3600)
+            memcache.add('views' + noteBookId.urlsafe(), views + 1, 86400)
         else:
-            memcache.add('views' + noteBookId.urlsafe(), views, 3600)
+            memcache.add('views' + noteBookId.urlsafe(), views, 86400)
     else:
         memcache.incr('views' + noteBookId.urlsafe())
     views = memcache.get('views' + noteBookId.urlsafe())
@@ -1483,7 +1483,7 @@ def coursePageMethod(request):
               course.elective, course.studentIds, info[0], course.branchNames,
               course.sectionNames, course.batchNames, course.semester,
               course.adminIds, course.courseCode]
-    memcache.add(course.key.urlsafe(), fields, 3600)
+    memcache.add(course.key.urlsafe(), fields, 86400)
     if profileId in course.adminIds:
         isAdmin = 1
     else:
@@ -1675,7 +1675,7 @@ def bookmarkMethod(request):
     if cacheVal is not None:
         cacheVal[8] = noteBook.bmUserList
     if memcache.get(noteBookId.urlsafe()) is None:
-        memcache.add(noteBookId.urlsafe(), cacheVal, 3600)
+        memcache.add(noteBookId.urlsafe(), cacheVal, 86400)
     else:
         memcache.set(noteBookId.urlsafe(), cacheVal)
     profile.put()
