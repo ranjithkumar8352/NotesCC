@@ -15,7 +15,7 @@ from models import SearchCourseRequest, BookmarkResponse, SearchNBRequest
 from models import UnsubscribeCourseRequest, NotificationList, BranchListResponse
 from models import EditProfileRequest, CollegeRequest, ReportRequest
 from models import EditCollegeRequest, EditCourseRequest, EditAssignmentRequest
-from models import EditExamRequest, EditNotesRequest
+from models import EditExamRequest, EditNotesRequest, StudentListRequest
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
 from apiMethods import courseListMethod, feedMethod, addAdminMethod
@@ -139,13 +139,10 @@ class NotesAPI(remote.Service):
     def feed(self, request):
         return feedMethod(request)
 
-    addAdminResource = endpoints.ResourceContainer(ProfileIdRequest,
-                                                   courseId=messages.StringField(2))
-
     @endpoints.method(
-        addAdminResource,
+        StudentListRequest,
         Response,
-        path='addAdmin/{courseId}',
+        path='addAdmin',
         http_method='POST',
         name='addAdmin')
     def addAdmin(self, request):
@@ -163,13 +160,10 @@ class NotesAPI(remote.Service):
     def timeTable(self, request):
         return timeTableMethod(request)
 
-    studentListResource = endpoints.ResourceContainer(ProfileIdRequest,
-                                                      courseId=messages.StringField(1))
-
     @endpoints.method(
-        studentListResource,
+        StudentListRequest,
         StudentListResponse,
-        path='studentList/{courseId}',
+        path='studentList',
         http_method='POST',
         name='studentList')
     def studentList(self, request):

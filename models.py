@@ -58,6 +58,7 @@ class Profile(ndb.Model):
     bookmarkedNoteBookIds = ndb.KeyProperty(repeated=True, kind='NoteBook')
     points = ndb.IntegerProperty(default=0)
     email = ndb.StringProperty(required=True)
+    dob = ndb.StringProperty()
 
 
 class ProfileForm(messages.Message):
@@ -69,6 +70,7 @@ class ProfileForm(messages.Message):
     photoUrl = messages.StringField(10, required=True)
     email = messages.StringField(14, required=True)
     gcmId = messages.StringField(15)
+    dob = messages.StringField(16)
 
 
 class Course(ndb.Model):
@@ -622,6 +624,7 @@ class EditProfileRequest(messages.Message):
     email = messages.StringField(14)
     gcmId = messages.StringField(15)
     profileId = messages.StringField(6)
+    dob = messages.StringField(16)
 
 
 class CollegeRequest(messages.Message):
@@ -649,3 +652,8 @@ class ReportRequest(messages.Message):
     key = messages.StringField(1)
     profileId = messages.StringField(2)
     description = messages.StringField(3)
+
+
+class StudentListRequest(messages.Message):
+    courseId = messages.StringField(1)
+    profileId = messages.StringField(2)

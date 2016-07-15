@@ -50,6 +50,8 @@ def editCourseMethod(request):
         course = courseId.get()
         for field in fields:
             value = getattr(request, field.name, None)
+            if field.name == 'collegeId' or field.name == 'profileId':
+                continue
             if value is None or value == "" or value == []:
                 continue
             setattr(course, field.name, value)
@@ -64,9 +66,11 @@ def editCourseMethod(request):
                 cacheVal[7] = course.courseName
                 memcache.set(examId.urlsafe(), cacheVal)
         memcache.delete(courseId.urlsafe())
+        print course
         course.put()
         return Response(response=0, description="OK")
     except Exception, E:
+        print str(E)
         return Response(response=1, description=str(E))
 
 

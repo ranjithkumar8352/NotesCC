@@ -21,8 +21,8 @@ class ProfilePicUpload(webapp2.RequestHandler):
         try:
             profileId = self.request.get('profileId')
         except Exception, E:
-            print "profileId Missing in request\n" + self.request + '\n' + str(E)
-            return self.response.write("profileId Missing in request\n" + self.request + '\n' + str(E))
+            print "profileId Missing in request\n" + str(self.request) + '\n' + str(E)
+            return self.response.write("profileId Missing in request\n" + str(self.request) + '\n' + str(E))
         file = self.request.POST.get('file')
         bucketName = BUCKET_NAME
         fileName = bucketName + '/ProfilePic/' + profileId + '.jpg'
@@ -62,34 +62,34 @@ class ImageUploadAndroid(webapp2.RequestHandler):
             try:
                 fileList = self.request.POST.getall('file')
             except Exception, E:
-                print "file Missing in request\n"+self.request+'\n'+str(E)
-                return self.response.write("file Missing in request\n"+self.request+'\n'+str(E))
+                print "file Missing in request\n"+str(self.request)+'\n'+str(E)
+                return self.response.write("file Missing in request\n"+str(self.request)+'\n'+str(E))
             try:
                 profileId = self.request.get('profileId')
             except Exception, E:
-                print "profileId Missing in request\n"+self.request+'\n'+str(E)
-                return self.response.write("profileId Missing in request\n"+self.request+'\n'+str(E))
+                print "profileId Missing in request\n"+str(self.request)+'\n'+str(E)
+                return self.response.write("profileId Missing in request\n"+str(self.request)+'\n'+str(E))
             try:
                 courseId = self.request.get('courseId')
             except Exception, E:
-                print "courseId Missing in request\n"+self.request+'\n'+str(E)
-                return self.response.write("courseId Missing in request\n"+self.request+'\n'+str(E))
+                print "courseId Missing in request\n"+str(self.request)+'\n'+str(E)
+                return self.response.write("courseId Missing in request\n"+str(self.request)+'\n'+str(E))
             try:
                 title = self.request.get('title')
             except Exception, E:
-                print "title Missing in request\n"+self.request+'\n'+str(E)
-                return self.response.write("title Missing in request\n"+self.request+'\n'+str(E))
+                print "title Missing in request\n"+str(self.request)+'\n'+str(E)
+                return self.response.write("title Missing in request\n"+str(self.request)+'\n'+str(E))
             try:
                 desc = self.request.get('desc')
             except Exception, E:
-                print "desc Missing in request\n"+self.request+'\n'+str(E)
-                return self.response.write("desc Missing in request\n"+self.request+'\n'+str(E))
+                print "desc Missing in request\n"+str(self.request)+'\n'+str(E)
+                return self.response.write("desc Missing in request\n"+str(self.request)+'\n'+str(E))
             print "Number of files to be uploaded" + str(len(fileList))
             try:
                 type = self.request.get('type')
             except Exception, E:
-                print "type Missing in request\n"+self.request+'\n'+str(E)
-                return self.response.write("type Missing in request\n"+self.request+'\n'+str(E))
+                print "type Missing in request\n"+str(self.request)+'\n'+str(E)
+                return self.response.write("type Missing in request\n"+str(self.request)+'\n'+str(E))
             bucketName = BUCKET_NAME
             if len(fileList)==0:
                 urlList.append("http://guiaquebueno.com/Images/Restaurantes/Restaurante_no_image.jpg")
@@ -105,17 +105,17 @@ class ImageUploadAndroid(webapp2.RequestHandler):
                     gcsFile.close()
             except Exception, E:
                 if str(E) == "'unicode' object has no attribute 'value'":
-                    print "0 image\n"+self.request
+                    print "0 image\n"+str(self.request)
                     urlList.append("http://guiaquebueno.com/Images/Restaurantes/Restaurante_no_image.jpg")
                 else:
-                    print "Upload Failed!!!\n"+self.request + '\n' + str(E)
-                    return self.response.write("UPLOAD FAILED\nRequest\n" + self.request + '\n' + str(E))
+                    print "Upload Failed!!!\n"+str(self.request) + '\n' + str(E)
+                    return self.response.write("UPLOAD FAILED\nRequest\n" + str(self.request) + '\n' + str(E))
             if type == 'notes':
                 try:
                     date = self.request.get('date')
                 except Exception, E:
-                    print "date Missing from request\n" + self.request + '\n'+str(E)
-                    return self.response.write("date Missing from request\n"+self.request+'\n'+str(E))
+                    print "date Missing from request\n" + str(self.request) + '\n'+str(E)
+                    return self.response.write("date Missing from request\n"+str(self.request)+'\n'+str(E))
                 url = PROJECT_URL + "/_ah/api/notesapi/v1/createNotes"
                 data = {'profileId': profileId, 'courseId': courseId, 'title': title, 'notesDesc': desc,
                         'urlList': urlList, 'date': date}
@@ -136,13 +136,13 @@ class ImageUploadAndroid(webapp2.RequestHandler):
                 try:
                     dueDate = self.request.get('dueDate')
                 except Exception, E:
-                    print "dueDate Missing from request\n" + self.request + '\n' + str(E)
-                    self.response.write("dueDate Missing from request\n" + self.request + '\n' + str(E))
+                    print "dueDate Missing from request\n" + str(self.request) + '\n' + str(E)
+                    self.response.write("dueDate Missing from request\n" + str(self.request) + '\n' + str(E))
                 try:
                     dueTime = self.request.get('dueTime')
                 except:
-                    print "dueTime Missing from request\n" + self.request+'\n'+str(E)
-                    self.response.write("dueTime Missing from request\n" + self.request+'\n'+str(E))
+                    print "dueTime Missing from request\n" + str(self.request)+'\n'+str(E)
+                    self.response.write("dueTime Missing from request\n" + str(self.request)+'\n'+str(E))
                 url = PROJECT_URL + "/_ah/api/notesapi/v1/createAssignment"
                 data = {'uploaderId': profileId, 'courseId': courseId, 'assignmentTitle': title, 'assignmentDesc': desc,
                         'urlList': urlList, 'dueDate': dueDate, 'dueTime': dueTime}
@@ -161,13 +161,13 @@ class ImageUploadAndroid(webapp2.RequestHandler):
                 try:
                     dueDate = self.request.get('dueDate')
                 except Exception, E:
-                    print "dueDate Missing from request\n" + self.request+'\n'+str(E)
-                    self.response.write("dueDate Missing from request\n" + self.request+'\n'+str(E))
+                    print "dueDate Missing from request\n" + str(self.request)+'\n'+str(E)
+                    self.response.write("dueDate Missing from request\n" + str(self.request)+'\n'+str(E))
                 try:
                     dueTime = self.request.get('dueTime')
                 except Exception, E:
-                    print "dueTime Missing from request\n" + self.request+'\n'+str(E)
-                    self.response.write("dueTime Missing from request\n" + self.request+'\n'+str(E))
+                    print "dueTime Missing from request\n" + str(self.request)+'\n'+str(E)
+                    self.response.write("dueTime Missing from request\n" + str(self.request)+'\n'+str(E))
                 url = PROJECT_URL + "/_ah/api/notesapi/v1/createExam"
                 data = {'uploaderId': profileId, 'courseId': courseId, 'examTitle': title, 'examDesc': desc,
                         'urlList': urlList, 'dueDate': dueDate, 'dueTime': dueTime}
@@ -267,22 +267,22 @@ class ImageUploadWeb(webapp2.RequestHandler):
         try:
             fileList = self.request.POST.getall('file')
         except Exception, E:
-            print "file Missing in request\n"+self.request+'\n'+str(E)
-            obj = {'response': 1, 'description': "file Missing in request\n"+self.request+'\n'+str(E)} 
+            print "file Missing in request\n"+str(self.request)+'\n'+str(E)
+            obj = {'response': 1, 'description': "file Missing in request\n"+str(self.request)+'\n'+str(E)} 
             self.response.headers['Content-Type'] = 'application/json'
             self.response.out.write(json.dumps(obj))
         try:
             profileId = self.request.get('profileId')
         except Exception, E:
-            print "profileId Missing in request\n"+self.request+'\n'+str(E)
-            obj = {'response': 1, 'description': "profileId Missing in request\n"+self.request+'\n'+str(E)} 
+            print "profileId Missing in request\n"+str(self.request)+'\n'+str(E)
+            obj = {'response': 1, 'description': "profileId Missing in request\n"+str(self.request)+'\n'+str(E)} 
             self.response.headers['Content-Type'] = 'application/json'
             self.response.out.write(json.dumps(obj))
         try:
             courseId = self.request.get('courseId')
         except Exception, E:
-            print "courseId Missing in request\n"+self.request+'\n'+str(E)
-            obj = {'response': 1, 'description': "courseId Missing in request\n"+self.request+'\n'+str(E)} 
+            print "courseId Missing in request\n"+str(self.request)+'\n'+str(E)
+            obj = {'response': 1, 'description': "courseId Missing in request\n"+str(self.request)+'\n'+str(E)} 
             self.response.headers['Content-Type'] = 'application/json'
             self.response.out.write(json.dumps(obj))
         bucketName = BUCKET_NAME

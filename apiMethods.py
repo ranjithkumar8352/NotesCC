@@ -82,6 +82,7 @@ def createProfileMethod(request):
         setattr(newProfile, 'photoUrl', getattr(request, 'photoUrl'))
         setattr(newProfile, 'email', getattr(request, 'email'))
         setattr(newProfile, 'gcmId', getattr(request, 'gcmId'))
+        setattr(newProfile, 'dob', getattr(request, 'dob'))
     except Exception, E:
         print str(E)
         traceback.print_stack()
@@ -514,13 +515,16 @@ def timeTableMethod(request):
        To get the timetable of all the subscribe courses of user"""
     try:
         profileId = ndb.Key(urlsafe=getattr(request, 'profileId'))
-    except Exception:
-        return TimeTableResponse(response=1, description="Invalid profile Id")
-    profile = profileId.get()
-    if profile is None:
-        return TimeTableResponse(response=1, description="Invalid profileId")
+        profile = profileId.get()
+        if profile is None:
+            raise Exception("Invalid profileId")
+    except Exception, E:
+        print str(E)
+        return TimeTableResponse(response=1, description=str(E))
     subscribedCourseIds = profile.subscribedCourseIds
+    print profile
     courseList = []
+    print subscribedCourseIds
     for courseId in subscribedCourseIds:
         course = courseId.get()
         courseList.append(TTCourseResponse(courseName=course.courseName,
