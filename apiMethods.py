@@ -1323,10 +1323,16 @@ def rateThisMethod(request):
         noteBook.ratedUserIds.remove(profileId)
     noteBook.ratedUserIds.append(profileId)
     noteBook.ratingList.append(rating)
+
+    # setting the totalRating to avg
+    noteBook.totalRating = str(sum(noteBook.ratingList) / len(noteBook.ratingList))
+
+    # updating the memccache
     cacheVal = memcache.get(noteBookId.urlsafe())
     if cacheVal is not None:
         cacheVal[9] = noteBook.ratedUserIds
         cacheVal[10] = noteBook.ratingList
+        cacheVal[5] = noteBook.totalRating
         memcache.set(noteBookId.urlsafe(), cacheVal)
     noteBook.put()
     return Response(response=0, description="OK")
