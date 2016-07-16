@@ -15,6 +15,8 @@ def sendNotification(topicName, id, type, title, text):
 
 
 def sendNotificationSingle(id, type, title, text):
+    if len(id) < 8:
+        return
     key = 'key=' + FCM_AUTH_KEY
     header = {'Content-Type': 'application/json', 'Authorization': key}
     body = {'to': id, 'data': {'type': type, 'title': title, 'message': text}}

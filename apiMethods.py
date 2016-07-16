@@ -483,6 +483,9 @@ def addAdminMethod(request):
         adminIds.add(profileId)
         course.adminIds = list(adminIds)
         print course
+        # creating notification
+        notifText = 'You have been made the admin of ' + course.courseName
+        createNotification([profileId], 'Campus Connect', notifText, 'admin', courseId=courseId.urlsafe())
         # adding admin to memcache
         cacheVal = memcache.get(courseId.urlsafe())
         if cacheVal is not None:
@@ -511,10 +514,6 @@ def addAdminMethod(request):
             memcache.set(courseId.urlsafe(), cacheVal)
     course.put()
     profile.put()
-
-    # creating notification
-    notifText = 'You have been made the admin of ' + course.courseName
-    createNotification([profileId], 'Campus Connect', notifText, 'admin', courseId=courseId.urlsafe())
 
     # sending downstream FCM notification
     sendNotificationSingle(profile.gcmId, 'admin', 'Campus Connect', notifText)
@@ -1354,7 +1353,7 @@ def rateThisMethod(request):
     # creating notification
     notifText = 'Someone rated your notebook!!! Suspense!'
     createNotification([noteBook.uploaderId], 'Campus Connect', notifText,
-                       'notes', noteBookId.urlsafe(), noteBook.courseId.urlsafe())
+                       'rated', noteBookId.urlsafe(), noteBook.courseId.urlsafe())
 
     return Response(response=0, description="OK")
 
@@ -1671,6 +1670,10 @@ def bookmarkMethod(request):
         bmUserList.add(profileId)
         noteBook.bmUserList = bmUserList
         status = 1
+        # creating notification
+        notifText = 'Congrats!!! Peoples are loving you notebook'
+        createNotification([noteBook.uploaderId], 'Campus Connect', notifText,
+                           'bookmark', noteBookId.urlsafe(), noteBook.courseId.urlsafe())
     cacheVal = memcache.get(noteBookId.urlsafe())
     if cacheVal is not None:
         cacheVal[8] = noteBook.bmUserList
@@ -1681,10 +1684,6 @@ def bookmarkMethod(request):
     profile.put()
     noteBook.put()
 
-    # creating notification
-    notifText = 'Congrats!!! Peoples are loving you notebook'
-    createNotification([noteBook.uploaderId], 'Campus Connect', notifText,
-                       'notes', noteBookId.urlsafe(), noteBook.courseId.urlsafe())
     return BookmarkResponse(response=0, description="OK", bookmarkStatus=status)
 
 
