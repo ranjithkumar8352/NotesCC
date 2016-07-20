@@ -637,6 +637,7 @@ class CollegeRequest(messages.Message):
     location = messages.StringField(2)
     name = messages.StringField(3)
     phone = messages.StringField(4)
+    email = messages.StringField(5)
 
 
 class CollegeRequestModel(ndb.Model):
@@ -645,6 +646,7 @@ class CollegeRequestModel(ndb.Model):
     name = ndb.StringProperty()
     phone = ndb.StringProperty()
     timeStamp = ndb.DateTimeProperty()
+    email = ndb.StringProperty()
 
 
 class Report(ndb.Model):

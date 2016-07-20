@@ -2020,16 +2020,18 @@ def collegeRequestMethod(request):
     location = getattr(request, 'location')
     name = getattr(request, 'name')
     phone = getattr(request, 'phone')
+    email = getattr(request, 'email')
     college = CollegeRequestModel(collegeName=collegeName,
                                   location=location, name=name,
                                   phone=phone,
                                   timeStamp=datetime.datetime.now() +
-                                  datetime.timedelta(hours=5, minutes=30))
+                                  datetime.timedelta(hours=5, minutes=30),
+                                  email=email)
     college.put()
     sp = SparkPost('d5eda063a40ae19610612ea5d0804f20d294e62d')
     body = """<h1>Campus Connect</h1><br>There is a request to create new College
               <br>""" + collegeName + """, """ + location + """
-              <br>by """ + name + """, """ + phone
+              <br>by """ + name + """, """ + phone + """<br>""" + email
     response = sp.transmissions.send(recipients=['saurav24081996@gmail.com', 'aayush@campusconnect.cc'],
                                      html=body,
                                      from_email={'email': 'aayush@campusconnect.cc', 'name': 'Campus Connect'},
