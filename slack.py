@@ -31,6 +31,7 @@ def slackWebHook():
             det += str(num) + '\t\t\t\t\t\t' + str(stuNum)
         text += det
         text += '\n'
+        text += "csv link: https://storage.googleapis.com/uploadnotes-2016.appspot.com/summary.csv"
 
     data = {'icon_url': 'https://s-media-cache-ak0.pinimg.com/236x/d7/a4/34/d7a4343ec74ae5427708b429cbf82a20.jpg',
             'username': 'Fl@pPy',

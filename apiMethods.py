@@ -516,7 +516,9 @@ def addAdminMethod(request):
     profile.put()
 
     # sending downstream FCM notification
-    sendNotificationSingle(profile.gcmId, 'admin', 'Campus Connect', notifText)
+
+    if profile.gcmId is not None:
+        sendNotificationSingle(profile.gcmId, 'admin', 'Campus Connect', notifText)
 
     return Response(response=0, description="OK")
 
