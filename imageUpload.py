@@ -16,7 +16,7 @@ class ProfilePicUpload(webapp2.RequestHandler):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
         self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
-        self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+        #self.response.headers.add_header('Access-Control-Allow-Origin', '*')
         self.response.headers['Content-Type'] = 'application/json'
         try:
             profileId = self.request.get('profileId')
@@ -53,7 +53,7 @@ class ImageUploadAndroid(webapp2.RequestHandler):
         self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
 
     def post(self):
-        self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+        #self.response.headers.add_header('Access-Control-Allow-Origin', '*')
         self.response.headers['Content-Type'] = 'application/json'
         flag = 0
         print self.request.POST
@@ -262,7 +262,7 @@ class ImageUploadWeb(webapp2.RequestHandler):
         self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
 
     def post(self):
-        self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+        #self.response.headers.add_header('Access-Control-Allow-Origin', '*')
         self.response.headers['Content-Type'] = 'application/json'
         try:
             fileList = self.request.POST.getall('file')
