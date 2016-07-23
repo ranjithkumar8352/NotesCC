@@ -1150,10 +1150,18 @@ def getNoteBookListMethod(request):
                 if notes is None:
                     continue
                 pages += len(notes.urlList)
+            #cacheVal = memcache.get(noteBookId.urlsafe())
+            #if cacheVal is not None:
+            memViews = memcache.get('views' + noteBookId.urlsafe())
+            print "memViews in cache : " + memViews
+            if memViews is None:
+                memViews = noteBook.views
+                memcache.add('views' + noteBookId.urlsafe(), memViews, 86400)
+
             new = NoteBookResponse(noteBookId=idurlsafe,
                                    courseName=course.courseName,
                                    uploaderName=uploader.profileName,
-                                   views=noteBook.views, pages=pages,
+                                   views=memViews, pages=pages,
                                    totalRating=noteBook.totalRating,
                                    frequency=noteBook.frequency,
                                    lastUpdated=noteBook.lastUpdated,
