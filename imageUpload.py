@@ -63,7 +63,7 @@ class ImageUploadAndroid(webapp2.RequestHandler):
                 fileList = self.request.POST.getall('file')
             except Exception, E:
                 print "file Missing in request\n"+str(self.request)+'\n'+str(E)
-                return self.response.write("file Missing in request\n"+str(self.request)+'\n'+str(E))
+                #return self.response.write("file Missing in request\n"+str(self.request)+'\n'+str(E))
             try:
                 profileId = self.request.get('profileId')
             except Exception, E:

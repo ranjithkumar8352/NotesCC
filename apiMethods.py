@@ -460,6 +460,7 @@ def addAdminMethod(request):
         course = courseId.get()
         if course is None:
             raise Exception("Invalid courseId")
+        notifTitle = course.courseName
     except Exception, E:
         print str(E)
         return Response(response=1, description=str(E))
@@ -518,7 +519,7 @@ def addAdminMethod(request):
     # sending downstream FCM notification
 
     if profile.gcmId is not None:
-        sendNotificationSingle(profile.gcmId, 'admin', 'Campus Connect', notifText)
+        sendNotificationSingle(profile.gcmId, 'admin', notifTitle, notifText)
 
     return Response(response=0, description="OK")
 
@@ -1570,6 +1571,7 @@ def getAssignmentListMethod(request):
                                               pages=len(assignment.urlList),
                                               courseName=course.courseName,
                                               colour=course.colour))
+    assList.sort(key=lambda x: x.lastUpdated, reverse=True)
     return GetAssListResponse(response=0, description="OK",
                               assList=assList)
 
@@ -1675,7 +1677,7 @@ def bookmarkMethod(request):
         # creating notification
         notifText = 'Congrats!!! Peoples are loving you notebook'
         createNotification([noteBook.uploaderId], 'Campus Connect', notifText,
-                           'bookmark', noteBookId.urlsafe(), noteBook.courseId.urlsafe())
+                           'notes', noteBookId.urlsafe(), noteBook.courseId.urlsafe())
     cacheVal = memcache.get(noteBookId.urlsafe())
     if cacheVal is not None:
         cacheVal[8] = noteBook.bmUserList

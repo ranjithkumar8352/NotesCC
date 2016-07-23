@@ -52,3 +52,4 @@ skip_files:
 - ^venv/*
 - ^campusconnect.sublime-project$
 - ^campusconnect.sublime-workspace$
+q
