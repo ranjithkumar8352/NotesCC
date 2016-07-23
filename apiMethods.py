@@ -1,5 +1,6 @@
 import datetime
 import traceback
+import requests
 
 from models import College, Course, Profile
 from models import Response, FeedCourseResponse, CourseListResponse, FeedResponse
@@ -1873,6 +1874,10 @@ def deleteProfile(id):
         return Response(response=1, description="No such profileId")
     profile = profileId.get()
     college = profile.collegeId.get()
+    try:
+        emailData = {"email": profile.email }
+    except:
+        print "error getting email from profile"
     college.studentCount -= 1
     for noteBookId in profile.uploadedNoteBookIds:
         deleteNoteBook(noteBookId.urlsafe())
@@ -1898,7 +1903,13 @@ def deleteProfile(id):
             course.studentIds.remove(profileId)
             course.put()
     profileId.delete()
+    
     college.put()
+    try:
+        r = requests.post("http://campusconnect-2016.herokuapp.com/deleteuser",data=emailData)
+        print r.text
+    except:
+        print "error deleting user in django"
     return Response(response=0, description="OK")
 
 
