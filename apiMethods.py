@@ -1645,6 +1645,7 @@ def getExamListMethod(request):
                                          pages=len(exam.urlList),
                                          courseName=course.courseName,
                                          colour=course.colour))
+    examList.sort(key=lambda x: x.lastUpdated, reverse=True)
     return GetExamListResponse(response=0, description="OK",
                                examList=examList)
 
