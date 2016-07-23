@@ -1900,18 +1900,18 @@ def deleteProfile(id):
     for courseId in profile.administeredCourseIds:
         memcache.delete(courseId.urlsafe())
         course = courseId.get()
-        if len(course.adminIds) == 1:
+        if len(course.adminIds) <= 1:
             if len(course.studentIds) == 1:
-                return Response(response=1, description="No admins")
+                course.delete()
+        else:
             course.adminIds.append(course.studentIds[0])
             newAdmin = course.adminIds[0]
             newAdmin.administeredCourseIds.append(courseId)
             newAdmin.put()
-        if profileId in course.studentIds:
-            course.studentIds.remove(profileId)
-            course.put()
+            if profileId in course.studentIds:
+                course.studentIds.remove(profileId)
+                course.put()
     profileId.delete()
-    
     college.put()
     try:
         r = requests.post("http://campusconnect-2016.herokuapp.com/deleteuser",data=emailData)
