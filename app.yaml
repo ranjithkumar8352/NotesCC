@@ -34,6 +34,8 @@ handlers:
   script: cronTasks/sendEmail.py
 - url: /task/delNotification
   script: cronTasks/deleteNotification.py
+- url: /task/reminder
+  script: cronTasks/reminderNotification.py
 
 libraries:
 - name: pycrypto
@@ -49,6 +51,6 @@ skip_files:
 - ^(.*/)?.*\.py[co]$
 - ^.git/*
 - ^test/*
-- ^venv/*
+
 - ^campusconnect.sublime-project$
 - ^campusconnect.sublime-workspace$
