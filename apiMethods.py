@@ -107,6 +107,9 @@ def createProfileMethod(request):
     else:
         setattr(newProfile, 'collegeId', collegeId)
         setattr(newProfile, 'availableCourseIds', list(availableCourseIds))
+        demoCourse = Course.query(Course.courseName=="Demo Course").get()
+        if demoCourse is not None:
+            newProfile.subscribedCourseIds = demoCourse.key
         # increasing the studentCount in college
         memcache.incr('stu' + collegeId.urlsafe())
         college.studentCount += 1
