@@ -3,7 +3,7 @@ import logging
 
 from models import Exam, Assignment
 from FCM import sendNotification
-
+from apiMethods import createNotification
 
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
@@ -19,10 +19,22 @@ for exam in examList:
                      exam.key.urlsafe(), 'exam',
                      'Warning!!! Exam ahead',
                      'There is a exam next week')
+    course = exam.courseId.get()
+    title = course.courseName
+    notificationText = 'There is a exam next week'
+    createNotification(course.studentIds, title,
+                       notificationText, 'exam',
+                       exam.key.urlsafe(), course.key.urlsafe())
 
 for assignment in assignmentList:
     LOG.info(str(assignment))
     sendNotification(assignment.courseId.urlsafe(),
                      assignment.key.urlsafe(), 'exam',
-                     'Warning!!! Exam ahead',
+                     'Warning!!! Assignment Submission ahead',
                      'There is a assignment submission next week')
+    course = assignment.courseId.get()
+    title = course.courseName
+    notificationText = 'There is a assignment submission next week'
+    createNotification(course.studentIds, title,
+                       notificationText, 'assignment',
+                       assignment.key.urlsafe(), course.key.urlsafe())

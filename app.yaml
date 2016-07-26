@@ -51,6 +51,6 @@ skip_files:
 - ^(.*/)?.*\.py[co]$
 - ^.git/*
 - ^test/*
-
+- ^venv/*
 - ^campusconnect.sublime-project$
 - ^campusconnect.sublime-workspace$
