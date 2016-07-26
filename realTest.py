@@ -6,7 +6,7 @@ from apiclient.discovery import build
 
 def main():
     apiRoot = PROJECT_URL + '/_ah/api'
-    # apiRoot = 'http://localhost:8080' + '/_ah/api'
+    apiRoot = 'http://localhost:8080' + '/_ah/api'
     api = 'notesapi'
     version = 'v1'
     discovery_url = '%s/discovery/v1/apis/%s/%s/rest' % (apiRoot, api, version)
@@ -230,7 +230,7 @@ def main():
     print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     examList = []
     examIdList = []
-    examList.append({'uploaderId': profileIdList[0], 'courseId': courseIdList[0], 'examTitle': 'Mid Term Exam', 'examDesc':'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime':'10:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({'uploaderId': profileIdList[0], 'courseId': courseIdList[0], 'examTitle': 'Mid Term Exam', 'examDesc':'The paper will be of 50 marks', 'dueDate': '01-08-2016', 'dueTime':'10:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
     examList.append({'uploaderId': profileIdList[2], 'courseId': courseIdList[0], 'examTitle': 'Mid Term Exam', 'examDesc':'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime':'10:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
     examList.append({'uploaderId': profileIdList[0], 'courseId': courseIdList[1], 'examTitle': 'Mid Term Exam', 'examDesc':'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime':'10:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
     examList.append({'uploaderId': profileIdList[2], 'courseId': courseIdList[1], 'examTitle': 'Mid Term Exam', 'examDesc':'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime':'10:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})

@@ -23,6 +23,10 @@ cron:
   url: /task/email
   schedule: every day 04:30
   target: crontask
+- description: "Sending Exam/Assignment notification"
+  url: /task/reminder
+  schedule: every day 04:30
+  target: crontask
 - description: "Sending Slack notification"
   url: /task/email
   schedule: every day 11:30
