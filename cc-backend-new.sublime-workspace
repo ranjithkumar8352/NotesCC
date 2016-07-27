@@ -223,7 +223,7 @@
 			"file": "apiMethods.py",
 			"settings":
 			{
-				"buffer_size": 89968,
+				"buffer_size": 90080,
 				"line_ending": "Unix"
 			}
 		},
@@ -231,7 +231,15 @@
 			"file": "cronTasks/reminderNotification.py",
 			"settings":
 			{
-				"buffer_size": 963,
+				"buffer_size": 1610,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app.yaml",
+			"settings":
+			{
+				"buffer_size": 1202,
 				"line_ending": "Unix"
 			}
 		},
@@ -322,8 +330,8 @@
 	],
 	"file_history":
 	[
-		"/home/flappy/NotesCC/app.yaml",
 		"/home/flappy/NotesCC/realTest.py",
+		"/home/flappy/NotesCC/app.yaml",
 		"/home/flappy/NotesCC/cronTasks/reminderNotification.py",
 		"/home/flappy/NotesCC/cron.yaml",
 		"/home/flappy/NotesCC/cloudstorage/common.py",
@@ -467,6 +475,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"assignment",
 			"getAssignment",
 			"createexam",
 			"exam",
@@ -593,8 +602,7 @@
 			"file",
 			"logout",
 			"lougout",
-			"logout",
-			"profile"
+			"logout"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -616,7 +624,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -625,15 +633,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 89968,
+						"buffer_size": 90080,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								31943,
-								31943
+								1200,
+								1200
 							]
 						],
 						"settings":
@@ -644,10 +652,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 11696.0,
+						"translation.y": 416.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -656,25 +664,56 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 963,
+						"buffer_size": 1610,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								356,
+								356
 							]
 						],
 						"settings":
 						{
+							"auto_complete": false,
 							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 48.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "app.yaml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1202,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1132,
+								1132
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/YAML/YAML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 336.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -687,7 +726,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 2,
+					"buffer": 3,
 					"file": "models.py",
 					"semi_transient": false,
 					"settings":
@@ -713,11 +752,11 @@
 						"translation.y": 4749.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 4,
 					"file": "FCM.py",
 					"semi_transient": true,
 					"settings":
@@ -729,8 +768,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								41,
+								41
 							]
 						],
 						"settings":
@@ -743,7 +782,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -777,7 +816,7 @@
 		"cols":
 		[
 			0.0,
-			0.919874664279,
+			0.894807520143,
 			1.0
 		],
 		"rows":
