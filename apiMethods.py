@@ -403,35 +403,41 @@ def feedCourseResponse(courseIds):
         assignmentIds = course.assignmentIds
         for assignmentId in assignmentIds:
             assignment = assignmentId.get()
-            if assignment is None:
-                continue
-            a = assignment.dueDate
-            date, month, year = int(a[0:2]), int(a[3:5]), int(a[6:10])
-            dueDate = datetime.date(year, month, date)
-            if(curDate > dueDate):
-                continue
-            a = assignment.dueTime
-            hour, minute = int(a[0:2]), int(a[3:5])
-            dueTime = datetime.time(hour, minute)
-            if(curDate == dueDate and dueTime < curTime):
-                continue
-            dueAssignments = dueAssignments + 1
+            try:
+                if assignment is None:
+                    continue
+                a = assignment.dueDate
+                date, month, year = int(a[0:2]), int(a[3:5]), int(a[6:10])
+                dueDate = datetime.date(year, month, date)
+                if(curDate > dueDate):
+                    continue
+                a = assignment.dueTime
+                hour, minute = int(a[0:2]), int(a[3:5])
+                dueTime = datetime.time(hour, minute)
+                if(curDate == dueDate and dueTime < curTime):
+                    continue
+                dueAssignments = dueAssignments + 1
+            except:
+                print "assignmentdate parse error"
         examIds = course.examIds
         for examId in examIds:
             exam = examId.get()
-            if exam is None:
-                continue
-            a = exam.dueDate
-            date, month, year = int(a[0:2]), int(a[3:5]), int(a[6:10])
-            dueDate = datetime.date(year, month, date)
-            if(curDate > dueDate):
-                continue
-            a = exam.dueTime
-            hour, minute = int(a[0:2]), int(a[3:5])
-            dueTime = datetime.time(hour, minute)
-            if(curDate == dueDate and dueTime < curTime):
-                continue
-            dueExams = dueExams + 1
+            try:
+                if exam is None:
+                    continue
+                a = exam.dueDate
+                date, month, year = int(a[0:2]), int(a[3:5]), int(a[6:10])
+                dueDate = datetime.date(year, month, date)
+                if(curDate > dueDate):
+                    continue
+                a = exam.dueTime
+                hour, minute = int(a[0:2]), int(a[3:5])
+                dueTime = datetime.time(hour, minute)
+                if(curDate == dueDate and dueTime < curTime):
+                    continue
+                dueExams = dueExams + 1
+            except:
+                print "Examdate parse error"
         noteBookIds = course.noteBookIds
         for noteBookId in noteBookIds:
             noteBook = noteBookId.get()
