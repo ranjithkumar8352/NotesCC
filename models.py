@@ -54,11 +54,13 @@ class Profile(ndb.Model):
     administeredCourseIds = ndb.KeyProperty(repeated=True, kind='Course')
     photoUrl = ndb.StringProperty(required=True)
     gcmId = ndb.StringProperty()
+    gId = ndb.StringProperty()
     uploadedNoteBookIds = ndb.KeyProperty(repeated=True, kind='NoteBook')
     bookmarkedNoteBookIds = ndb.KeyProperty(repeated=True, kind='NoteBook')
     points = ndb.IntegerProperty(default=0)
     email = ndb.StringProperty(required=True)
     dob = ndb.StringProperty()
+    gId = ndb.StringProperty()
 
 
 class ProfileForm(messages.Message):
@@ -71,6 +73,7 @@ class ProfileForm(messages.Message):
     email = messages.StringField(14, required=True)
     gcmId = messages.StringField(15)
     dob = messages.StringField(16)
+    gId = messages.StringField(17)
 
 
 class Course(ndb.Model):
@@ -141,6 +144,18 @@ class SubscribeCourseRequest(messages.Message):
 class CourseListRequest(messages.Message):
     profileId = messages.StringField(1)
     courseIds = messages.StringField(2, repeated=True)
+
+class ProfileResponse(messages.Message):
+    response = messages.IntegerField(1)
+    profileId = messages.StringField(2)
+    profileName = messages.StringField(3)
+    description = messages.StringField(4)
+    collegeId = messages.StringField(5)
+    collegeName = messages.StringField(6)
+    batchName = messages.StringField(7)
+    branchName = messages.StringField(8)
+    sectionName = messages.StringField(9)
+    photoUrl = messages.StringField(10)
 
 
 class CourseResponse(messages.Message):
@@ -664,3 +679,8 @@ class ReportRequest(messages.Message):
 class StudentListRequest(messages.Message):
     courseId = messages.StringField(1)
     profileId = messages.StringField(2)
+
+class getProfileRequest(messages.Message):
+    email = messages.StringField(1)
+    gId = messages.StringField(2)
+    gcmId = messages.StringField(3)

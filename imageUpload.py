@@ -13,10 +13,10 @@ class ProfilePicUpload(webapp2.RequestHandler):
         self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
 
     def post(self):
-        self.response.headers['Access-Control-Allow-Origin'] = '*'
-        self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
-        self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
-        #self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+        #self.response.headers['Access-Control-Allow-Origin'] = '*'
+        #self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
+        #self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
+        self.response.headers.add_header('Access-Control-Allow-Origin', '*')
         self.response.headers['Content-Type'] = 'application/json'
         try:
             profileId = self.request.get('profileId')
@@ -25,7 +25,8 @@ class ProfilePicUpload(webapp2.RequestHandler):
             return self.response.write("profileId Missing in request\n" + str(self.request) + '\n' + str(E))
         file = self.request.POST.get('file')
         bucketName = BUCKET_NAME
-        fileName = bucketName + '/ProfilePic/' + profileId + '.jpg'
+        timestamp = "".join(str(datetime.datetime.now()).split())
+        fileName = bucketName + '/ProfilePic/' + profileId + '/' + timestamp + '.jpg'
         gcsFile = gcs.open(fileName, mode='w', content_type='image/jpeg',
                            options={'x-goog-acl': 'public-read'})
         gcsFile.write(file.value)

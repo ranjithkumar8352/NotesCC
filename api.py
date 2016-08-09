@@ -16,6 +16,7 @@ from models import UnsubscribeCourseRequest, NotificationList, BranchListRespons
 from models import EditProfileRequest, CollegeRequest, ReportRequest
 from models import EditCollegeRequest, EditCourseRequest, EditAssignmentRequest
 from models import EditExamRequest, EditNotesRequest, StudentListRequest
+from models import getProfileRequest, ProfileResponse
 from apiMethods import createCollegeMethod, addCourseMethod
 from apiMethods import createProfileMethod, subscribeCourseMethod
 from apiMethods import courseListMethod, feedMethod, addAdminMethod
@@ -26,7 +27,7 @@ from apiMethods import rateThisMethod, coursePageMethod, branchListMethod
 from apiMethods import getAssignmentListMethod, getExamListMethod, collegeRequestMethod
 from apiMethods import bookmarkMethod, clearAll, collegeListMethod, addBranchMethod
 from apiMethods import deleteMethod, unsubscribeCourseMethod, getNotificationMethod
-from apiMethods import reportMethod
+from apiMethods import reportMethod, getProfileMethod
 from searchAPI import createCourseDoc, searchCourseMethod, searchNBMethod
 from editMethods import editCollegeMethod, editProfileMethod, editCourseMethod
 from editMethods import editAssignmentMethod, editExamMethod, editNotesMethod
@@ -64,6 +65,15 @@ class NotesAPI(remote.Service):
         name='createProfile')
     def createProfile(self, request):
         return createProfileMethod(request)
+
+    @endpoints.method(
+        getProfileRequest,
+        ProfileResponse,
+        path='getProfile',
+        http_method='POST',
+        name='getProfile')
+    def getProfile(self, request):
+        return getProfileMethod(request)
 
     @endpoints.method(
         EditProfileRequest,

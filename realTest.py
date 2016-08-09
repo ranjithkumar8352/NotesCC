@@ -15,10 +15,6 @@ def main():
     collegeIdList = []
     collegeList = []
     collegeList.append({'abbreviation':'LNMIIT', 'collegeName':'The LNM Institute of Information Technology', 'collegeType':'Engineering', 'location':'Jaipur', 'semStartDate':'23-07-2016', 'semEndDate':'23-12:2016', 'branchNameList':['CSE', 'ECE', 'MME', 'CCE']})
-    collegeList.append({'abbreviation':'BITS', 'collegeName':'Birla Institute of Technology', 'collegeType':'Engineering', 'location':'Pilani', 'semStartDate':'24-07-2016', 'semEndDate':'29-11-2016', 'branchNameList':['CSE', 'ECE', 'MECH', 'IT']})
-    collegeList.append({'abbreviation':'NIT-K', 'collegeName':'National Institute of Technology', 'collegeType':'Engineering', 'location':'Suratkal', 'semStartDate':'01-08-2016', 'semEndDate':'24-12-2016', 'branchNameList':['CSE', 'CHEM', 'MECH']})
-    collegeList.append({'abbreviation':'IIIT-H', 'collegeName':'International Institute of Information Technology', 'collegeType':'Engineering', 'location':'Hyderabad', 'semStartDate':'24-06-2016', 'semEndDate':'23-01-2016', 'branchNameList':['CSE', 'CHEM', 'ECE']})
-    collegeList.append({'abbreviation':'IIT-K', 'collegeName':'Indian Institute of Technology', 'collegeType':'Engineering', 'location':'Kanpur', 'semStartDate':'24-07-2016', 'semEndDate':'23-01-2016', 'branchNameList':['CSE', 'CHEM', 'ECE', 'CIVIL']})
     print "CREATING COLLEGES ..."
     for collegeInfo in collegeList:
         try:

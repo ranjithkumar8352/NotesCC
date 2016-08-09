@@ -13,7 +13,7 @@ from models import AssignmentResponse, ExamResponse, GetAssListResponse
 from models import GetExamListResponse, CollegeListResponse, CollegeDetails
 from models import BookmarkResponse, Notification, NotificationResponse
 from models import NotificationList, BranchListResponse, CollegeRequestModel
-from models import Report
+from models import Report, ProfileResponse
 from searchAPI import createNBDoc
 from FCM import sendNotification, sendNotificationSingle
 from sendEmail import sendEmail
@@ -83,6 +83,7 @@ def createProfileMethod(request):
         setattr(newProfile, 'email', getattr(request, 'email'))
         setattr(newProfile, 'gcmId', getattr(request, 'gcmId'))
         setattr(newProfile, 'dob', getattr(request, 'dob'))
+        setattr(newProfile, 'gId', getattr(request, 'gId'))
     except Exception, E:
         print str(E)
         traceback.print_stack()
@@ -92,7 +93,8 @@ def createProfileMethod(request):
     queryString = ndb.AND(Course.collegeId == collegeId,
                           Course.batchNames == newProfile.batchName,
                           Course.branchNames == newProfile.branchName,
-                          Course.sectionNames == newProfile.sectionName)
+                          Course.sectionNames == newProfile.sectionName.upper())
+    print queryString
     for course in Course.query(queryString).fetch():
         availableCourseIds.add(course.key)
     college = collegeId.get()
@@ -1822,14 +1824,15 @@ def deleteNoteBook(id, delNotes=0):
         for notesId in noteBook.notesIds:
             notesId.delete()
     course = noteBook.courseId.get()
-    course.noteBookIds.remove(noteBookId)
+    if course is not None:
+        course.noteBookIds.remove(noteBookId)
+        college = course.collegeId.get()
+        college.noteBookCount -= 1
+        college.put()
+        course.put()
     uploader = noteBook.uploaderId.get()
     uploader.uploadedNoteBookIds.remove(noteBookId)
     bookmarkedProfiles = Profile.query(Profile.bookmarkedNoteBookIds == noteBookId).fetch()
-    college = course.collegeId.get()
-    college.noteBookCount -= 1
-    college.put()
-    course.put()
     uploader.put()
     for profileR in bookmarkedProfiles:
         profile = profileR.key.get()
@@ -1909,26 +1912,25 @@ def deleteProfile(id):
         examId = exam.key
         deleteExam(examId.urlsafe())
     for courseId in profile.administeredCourseIds:
-        memcache.delete(courseId.urlsafe())
-        course = courseId.get()
-        if len(course.adminIds) <= 1:
-            if len(course.studentIds) == 1:
-                course.delete()
-        else:
-            course.adminIds.append(course.studentIds[0])
-            newAdmin = course.adminIds[0]
-            newAdmin.administeredCourseIds.append(courseId)
-            newAdmin.put()
-            if profileId in course.studentIds:
-                course.studentIds.remove(profileId)
-                course.put()
+        try:
+            memcache.delete(courseId.urlsafe())
+            course = courseId.get()
+            if course is not None:
+                if len(course.adminIds) <= 1:
+                    if len(course.studentIds) == 1:
+                        courseId.delete()
+                else:
+                    course.adminIds.append(course.studentIds[0])
+                    newAdmin = course.adminIds[0].get()
+                    newAdmin.administeredCourseIds.append(courseId)
+                    newAdmin.put()
+                    if profileId in course.studentIds:
+                        course.studentIds.remove(profileId)
+                        course.put()
+        except:
+            print "courseId not found"
     profileId.delete()
     college.put()
-    try:
-        r = requests.post("http://campusconnect-2016.herokuapp.com/deleteuser",data=emailData)
-        print r.text
-    except:
-        print "error deleting user in django"
     return Response(response=0, description="OK")
 
 
@@ -2104,3 +2106,33 @@ def rectify():
             if profileId.get() is None:
                 course.adminIds.remove(profileId)
         course.put()
+
+def getProfileMethod(request):
+    try:
+        email = getattr(request,'email')
+        gId = getattr(request,'gId')
+        gcmId = getattr(request,'gcmId')
+        print gId
+        print email
+        print gcmId
+    except:
+        return Response(response=1,description="error")
+    profile = Profile.query(Profile.email==email).get()
+    if profile is not None:
+        if profile.gId == gId:
+            profileName = profile.profileName
+            batchName = profile.batchName
+            branchName = profile.branchName
+            sectionName = profile.sectionName
+            photoUrl = profile.photoUrl
+            collegeId = profile.collegeId
+            college = collegeId.get()
+            if college is not None:
+                collegeName = college.collegeName
+            if gcmId != "" and gcmId != profile.gcmId:
+                profile.gcmId = gcmId
+                profile.put()
+            return ProfileResponse(response=0,description="OK",profileId=profile.key.urlsafe(),profileName=profileName,batchName=batchName,branchName=branchName,sectionName=sectionName,photoUrl=photoUrl,collegeId=collegeId.urlsafe(),collegeName=collegeName)
+        else:
+            return ProfileResponse(response=1,description="Authentication failed")
+    return ProfileResponse(response=1,description="not found")
