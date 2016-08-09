@@ -6,7 +6,7 @@ from apiclient.discovery import build
 
 def main():
     apiRoot = PROJECT_URL + '/_ah/api'
-    #apiRoot = 'http://localhost:8080' + '/_ah/api'
+    apiRoot = 'http://localhost:8080' + '/_ah/api'
     api = 'notesapi'
     version = 'v1'
     discovery_url = '%s/discovery/v1/apis/%s/%s/rest' % (apiRoot, api, version)
@@ -209,7 +209,7 @@ def main():
     # ____________________________________CREATING ASSIGNMENT_________________________________________
     assignmentList = []
     assignmentIdList = []
-    assignmentList.append({'assignmentTitle': 'Assignment 1', 'assignmentDesc':'This assignment consists of 2 pages with each', 'dueDate': '05-07-2016', 'dueTime': '12:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png', 'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png'], 'uploaderId':profileIdList[0], 'courseId': courseIdList[0]})
+    assignmentList.append({'assignmentTitle': 'Assignment 1', 'assignmentDesc':'This assignment consists of 2 pages with each', 'dueDate': '02-08-2016', 'dueTime': '12:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png', 'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png'], 'uploaderId':profileIdList[0], 'courseId': courseIdList[0]})
     assignmentList.append({'assignmentTitle': 'Assignment 2', 'assignmentDesc':'This assignment consists of 3 pages with each', 'dueDate': '05-07-2016', 'dueTime': '12:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png', 'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png', 'https://storage.googleapis.com/uploadingtest-2016.appspot.com/17.png'], 'uploaderId':profileIdList[2], 'courseId': courseIdList[0]})
     assignmentList.append({'assignmentTitle': 'Assignment 1', 'assignmentDesc':'This assignment consists of 2 pages with each', 'dueDate': '05-07-2016', 'dueTime': '12:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png', 'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png'], 'uploaderId':profileIdList[0], 'courseId': courseIdList[1]})
     assignmentList.append({'assignmentTitle': 'Assignment 2', 'assignmentDesc':'This assignment consists of 3 pages with each', 'dueDate': '05-07-2016', 'dueTime': '12:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png', 'https://storage.googleapis.com/uploadingtest-2016.appspot.com/16.png', 'https://storage.googleapis.com/uploadingtest-2016.appspot.com/17.png'], 'uploaderId':profileIdList[2], 'courseId': courseIdList[1]})
@@ -226,7 +226,7 @@ def main():
     print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     examList = []
     examIdList = []
-    examList.append({'uploaderId': profileIdList[0], 'courseId': courseIdList[0], 'examTitle': 'Mid Term Exam', 'examDesc':'The paper will be of 50 marks', 'dueDate': '01-08-2016', 'dueTime':'10:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
+    examList.append({'uploaderId': profileIdList[0], 'courseId': courseIdList[0], 'examTitle': 'Mid Term Exam', 'examDesc':'The paper will be of 50 marks', 'dueDate': '02-08-2016', 'dueTime':'10:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
     examList.append({'uploaderId': profileIdList[2], 'courseId': courseIdList[0], 'examTitle': 'Mid Term Exam', 'examDesc':'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime':'10:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
     examList.append({'uploaderId': profileIdList[0], 'courseId': courseIdList[1], 'examTitle': 'Mid Term Exam', 'examDesc':'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime':'10:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})
     examList.append({'uploaderId': profileIdList[2], 'courseId': courseIdList[1], 'examTitle': 'Mid Term Exam', 'examDesc':'The paper will be of 50 marks', 'dueDate': '10-07-2016', 'dueTime':'10:00', 'urlList':['https://storage.googleapis.com/uploadingtest-2016.appspot.com/15.png']})

@@ -757,6 +757,12 @@ def getAssignmentMethod(request):
             memcache.add('views' + assignmentId.urlsafe(), memViews, 86400)
         if isAuthor == 0:
             memcache.incr('views' + assignmentId.urlsafe())
+            coursePage = memcache.get(cacheVal[9])
+            if coursePage is not None:
+                if assignmentId.urlsafe() in coursePage[8]:
+                    idx = coursePage[8].index(assignmentId.urlsafe())
+                    coursePage[8][idx].views += 1
+                    memcache.set(cacheVal[9], coursePage)
         views = memcache.get('views' + assignmentId.urlsafe())
         return GetAssignmentResponse(response=0, description="OK",
                                      isAuthor=isAuthor,
@@ -782,7 +788,7 @@ def getAssignmentMethod(request):
     assignment.put()
     fields = [assignment.assignmentTitle, assignment.assignmentDesc, assignment.dateUploaded,
               uploaderName, assignment.dueDate, assignment.dueTime, assignment.urlList,
-              course.courseName, assignment.uploaderId]
+              course.courseName, assignment.uploaderId, assignment.courseId.urlsafe()]
     memcache.add(assignmentId.urlsafe(), fields, 86400)
     if memcache.get('views' + assignmentId.urlsafe()) is None:
         if isAuthor == 0:
@@ -840,6 +846,12 @@ def getExamMethod(request):
             memcache.add('views' + examId.urlsafe(), memViews, 86400)
         if isAuthor == 0:
             memcache.incr('views' + examId.urlsafe())
+            coursePage = memcache.get(cacheVal[9])
+            if coursePage is not None:
+                if assignmentId.urlsafe() in coursePage[8]:
+                    idx = coursePage[8].index(examId.urlsafe())
+                    coursePage[8][idx].views += 1
+                    memcache.set(cacheVal[9], coursePage)
         views = memcache.get('views' + examId.urlsafe())
         return GetExamResponse(response=0, description="OK",
                                isAuthor=isAuthor, examTitle=cacheVal[0],
@@ -1412,7 +1424,7 @@ def coursePageMethod(request):
                                   examCount=cacheVal[4], assignmentCount=cacheVal[5],
                                   notesCount=cacheVal[6], examList=cacheVal[7],
                                   assignmentList=cacheVal[8], studentCount=cacheVal[9],
-                                  professorName=cacheVal[10], colour=cacheVal[11],
+            assignmentId.urlsafe()assignmentId.urlsafe()                      professorName=cacheVal[10], colour=cacheVal[11],
                                   elective=cacheVal[12], collegeName=cacheVal[14],
                                   branchNames=cacheVal[15], sectionNames=cacheVal[16],
                                   batchNames=cacheVal[17], semester=cacheVal[18],
