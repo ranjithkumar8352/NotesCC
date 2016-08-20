@@ -93,7 +93,7 @@ def createProfileMethod(request):
     queryString = ndb.AND(Course.collegeId == collegeId,
                           Course.batchNames == newProfile.batchName,
                           Course.branchNames == newProfile.branchName,
-                          Course.sectionNames == newProfile.sectionName.upper())
+                          Course.sectionNames == newProfile.sectionName)
     print queryString
     for course in Course.query(queryString).fetch():
         availableCourseIds.add(course.key)
@@ -1424,7 +1424,7 @@ def coursePageMethod(request):
                                   examCount=cacheVal[4], assignmentCount=cacheVal[5],
                                   notesCount=cacheVal[6], examList=cacheVal[7],
                                   assignmentList=cacheVal[8], studentCount=cacheVal[9],
-            assignmentId.urlsafe()assignmentId.urlsafe()                      professorName=cacheVal[10], colour=cacheVal[11],
+                                  professorName=cacheVal[10], colour=cacheVal[11],
                                   elective=cacheVal[12], collegeName=cacheVal[14],
                                   branchNames=cacheVal[15], sectionNames=cacheVal[16],
                                   batchNames=cacheVal[17], semester=cacheVal[18],

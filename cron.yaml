@@ -32,6 +32,6 @@ cron:
   schedule: every day 11:30
   target: crontask
 - description: My Daily Backup
-  url: /_ah/datastore_admin/backup.create?name=backup&kind=Course&kind=College&kind=Profile&kind=Assignment&kind=Exam&kind=Notes&kind&NoteBook&kind=Notification&kind=CollegeRequestModel&filesystem=gs&gs_bucket_name=uploadnotes-2016.appspot.com/backup
-  schedule: every sunday 00:00
+  url: /_ah/datastore_admin/backup.create?name=backup&kind=Course&kind=College&kind=Profile&kind=Assignment&kind=Exam&kind=Notes&kind=NoteBook&kind=Notification&kind=CollegeRequestModel&filesystem=gs&gs_bucket_name=cc-backups
+  schedule: every sunday,tuesday,thursday 02:00
   target: ah-builtin-python-bundle

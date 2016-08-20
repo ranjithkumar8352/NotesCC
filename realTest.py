@@ -5,8 +5,8 @@ from apiclient.discovery import build
 
 
 def main():
-    apiRoot = PROJECT_URL + '/_ah/api'
-    apiRoot = 'http://localhost:8080' + '/_ah/api'
+    apiRoot = 'https://uploadingtest-2016.appspot.com/_ah/api'
+    #apiRoot = 'http://localhost:8080' + '/_ah/api'
     api = 'notesapi'
     version = 'v1'
     discovery_url = '%s/discovery/v1/apis/%s/%s/rest' % (apiRoot, api, version)

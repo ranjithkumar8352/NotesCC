@@ -317,15 +317,15 @@ class NotesAPI(remote.Service):
     def bookmarkNoteBook(self, request):
         return bookmarkMethod(request)
 
-    @endpoints.method(
-        message_types.VoidMessage,
-        message_types.VoidMessage,
-        path='clearAll',
-        http_method='GET',
-        name='clearAll')
-    def clearAll(self, request):
-        clearAll()
-        return message_types.VoidMessage()
+    # @endpoints.method(
+    #     message_types.VoidMessage,
+    #     message_types.VoidMessage,
+    #     path='clearAll',
+    #     http_method='GET',
+    #     name='clearAll')
+    # def clearAll(self, request):
+    #     clearAll()
+    #     return message_types.VoidMessage()
 
     @endpoints.method(
         message_types.VoidMessage,
@@ -349,9 +349,9 @@ class NotesAPI(remote.Service):
     @endpoints.method(
         DeleteRequest,
         Response,
-        path='delete',
+        path='reportme',
         http_method='POST',
-        name='delete')
+        name='reportme')
     def delete(self, request):
         return deleteMethod(request)
 
